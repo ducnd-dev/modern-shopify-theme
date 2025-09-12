@@ -1,0 +1,349 @@
+{{ 'section-hero.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<section class="hero relative overflow-hidden section-{{ section.id }}-padding">
+  <!-- Background Media -->
+  <div class="absolute inset-0 z-0">
+    {%- if section.settings.hero_video != blank -%}
+      <!-- Video Background -->
+      <video 
+        class="w-full h-full object-cover" 
+        autoplay 
+        muted 
+        loop 
+        playsinline
+        {%- if section.settings.hero_image != blank -%}
+          poster="{{ section.settings.hero_image | image_url: width: 1920 }}"
+        {%- endif -%}
+      >
+        <source src="{{ section.settings.hero_video | file_url }}" type="video/mp4">
+        <!-- Fallback to image if video fails -->
+        {%- if section.settings.hero_image != blank -%}
+          <img 
+            src="{{ section.settings.hero_image | image_url: width: 1920 }}" 
+            alt="{{ section.settings.hero_image.alt | escape }}"
+            class="w-full h-full object-cover"
+          >
+        {%- endif -%}
+      </video>
+    {%- elsif section.settings.hero_image != blank -%}
+      <!-- Image Background -->
+      <img 
+        src="{{ section.settings.hero_image | image_url: width: 1920 }}" 
+        srcset="{{ section.settings.hero_image | image_url: width: 375 }} 375w,
+                {{ section.settings.hero_image | image_url: width: 750 }} 750w,
+                {{ section.settings.hero_image | image_url: width: 1100 }} 1100w,
+                {{ section.settings.hero_image | image_url: width: 1500 }} 1500w,
+                {{ section.settings.hero_image | image_url: width: 1920 }} 1920w"
+        sizes="100vw"
+        alt="{{ section.settings.hero_image.alt | escape }}"
+        class="w-full h-full object-cover"
+        loading="eager"
+      >
+    {%- else -%}
+      <!-- Gradient Background Fallback -->
+      <div class="w-full h-full bg-gradient-to-br from-primary-600 via-primary-700 to-accent-600"></div>
+    {%- endif -%}
+    
+    <!-- Overlay -->
+    {%- if section.settings.show_overlay -%}
+      <div class="absolute inset-0 bg-black/{{ section.settings.overlay_opacity }}"></div>
+    {%- endif -%}
+  </div>
+
+  <!-- Content -->
+  <div class="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen flex items-center justify-center py-20">
+      <div class="text-center max-w-4xl mx-auto">
+        <!-- Badge -->
+        {%- if section.settings.badge_text != blank -%}
+          <div class="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm font-medium mb-6 animate-fade-in">
+            {%- if section.settings.badge_icon != blank -%}
+              <span class="mr-2">{{ section.settings.badge_icon }}</span>
+            {%- endif -%}
+            {{ section.settings.badge_text }}
+          </div>
+        {%- endif -%}
+
+        <!-- Headline -->
+        {%- if section.settings.heading != blank -%}
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 leading-tight animate-slide-up font-display">
+            {%- liquid
+              assign heading_parts = section.settings.heading | split: '|'
+              for part in heading_parts
+                if forloop.last and heading_parts.size > 1
+                  echo '<span class="text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-accent-600">'
+                  echo part | strip
+                  echo '</span>'
+                else
+                  echo part | strip
+                  unless forloop.last
+                    echo '<br>'
+                  endunless
+                endif
+              endfor
+            -%}
+          </h1>
+        {%- endif -%}
+
+        <!-- Subheading -->
+        {%- if section.settings.subheading != blank -%}
+          <p class="text-lg sm:text-xl lg:text-2xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed animate-slide-up" style="animation-delay: 0.1s;">
+            {{ section.settings.subheading }}
+          </p>
+        {%- endif -%}
+
+        <!-- Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up" style="animation-delay: 0.2s;">
+          {%- if section.settings.button_label != blank -%}
+            <a 
+              href="{{ section.settings.button_link | default: '#' }}" 
+              class="inline-flex items-center px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-primary-500/50"
+            >
+              {{ section.settings.button_label }}
+              {%- if section.settings.button_icon -%}
+                <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+              {%- endif -%}
+            </a>
+          {%- endif -%}
+          
+          {%- if section.settings.button_label_2 != blank -%}
+            <a 
+              href="{{ section.settings.button_link_2 | default: '#' }}" 
+              class="inline-flex items-center px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white font-semibold rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/20"
+            >
+              {{ section.settings.button_label_2 }}
+            </a>
+          {%- endif -%}
+        </div>
+
+        <!-- Features -->
+        {%- if section.blocks.size > 0 -%}
+          <div class="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in" style="animation-delay: 0.4s;">
+            {%- for block in section.blocks -%}
+              <div class="text-center">
+                {%- if block.settings.icon -%}
+                  <div class="w-16 h-16 mx-auto mb-4 text-4xl text-white/80">
+                    {{ block.settings.icon }}
+                  </div>
+                {%- endif -%}
+                <h3 class="text-lg font-semibold text-white mb-2">{{ block.settings.title }}</h3>
+                <p class="text-white/70">{{ block.settings.description }}</p>
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        <!-- Scroll Indicator -->
+        {%- if section.settings.show_scroll_indicator -%}
+          <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <div class="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
+              <div class="w-1 h-3 bg-white/70 rounded-full mt-2 animate-pulse"></div>
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero Section",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Background Image"
+    },
+    {
+      "type": "video",
+      "id": "hero_video",
+      "label": "Background Video",
+      "info": "Video will override image background"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_overlay",
+      "label": "Show overlay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay opacity",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge text"
+    },
+    {
+      "type": "text",
+      "id": "badge_icon",
+      "label": "Badge icon (emoji or symbol)"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Use | to create gradient text on the last part",
+      "default": "Welcome to Our|Amazing Store"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Discover our curated collection of premium products designed for the modern lifestyle."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "First button label",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "First button link"
+    },
+    {
+      "type": "checkbox",
+      "id": "button_icon",
+      "label": "Show arrow icon in first button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "button_label_2",
+      "label": "Second button label"
+    },
+    {
+      "type": "url",
+      "id": "button_link_2",
+      "label": "Second button link"
+    },
+    {
+      "type": "header",
+      "content": "Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scroll_indicator",
+      "label": "Show scroll indicator",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon (emoji or symbol)",
+          "default": "🚚"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Free Shipping"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description",
+          "default": "On orders over $99"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Section",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "🚚",
+            "title": "Free Shipping",
+            "description": "On orders over $99"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "🔄",
+            "title": "Easy Returns",
+            "description": "30-day return policy"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "⭐",
+            "title": "Premium Quality",
+            "description": "Curated products only"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

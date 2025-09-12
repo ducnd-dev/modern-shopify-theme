@@ -1,0 +1,309 @@
+{% comment %}
+  Collection Template
+  Collection listing page with filtering and sorting
+{% endcomment %}
+
+{% section 'header' %}
+
+<main id="main" class="main-content" role="main">
+  <div class="container section-spacing">
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumbs mb-8" aria-label="Breadcrumb">
+      <ol class="flex items-center space-x-2 text-sm text-gray-500">
+        <li><a href="/" class="hover:text-gray-700 dark:hover:text-gray-300">Home</a></li>
+        <li class="flex items-center">
+          <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+          </svg>
+          <span class="text-gray-900 dark:text-white">{{ collection.title }}</span>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Collection Header -->
+    <div class="collection-header mb-12 text-center">
+      <h1 class="text-4xl font-bold mb-4">{{ collection.title }}</h1>
+      {% if collection.description != blank %}
+        <div class="prose prose-lg mx-auto dark:prose-invert">
+          {{ collection.description }}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Collection Tools -->
+    <div class="collection-tools flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <!-- Product Count -->
+      <div class="collection-count">
+        <p class="text-sm text-gray-500">
+          Showing 
+          {% if collection.products.size > 0 %}
+            {{ paginate.current_offset | plus: 1 }}{% unless paginate.current_offset == 0 %}-{{ paginate.current_offset | plus: paginate.page_size }}{% endunless %}
+            of {{ collection.products_count }}
+          {% else %}
+            0
+          {% endif %}
+          {% if collection.products_count == 1 %}product{% else %}products{% endif %}
+        </p>
+      </div>
+
+      <!-- Filters and Sort -->
+      <div class="collection-controls flex flex-col sm:flex-row gap-4">
+        <!-- Filter Toggle (Mobile) -->
+        <button 
+          type="button" 
+          class="btn btn-secondary md:hidden"
+          data-filter-toggle
+          aria-label="Toggle filters"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707v6.586a1 1 0 01-1.447.894l-4-2A1 1 0 018 18.586v-4.586a1 1 0 00-.293-.707L1.293 7.293A1 1 0 011 6.586V4z"></path>
+          </svg>
+          Filters
+        </button>
+
+        <!-- Sort -->
+        <div class="sort-wrapper">
+          <label for="sort-by" class="sr-only">Sort by</label>
+          <select id="sort-by" class="form-select" onchange="location.href=this.value">
+            <option value="{{ collection.url }}?sort_by=manual" {% if collection.sort_by == 'manual' %}selected{% endif %}>Featured</option>
+            <option value="{{ collection.url }}?sort_by=best-selling" {% if collection.sort_by == 'best-selling' %}selected{% endif %}>Best selling</option>
+            <option value="{{ collection.url }}?sort_by=title-ascending" {% if collection.sort_by == 'title-ascending' %}selected{% endif %}>A-Z</option>
+            <option value="{{ collection.url }}?sort_by=title-descending" {% if collection.sort_by == 'title-descending' %}selected{% endif %}>Z-A</option>
+            <option value="{{ collection.url }}?sort_by=price-ascending" {% if collection.sort_by == 'price-ascending' %}selected{% endif %}>Price: Low to High</option>
+            <option value="{{ collection.url }}?sort_by=price-descending" {% if collection.sort_by == 'price-descending' %}selected{% endif %}>Price: High to Low</option>
+            <option value="{{ collection.url }}?sort_by=created-descending" {% if collection.sort_by == 'created-descending' %}selected{% endif %}>Newest</option>
+            <option value="{{ collection.url }}?sort_by=created-ascending" {% if collection.sort_by == 'created-ascending' %}selected{% endif %}>Oldest</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="collection-content grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Sidebar Filters -->
+      <aside class="collection-sidebar lg:block hidden" data-filters>
+        <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+          <h3 class="text-lg font-semibold mb-6">Filters</h3>
+
+          <!-- Price Filter -->
+          <div class="filter-group mb-6">
+            <h4 class="font-medium mb-3">Price</h4>
+            <div class="space-y-2">
+              <label class="flex items-center">
+                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span class="ml-2 text-sm">Under $25</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span class="ml-2 text-sm">$25 - $50</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span class="ml-2 text-sm">$50 - $100</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span class="ml-2 text-sm">Over $100</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Availability Filter -->
+          <div class="filter-group mb-6">
+            <h4 class="font-medium mb-3">Availability</h4>
+            <div class="space-y-2">
+              <label class="flex items-center">
+                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span class="ml-2 text-sm">In stock</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span class="ml-2 text-sm">Out of stock</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Product Type Filter -->
+          {% assign product_types = collection.products | map: 'type' | uniq | compact %}
+          {% if product_types.size > 1 %}
+            <div class="filter-group mb-6">
+              <h4 class="font-medium mb-3">Product Type</h4>
+              <div class="space-y-2">
+                {% for type in product_types %}
+                  <label class="flex items-center">
+                    <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="{{ type | handle }}">
+                    <span class="ml-2 text-sm">{{ type }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Vendor Filter -->
+          {% assign vendors = collection.products | map: 'vendor' | uniq | compact %}
+          {% if vendors.size > 1 %}
+            <div class="filter-group mb-6">
+              <h4 class="font-medium mb-3">Brand</h4>
+              <div class="space-y-2">
+                {% for vendor in vendors %}
+                  <label class="flex items-center">
+                    <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="{{ vendor | handle }}">
+                    <span class="ml-2 text-sm">{{ vendor }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Clear Filters -->
+          <button type="button" class="btn btn-secondary w-full" onclick="clearFilters()">
+            Clear all filters
+          </button>
+        </div>
+      </aside>
+
+      <!-- Mobile Filter Modal -->
+      <div class="fixed inset-0 bg-black bg-opacity-50 z-50 lg:hidden hidden" data-filter-modal>
+        <div class="fixed inset-y-0 left-0 w-full max-w-sm bg-white dark:bg-gray-900 overflow-y-auto">
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-lg font-semibold">Filters</h3>
+              <button type="button" data-filter-close>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+            <!-- Same filter content as sidebar -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="collection-products lg:col-span-3">
+        {% paginate collection.products by 12 %}
+          {% if collection.products.size > 0 %}
+            <div class="products-grid">
+              {% for product in collection.products %}
+                {% render 'product-card', product: product %}
+              {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if paginate.pages > 1 %}
+              <nav class="pagination mt-12" aria-label="Collection pagination">
+                <div class="flex items-center justify-center space-x-2">
+                  {% if paginate.previous %}
+                    <a href="{{ paginate.previous.url }}" class="btn btn-secondary" aria-label="Previous page">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                      </svg>
+                    </a>
+                  {% endif %}
+
+                  {% for part in paginate.parts %}
+                    {% if part.is_link %}
+                      <a href="{{ part.url }}" class="btn btn-secondary">{{ part.title }}</a>
+                    {% else %}
+                      {% if part.title == paginate.current_page %}
+                        <span class="btn btn-primary">{{ part.title }}</span>
+                      {% else %}
+                        <span class="btn btn-secondary opacity-50">{{ part.title }}</span>
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if paginate.next %}
+                    <a href="{{ paginate.next.url }}" class="btn btn-secondary" aria-label="Next page">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                    </a>
+                  {% endif %}
+                </div>
+              </nav>
+            {% endif %}
+          {% else %}
+            <!-- Empty State -->
+            <div class="empty-collection text-center py-16">
+              <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+              </svg>
+              <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">No products found</h2>
+              <p class="text-gray-600 dark:text-gray-400 mb-6">Try adjusting your filters or browse our other collections.</p>
+              <a href="/collections" class="btn btn-primary">Browse Collections</a>
+            </div>
+          {% endif %}
+        {% endpaginate %}
+      </div>
+    </div>
+  </div>
+</main>
+
+{% section 'footer' %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Mobile filter toggle
+  const filterToggle = document.querySelector('[data-filter-toggle]');
+  const filterModal = document.querySelector('[data-filter-modal]');
+  const filterClose = document.querySelector('[data-filter-close]');
+
+  if (filterToggle && filterModal) {
+    filterToggle.addEventListener('click', function() {
+      filterModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    });
+
+    filterClose?.addEventListener('click', function() {
+      filterModal.classList.add('hidden');
+      document.body.style.overflow = '';
+    });
+
+    filterModal.addEventListener('click', function(e) {
+      if (e.target === filterModal) {
+        filterModal.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+    });
+  }
+
+  // Filter functionality
+  const filterCheckboxes = document.querySelectorAll('[data-filters] input[type="checkbox"]');
+  
+  filterCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      applyFilters();
+    });
+  });
+
+  function applyFilters() {
+    const activeFilters = Array.from(filterCheckboxes)
+      .filter(checkbox => checkbox.checked)
+      .map(checkbox => checkbox.value);
+
+    // Build filter URL
+    let url = new URL(window.location);
+    url.searchParams.delete('filter');
+    
+    if (activeFilters.length > 0) {
+      url.searchParams.set('filter', activeFilters.join(','));
+    }
+
+    // Apply filters (in a real implementation, this would trigger a page reload or AJAX request)
+    window.location.href = url.toString();
+  }
+
+  function clearFilters() {
+    filterCheckboxes.forEach(checkbox => {
+      checkbox.checked = false;
+    });
+    
+    let url = new URL(window.location);
+    url.searchParams.delete('filter');
+    window.location.href = url.toString();
+  }
+
+  // Make clearFilters globally available
+  window.clearFilters = clearFilters;
+});
+</script>

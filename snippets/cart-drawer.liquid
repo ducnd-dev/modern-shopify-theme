@@ -1,0 +1,414 @@
+{{ 'component-cart-drawer.css' | asset_url | stylesheet_tag }}
+
+<!-- Cart Drawer Overlay -->
+<div class="cart-drawer-overlay fixed inset-0 bg-black/50 z-50 opacity-0 invisible transition-all duration-300" id="cart-drawer-overlay"></div>
+
+<!-- Cart Drawer -->
+<div class="cart-drawer fixed top-0 right-0 w-full sm:w-96 h-full bg-white dark:bg-neutral-900 z-50 transform translate-x-full transition-transform duration-300 shadow-2xl" id="cart-drawer">
+  <div class="flex flex-col h-full">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700">
+      <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+        Shopping Cart
+        <span class="cart-count text-sm text-neutral-500 dark:text-neutral-400 ml-2">
+          (<span id="cart-drawer-count">{{ cart.item_count }}</span>)
+        </span>
+      </h2>
+      <button
+        class="p-2 rounded-md text-neutral-700 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+        id="cart-drawer-close"
+        aria-label="Close cart"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Cart Items -->
+    <div class="flex-1 overflow-y-auto" id="cart-drawer-items">
+      {%- if cart == empty -%}
+        <div class="flex flex-col items-center justify-center h-full p-8 text-center">
+          <svg class="w-16 h-16 text-neutral-400 dark:text-neutral-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0H17M9 18v.01M20 18v.01"></path>
+          </svg>
+          <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2">Your cart is empty</h3>
+          <p class="text-neutral-600 dark:text-neutral-400 mb-6">Add some products to get started</p>
+          <button
+            class="inline-flex items-center px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-primary-500/50"
+            id="continue-shopping"
+          >
+            Continue Shopping
+          </button>
+        </div>
+      {%- else -%}
+        <div class="p-4 space-y-4">
+          {%- for item in cart.items -%}
+            <div class="cart-item flex items-center space-x-4 p-4 bg-neutral-50 dark:bg-neutral-800 rounded-lg" data-index="{{ forloop.index }}">
+              <!-- Product Image -->
+              <div class="flex-shrink-0 w-16 h-16 bg-neutral-100 dark:bg-neutral-700 rounded-lg overflow-hidden">
+                {%- if item.image -%}
+                  <img
+                    src="{{ item.image | image_url: width: 80 }}"
+                    alt="{{ item.image.alt | escape }}"
+                    class="w-full h-full object-cover"
+                    loading="lazy"
+                  >
+                {%- else -%}
+                  <div class="w-full h-full bg-gradient-to-br from-neutral-200 to-neutral-300 dark:from-neutral-600 dark:to-neutral-700 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-neutral-400 dark:text-neutral-500" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                    </svg>
+                  </div>
+                {%- endif -%}
+              </div>
+
+              <!-- Product Details -->
+              <div class="flex-1 min-w-0">
+                <h4 class="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate">
+                  <a href="{{ item.url }}" class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300">
+                    {{ item.product.title }}
+                  </a>
+                </h4>
+                
+                {%- if item.product.has_only_default_variant == false -%}
+                  <div class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                    {%- for option in item.options_with_values -%}
+                      <span>{{ option.name }}: {{ option.value }}</span>
+                      {%- unless forloop.last %}, {% endunless -%}
+                    {%- endfor -%}
+                  </div>
+                {%- endif -%}
+
+                <!-- Quantity Controls -->
+                <div class="flex items-center space-x-2 mt-2">
+                  <button
+                    class="w-8 h-8 rounded-full bg-white dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors duration-300"
+                    data-quantity-change="-1"
+                    data-index="{{ forloop.index }}"
+                    aria-label="Decrease quantity"
+                  >
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                    </svg>
+                  </button>
+                  
+                  <span class="w-8 text-center text-sm font-medium text-neutral-900 dark:text-neutral-100">{{ item.quantity }}</span>
+                  
+                  <button
+                    class="w-8 h-8 rounded-full bg-white dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors duration-300"
+                    data-quantity-change="1"
+                    data-index="{{ forloop.index }}"
+                    aria-label="Increase quantity"
+                  >
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Price and Remove -->
+              <div class="text-right">
+                <div class="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{{ item.final_line_price | money }}</div>
+                {%- if item.original_line_price != item.final_line_price -%}
+                  <div class="text-xs text-neutral-500 dark:text-neutral-400 line-through">{{ item.original_line_price | money }}</div>
+                {%- endif -%}
+                <button
+                  class="mt-2 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 rounded p-1"
+                  data-remove-item
+                  data-index="{{ forloop.index }}"
+                  aria-label="Remove item"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+
+        <!-- Discounts -->
+        {%- if cart.cart_level_discount_applications.size > 0 -%}
+          <div class="px-4 py-2 bg-green-50 dark:bg-green-900/20 border-t border-green-200 dark:border-green-800">
+            {%- for discount in cart.cart_level_discount_applications -%}
+              <div class="flex items-center justify-between text-sm">
+                <span class="text-green-700 dark:text-green-300">{{ discount.title }}</span>
+                <span class="font-medium text-green-700 dark:text-green-300">-{{ discount.total_allocated_amount | money }}</span>
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+
+    <!-- Footer -->
+    {%- unless cart == empty -%}
+      <div class="border-t border-neutral-200 dark:border-neutral-700 p-4 space-y-4">
+        <!-- Shipping Calculator -->
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-neutral-600 dark:text-neutral-400">Shipping</span>
+          <span class="text-neutral-900 dark:text-neutral-100">Calculated at checkout</span>
+        </div>
+
+        <!-- Subtotal -->
+        <div class="flex items-center justify-between text-lg font-semibold">
+          <span class="text-neutral-900 dark:text-neutral-100">Subtotal</span>
+          <span class="text-neutral-900 dark:text-neutral-100" id="cart-subtotal">{{ cart.total_price | money }}</span>
+        </div>
+
+        <!-- Progress Bar for Free Shipping -->
+        {%- assign free_shipping_threshold = settings.free_shipping_threshold | default: 10000 -%}
+        {%- if cart.total_price < free_shipping_threshold -%}
+          {%- assign remaining_for_free_shipping = free_shipping_threshold | minus: cart.total_price -%}
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-neutral-600 dark:text-neutral-400">Add {{ remaining_for_free_shipping | money }} more for free shipping</span>
+            </div>
+            <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2">
+              {%- assign progress_percentage = cart.total_price | times: 100 | divided_by: free_shipping_threshold -%}
+              <div class="bg-primary-600 h-2 rounded-full transition-all duration-300" style="width: {{ progress_percentage }}%"></div>
+            </div>
+          </div>
+        {%- else -%}
+          <div class="flex items-center space-x-2 text-sm text-green-600 dark:text-green-400">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>You qualify for free shipping!</span>
+          </div>
+        {%- endif -%}
+
+        <!-- Action Buttons -->
+        <div class="space-y-3">
+          <form action="{{ routes.cart_url }}" method="post" novalidate class="cart">
+            <button
+              type="submit"
+              name="checkout"
+              class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-4 px-6 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-primary-500/50 flex items-center justify-center space-x-2"
+              id="checkout-button"
+            >
+              <span>Checkout</span>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+              </svg>
+            </button>
+          </form>
+          
+          <button
+            class="w-full border-2 border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-primary-600 hover:text-primary-600 dark:hover:border-primary-400 dark:hover:text-primary-400 font-semibold py-3 px-6 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-primary-500/50"
+            id="view-cart"
+          >
+            View Cart
+          </button>
+        </div>
+
+        <!-- Payment Methods -->
+        {%- if settings.show_payment_methods -%}
+          <div class="flex items-center justify-center space-x-2 pt-2">
+            <span class="text-xs text-neutral-500 dark:text-neutral-400">We accept:</span>
+            <div class="flex items-center space-x-1">
+              <!-- Add payment method icons here -->
+              <svg class="w-8 h-5" viewBox="0 0 38 24" fill="none">
+                <!-- Visa icon -->
+                <rect width="38" height="24" rx="4" fill="#1a1f71"/>
+                <path d="M15.1 7.5h-2.8L9.1 16.5h2.2l.6-1.4h2.9l.3 1.4h2.4L15.1 7.5zm-1.4 6.1l1-2.4 1 2.4h-2z" fill="white"/>
+              </svg>
+              <svg class="w-8 h-5" viewBox="0 0 38 24" fill="none">
+                <!-- Mastercard icon -->
+                <rect width="38" height="24" rx="4" fill="#eb001b"/>
+                <circle cx="14" cy="12" r="6" fill="#ff5f00"/>
+                <circle cx="24" cy="12" r="6" fill="#f79e1b"/>
+              </svg>
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endunless -%}
+  </div>
+</div>
+
+<script>
+  class CartDrawer {
+    constructor() {
+      this.drawer = document.getElementById('cart-drawer');
+      this.overlay = document.getElementById('cart-drawer-overlay');
+      this.closeButton = document.getElementById('cart-drawer-close');
+      this.continueShoppingButton = document.getElementById('continue-shopping');
+      this.viewCartButton = document.getElementById('view-cart');
+      
+      this.init();
+    }
+    
+    init() {
+      this.setupEventListeners();
+      this.setupCartUpdates();
+    }
+    
+    setupEventListeners() {
+      // Open cart drawer
+      document.addEventListener('cart:open', () => this.open());
+      
+      // Close cart drawer
+      this.closeButton?.addEventListener('click', () => this.close());
+      this.overlay?.addEventListener('click', () => this.close());
+      
+      // Continue shopping
+      this.continueShoppingButton?.addEventListener('click', () => this.close());
+      
+      // View cart
+      this.viewCartButton?.addEventListener('click', () => {
+        window.location.href = '{{ routes.cart_url }}';
+      });
+      
+      // Quantity changes
+      document.addEventListener('click', (e) => {
+        if (e.target.matches('[data-quantity-change]')) {
+          e.preventDefault();
+          const change = parseInt(e.target.dataset.quantityChange);
+          const index = parseInt(e.target.dataset.index);
+          this.updateQuantity(index, change);
+        }
+        
+        if (e.target.matches('[data-remove-item]')) {
+          e.preventDefault();
+          const index = parseInt(e.target.dataset.index);
+          this.removeItem(index);
+        }
+      });
+      
+      // Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') this.close();
+      });
+    }
+    
+    setupCartUpdates() {
+      // Listen for cart updates from other components
+      document.addEventListener('cart:updated', (e) => {
+        this.updateCartContents(e.detail);
+      });
+      
+      // Listen for items added to cart
+      document.addEventListener('cart:item-added', (e) => {
+        this.showNotification(e.detail);
+        this.open();
+      });
+    }
+    
+    open() {
+      this.drawer.classList.remove('translate-x-full');
+      this.overlay.classList.remove('opacity-0', 'invisible');
+      document.body.classList.add('overflow-hidden');
+    }
+    
+    close() {
+      this.drawer.classList.add('translate-x-full');
+      this.overlay.classList.add('opacity-0', 'invisible');
+      document.body.classList.remove('overflow-hidden');
+    }
+    
+    async updateQuantity(index, change) {
+      try {
+        const cartItems = await this.getCart();
+        const item = cartItems.items[index - 1];
+        const newQuantity = Math.max(0, item.quantity + change);
+        
+        const updates = {
+          [item.key]: newQuantity
+        };
+        
+        await this.updateCart(updates);
+      } catch (error) {
+        console.error('Error updating quantity:', error);
+      }
+    }
+    
+    async removeItem(index) {
+      try {
+        const cartItems = await this.getCart();
+        const item = cartItems.items[index - 1];
+        
+        const updates = {
+          [item.key]: 0
+        };
+        
+        await this.updateCart(updates);
+      } catch (error) {
+        console.error('Error removing item:', error);
+      }
+    }
+    
+    async getCart() {
+      const response = await fetch('{{ routes.cart_url }}.json');
+      return response.json();
+    }
+    
+    async updateCart(updates) {
+      const response = await fetch('{{ routes.cart_update_url }}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ updates })
+      });
+      
+      const cart = await response.json();
+      this.updateCartContents(cart);
+      
+      // Update cart count in header
+      this.updateCartCount(cart.item_count);
+      
+      return cart;
+    }
+    
+    updateCartContents(cart) {
+      // Update cart drawer with new contents
+      // This would typically re-render the cart items
+      location.reload(); // Simple approach - in production, you'd update the DOM
+    }
+    
+    updateCartCount(count) {
+      const cartCountElements = document.querySelectorAll('.cart-count-bubble, #cart-drawer-count');
+      cartCountElements.forEach(element => {
+        if (element.id === 'cart-drawer-count') {
+          element.textContent = count;
+        } else {
+          element.textContent = count;
+          if (count === 0) {
+            element.classList.add('hidden');
+          } else {
+            element.classList.remove('hidden');
+          }
+        }
+      });
+    }
+    
+    showNotification(item) {
+      const notification = document.getElementById('cart-notification');
+      if (!notification) return;
+      
+      const image = notification.querySelector('#cart-notification-image');
+      const title = notification.querySelector('#cart-notification-title');
+      const message = notification.querySelector('#cart-notification-message');
+      
+      if (item.image) image.src = item.image;
+      title.textContent = item.product_title;
+      message.textContent = 'Added to cart successfully!';
+      
+      // Show notification
+      notification.classList.remove('translate-x-full');
+      
+      // Hide after 3 seconds
+      setTimeout(() => {
+        notification.classList.add('translate-x-full');
+      }, 3000);
+    }
+  }
+  
+  // Initialize cart drawer
+  document.addEventListener('DOMContentLoaded', () => {
+    new CartDrawer();
+  });
+</script>

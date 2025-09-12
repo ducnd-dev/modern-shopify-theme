@@ -1,0 +1,479 @@
+{{ 'section-newsletter.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<section class="newsletter relative overflow-hidden section-{{ section.id }}-padding {{ section.settings.color_scheme }}">
+  <!-- Background -->
+  <div class="absolute inset-0">
+    {%- if section.settings.background_image != blank -%}
+      <img 
+        src="{{ section.settings.background_image | image_url: width: 1920 }}"
+        srcset="{{ section.settings.background_image | image_url: width: 375 }} 375w,
+                {{ section.settings.background_image | image_url: width: 750 }} 750w,
+                {{ section.settings.background_image | image_url: width: 1100 }} 1100w,
+                {{ section.settings.background_image | image_url: width: 1500 }} 1500w,
+                {{ section.settings.background_image | image_url: width: 1920 }} 1920w"
+        sizes="100vw"
+        alt="{{ section.settings.background_image.alt | escape }}"
+        class="w-full h-full object-cover"
+      >
+      {%- if section.settings.show_overlay -%}
+        <div class="absolute inset-0 bg-black/{{ section.settings.overlay_opacity }}"></div>
+      {%- endif -%}
+    {%- else -%}
+      <div class="w-full h-full bg-gradient-to-br {{ section.settings.gradient_colors }}"></div>
+    {%- endif -%}
+  </div>
+
+  <!-- Decorative Elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <!-- Floating Icons/Shapes -->
+    <div class="absolute top-10 left-10 w-20 h-20 rounded-full bg-white/10 backdrop-blur-sm animate-pulse"></div>
+    <div class="absolute top-1/3 right-20 w-16 h-16 rounded-lg bg-primary-500/20 rotate-45 animate-bounce-subtle"></div>
+    <div class="absolute bottom-20 left-1/4 w-12 h-12 rounded-full bg-accent-500/30 animate-pulse-soft"></div>
+    <div class="absolute bottom-1/3 right-10 w-24 h-24 rounded-full bg-white/5 animate-bounce-subtle" style="animation-delay: 1s;"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto text-center">
+      <!-- Badge -->
+      {%- if section.settings.badge_text != blank -%}
+        <div class="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm font-medium mb-6 animate-fade-in">
+          {%- if section.settings.badge_icon != blank -%}
+            <span class="mr-2 text-lg">{{ section.settings.badge_icon }}</span>
+          {%- endif -%}
+          {{ section.settings.badge_text }}
+        </div>
+      {%- endif -%}
+
+      <!-- Headline -->
+      {%- if section.settings.heading != blank -%}
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight animate-slide-up font-display">
+          {%- liquid
+            assign heading_parts = section.settings.heading | split: '|'
+            for part in heading_parts
+              if forloop.last and heading_parts.size > 1
+                echo '<span class="text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-accent-600">'
+                echo part | strip
+                echo '</span>'
+              else
+                echo part | strip
+                unless forloop.last
+                  echo '<br>'
+                endunless
+              endif
+            endfor
+          -%}
+        </h2>
+      {%- endif -%}
+
+      <!-- Subheading -->
+      {%- if section.settings.subheading != blank -%}
+        <p class="text-lg sm:text-xl lg:text-2xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed animate-slide-up" style="animation-delay: 0.1s;">
+          {{ section.settings.subheading }}
+        </p>
+      {%- endif -%}
+
+      <!-- Newsletter Form -->
+      <div class="max-w-md mx-auto animate-slide-up" style="animation-delay: 0.2s;">
+        <form 
+          action="{{ routes.root_url }}contact" 
+          method="post" 
+          id="ContactForm" 
+          accept-charset="UTF-8" 
+          class="newsletter-form"
+          novalidate="novalidate"
+        >
+          <input type="hidden" name="form_type" value="customer">
+          <input type="hidden" name="utf8" value="✓">
+          <input type="hidden" name="contact[tags]" value="newsletter">
+
+          <div class="flex flex-col sm:flex-row gap-3">
+            <div class="flex-1">
+              <label for="NewsletterForm--{{ section.id }}" class="sr-only">
+                {{ 'newsletter.label' | t }}
+              </label>
+              <input
+                id="NewsletterForm--{{ section.id }}"
+                type="email"
+                name="contact[email]"
+                class="w-full px-6 py-4 rounded-full bg-white/90 backdrop-blur-sm border border-white/30 text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-4 focus:ring-white/30 focus:bg-white transition-all duration-300"
+                value="{{ form.email }}"
+                aria-required="true"
+                autocorrect="off"
+                autocapitalize="off"
+                autocomplete="email"
+                {% if form.errors %}
+                  autofocus
+                  aria-invalid="true"
+                  aria-describedby="NewsletterForm--{{ section.id }}-error"
+                {% endif %}
+                placeholder="{{ 'newsletter.placeholder' | t | default: 'Enter your email address' }}"
+                required
+              >
+            </div>
+            <button
+              type="submit"
+              class="px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-primary-500/50 flex items-center justify-center gap-2 whitespace-nowrap"
+              name="commit"
+              id="Subscribe"
+              aria-label="{{ 'newsletter.button_label' | t | default: 'Subscribe' }}"
+            >
+              <span>{{ section.settings.button_text | default: 'Subscribe' }}</span>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+              </svg>
+            </button>
+          </div>
+
+          {%- if form.errors -%}
+            <div class="mt-4 p-4 bg-red-500/20 backdrop-blur-sm border border-red-500/30 rounded-lg" id="NewsletterForm--{{ section.id }}-error" role="alert" tabindex="-1">
+              <h3 class="text-red-200 font-medium mb-2">
+                {{ 'templates.contact.form.error_heading' | t }}
+              </h3>
+              <ul class="text-red-200 text-sm">
+                {%- for field in form.errors -%}
+                  <li>
+                    {%- if field == 'form' -%}
+                      {{ form.errors.messages[field] }}
+                    {%- else -%}
+                      {{ form.errors.translated_fields[field] | capitalize }} {{ form.errors.messages[field] }}
+                    {%- endif -%}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- endif -%}
+
+          {%- if form.posted_successfully? -%}
+            <div class="mt-4 p-4 bg-green-500/20 backdrop-blur-sm border border-green-500/30 rounded-lg">
+              <h3 class="text-green-200 font-medium mb-2">
+                {{ 'newsletter.success_heading' | t | default: 'Thank you for subscribing!' }}
+              </h3>
+              <p class="text-green-200 text-sm">
+                {{ 'newsletter.success_message' | t | default: 'You have been successfully subscribed to our newsletter.' }}
+              </p>
+            </div>
+          {%- endif -%}
+        </form>
+
+        <!-- Additional Info -->
+        {%- if section.settings.show_privacy_note -%}
+          <p class="text-white/70 text-sm mt-4">
+            {{ section.settings.privacy_text | default: 'We respect your privacy. Unsubscribe at any time.' }}
+          </p>
+        {%- endif -%}
+      </div>
+
+      <!-- Benefits -->
+      {%- if section.blocks.size > 0 -%}
+        <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in" style="animation-delay: 0.4s;">
+          {%- for block in section.blocks -%}
+            <div class="text-center" {{ block.shopify_attributes }}>
+              {%- if block.settings.icon -%}
+                <div class="w-16 h-16 mx-auto mb-4 text-4xl text-white/80">
+                  {{ block.settings.icon }}
+                </div>
+              {%- endif -%}
+              <h3 class="text-lg font-semibold text-white mb-2">{{ block.settings.title }}</h3>
+              <p class="text-white/70">{{ block.settings.description }}</p>
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      <!-- Social Proof -->
+      {%- if section.settings.show_social_proof -%}
+        <div class="mt-8 flex flex-wrap justify-center items-center gap-4 text-white/60 text-sm animate-fade-in" style="animation-delay: 0.5s;">
+          <span>{{ section.settings.social_proof_text | default: 'Join 50,000+ subscribers' }}</span>
+          <div class="flex items-center gap-1">
+            {%- for i in (1..5) -%}
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+            {%- endfor -%}
+          </div>
+          <span>{{ section.settings.rating_text | default: 'Rated 4.9/5 by our subscribers' }}</span>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const newsletterForm = document.getElementById('ContactForm');
+    const emailInput = newsletterForm?.querySelector('input[type="email"]');
+    const submitButton = newsletterForm?.querySelector('button[type="submit"]');
+    
+    if (newsletterForm && emailInput && submitButton) {
+      // Email validation
+      emailInput.addEventListener('input', function() {
+        const email = this.value;
+        const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        
+        if (email.length > 0) {
+          if (isValid) {
+            this.classList.remove('border-red-500');
+            this.classList.add('border-green-500');
+          } else {
+            this.classList.remove('border-green-500');
+            this.classList.add('border-red-500');
+          }
+        } else {
+          this.classList.remove('border-red-500', 'border-green-500');
+        }
+      });
+      
+      // Form submission
+      newsletterForm.addEventListener('submit', function(e) {
+        const email = emailInput.value;
+        const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        
+        if (!isValid) {
+          e.preventDefault();
+          emailInput.focus();
+          emailInput.classList.add('border-red-500');
+          return;
+        }
+        
+        // Show loading state
+        submitButton.disabled = true;
+        submitButton.innerHTML = `
+          <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>Subscribing...</span>
+        `;
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Newsletter Signup",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_overlay",
+      "label": "Show overlay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay opacity",
+      "default": 40
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        {
+          "value": "bg-primary-600",
+          "label": "Primary"
+        },
+        {
+          "value": "bg-gradient-to-br from-primary-600 to-accent-600",
+          "label": "Primary to Accent"
+        },
+        {
+          "value": "bg-gradient-to-br from-neutral-800 to-neutral-900",
+          "label": "Dark"
+        },
+        {
+          "value": "bg-gradient-to-br from-primary-600 via-purple-600 to-accent-600",
+          "label": "Vibrant"
+        }
+      ],
+      "default": "bg-gradient-to-br from-primary-600 to-accent-600"
+    },
+    {
+      "type": "text",
+      "id": "gradient_colors",
+      "label": "Custom gradient colors",
+      "info": "Tailwind gradient classes (e.g., from-blue-600 to-purple-600)",
+      "default": "from-primary-600 to-accent-600"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge text"
+    },
+    {
+      "type": "text",
+      "id": "badge_icon",
+      "label": "Badge icon (emoji)"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Use | to create gradient text on the last part",
+      "default": "Stay in the|Loop"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Subscribe to our newsletter for exclusive deals, new arrivals, and style inspiration."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Subscribe"
+    },
+    {
+      "type": "header",
+      "content": "Privacy & Social Proof"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_privacy_note",
+      "label": "Show privacy note",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "privacy_text",
+      "label": "Privacy text",
+      "default": "We respect your privacy. Unsubscribe at any time."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social_proof",
+      "label": "Show social proof",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "social_proof_text",
+      "label": "Social proof text",
+      "default": "Join 50,000+ subscribers"
+    },
+    {
+      "type": "text",
+      "id": "rating_text",
+      "label": "Rating text",
+      "default": "Rated 4.9/5 by our subscribers"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon (emoji)",
+          "default": "📧"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Weekly Updates"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description",
+          "default": "Get the latest news and offers"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Newsletter Signup",
+      "blocks": [
+        {
+          "type": "benefit",
+          "settings": {
+            "icon": "📧",
+            "title": "Weekly Updates",
+            "description": "Get the latest news and offers"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "icon": "🎁",
+            "title": "Exclusive Deals",
+            "description": "Subscriber-only discounts"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "icon": "👕",
+            "title": "Style Tips",
+            "description": "Fashion and styling advice"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

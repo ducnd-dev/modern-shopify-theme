@@ -1,0 +1,544 @@
+{{ 'section-header.css' | asset_url | stylesheet_tag }}
+
+<sticky-header class="header-wrapper color-{{ section.settings.color_scheme }} gradient">
+  <!-- Announcement Bar (if enabled from settings) -->
+  {%- if section.settings.enable_sticky_header -%}
+    <script src="{{ 'sticky-header.js' | asset_url }}" defer="defer"></script>
+  {%- endif -%}
+  
+  <header class="header sticky top-0 z-50 transition-all duration-300 {% if section.settings.enable_sticky_header %}header--sticky{% endif %}">
+    <!-- Top Bar (Optional) -->
+    {%- if section.settings.show_top_bar -%}
+      <div class="header-top-bar bg-neutral-100 dark:bg-neutral-800 text-sm py-2 border-b border-neutral-200 dark:border-neutral-700">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+              {%- if section.settings.top_bar_text != blank -%}
+                <span class="text-neutral-600 dark:text-neutral-400">{{ section.settings.top_bar_text }}</span>
+              {%- endif -%}
+            </div>
+            <div class="flex items-center space-x-4">
+              <!-- Currency Selector -->
+              {%- if section.settings.show_currency_selector -%}
+                {%- form 'currency' -%}
+                  <select name="currency" class="bg-transparent text-neutral-600 dark:text-neutral-400 text-sm border-none focus:outline-none" onchange="this.form.submit();">
+                    {%- for currency in shop.enabled_currencies -%}
+                      <option value="{{ currency.iso_code }}" {%- if currency == cart.currency -%}selected{%- endif -%}>
+                        {{ currency.iso_code }} {{ currency.symbol }}
+                      </option>
+                    {%- endfor -%}
+                  </select>
+                {%- endform -%}
+              {%- endif -%}
+              
+              <!-- Language Selector -->
+              {%- if section.settings.show_language_selector and shop.published_locales.size > 1 -%}
+                {%- form 'localization' -%}
+                  <select name="locale_code" class="bg-transparent text-neutral-600 dark:text-neutral-400 text-sm border-none focus:outline-none" onchange="this.form.submit();">
+                    {%- for locale in shop.published_locales -%}
+                      <option value="{{ locale.iso_code }}" {%- if locale == request.locale -%}selected{%- endif -%}>
+                        {{ locale.endonym_name | capitalize }}
+                      </option>
+                    {%- endfor -%}
+                  </select>
+                {%- endform -%}
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      </div>
+    {%- endif -%}
+
+    <!-- Main Header -->
+    <div class="header-main bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border-b border-neutral-200/50 dark:border-neutral-700/50">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 lg:h-20">
+          <!-- Mobile Menu Button -->
+          <button
+            class="lg:hidden p-2 rounded-md text-neutral-700 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            aria-label="Open menu"
+            id="mobile-menu-button"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+
+          <!-- Logo -->
+          <div class="flex-shrink-0">
+            <a href="{{ routes.root_url }}" class="flex items-center focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">
+              {%- if settings.logo != blank -%}
+                <img
+                  src="{{ settings.logo | image_url: width: 200 }}"
+                  alt="{{ shop.name }}"
+                  class="h-8 lg:h-10 w-auto"
+                  width="{{ settings.logo.width }}"
+                  height="{{ settings.logo.height }}"
+                >
+              {%- else -%}
+                <span class="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-neutral-100 font-display">
+                  {{ shop.name }}
+                </span>
+              {%- endif -%}
+            </a>
+          </div>
+
+          <!-- Desktop Navigation -->
+          <nav class="hidden lg:flex space-x-8" role="navigation">
+            {%- for link in linklists[section.settings.menu].links -%}
+              {%- if link.links != blank -%}
+                <!-- Dropdown Menu -->
+                <div class="relative group">
+                  <button
+                    class="flex items-center text-neutral-700 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors duration-300 py-2 focus:outline-none focus:text-primary-600"
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                  >
+                    {{ link.title }}
+                    <svg class="ml-1 w-4 h-4 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </button>
+
+                  <!-- Mega Menu -->
+                  <div class="absolute top-full left-0 w-screen max-w-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 z-50">
+                    <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xl border border-neutral-200 dark:border-neutral-700 p-6 mt-2">
+                      <div class="grid gap-4">
+                        {%- for child_link in link.links -%}
+                          {%- if child_link.links != blank -%}
+                            <!-- Sub-category -->
+                            <div>
+                              <h3 class="font-semibold text-neutral-900 dark:text-neutral-100 mb-3">{{ child_link.title }}</h3>
+                              <ul class="space-y-2">
+                                {%- for grandchild_link in child_link.links -%}
+                                  <li>
+                                    <a
+                                      href="{{ grandchild_link.url }}"
+                                      class="block text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300"
+                                    >
+                                      {{ grandchild_link.title }}
+                                    </a>
+                                  </li>
+                                {%- endfor -%}
+                              </ul>
+                            </div>
+                          {%- else -%}
+                            <!-- Single link -->
+                            <a
+                              href="{{ child_link.url }}"
+                              class="flex items-center p-3 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors duration-300 group"
+                            >
+                              <div>
+                                <div class="font-medium text-neutral-900 dark:text-neutral-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300">
+                                  {{ child_link.title }}
+                                </div>
+                                {%- if child_link.summary != blank -%}
+                                  <div class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+                                    {{ child_link.summary }}
+                                  </div>
+                                {%- endif -%}
+                              </div>
+                            </a>
+                          {%- endif -%}
+                        {%- endfor -%}
+                      </div>
+
+                      <!-- Featured Product or Promotion in Mega Menu -->
+                      {%- if section.settings.featured_collection != blank -%}
+                        <div class="mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-600">
+                          <h4 class="font-semibold text-neutral-900 dark:text-neutral-100 mb-3">Featured</h4>
+                          {%- assign featured_product = collections[section.settings.featured_collection].products.first -%}
+                          {%- if featured_product -%}
+                            <a href="{{ featured_product.url }}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors duration-300">
+                              {%- if featured_product.featured_media -%}
+                                <img
+                                  src="{{ featured_product.featured_media | image_url: width: 60 }}"
+                                  alt="{{ featured_product.featured_media.alt | escape }}"
+                                  class="w-12 h-12 object-cover rounded-lg"
+                                >
+                              {%- endif -%}
+                              <div>
+                                <div class="font-medium text-neutral-900 dark:text-neutral-100 text-sm">{{ featured_product.title }}</div>
+                                <div class="text-primary-600 dark:text-primary-400 font-semibold text-sm">{{ featured_product.price | money }}</div>
+                              </div>
+                            </a>
+                          {%- endif -%}
+                        </div>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                </div>
+              {%- else -%}
+                <!-- Single Link -->
+                <a
+                  href="{{ link.url }}"
+                  class="text-neutral-700 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors duration-300 py-2 {% if link.active %}text-primary-600 dark:text-primary-400{% endif %}"
+                >
+                  {{ link.title }}
+                </a>
+              {%- endif -%}
+            {%- endfor -%}
+          </nav>
+
+          <!-- Header Actions -->
+          <div class="flex items-center space-x-4">
+            <!-- Search -->
+            <button
+              class="p-2 rounded-md text-neutral-700 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              aria-label="Search"
+              id="search-button"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </button>
+
+            <!-- Dark Mode Toggle -->
+            <button
+              class="p-2 rounded-md text-neutral-700 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              aria-label="Toggle dark mode"
+              id="dark-mode-toggle"
+            >
+              <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+              </svg>
+              <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+              </svg>
+            </button>
+
+            <!-- Account -->
+            <a
+              href="{{ routes.account_url }}"
+              class="p-2 rounded-md text-neutral-700 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              aria-label="Account"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+            </a>
+
+            <!-- Cart -->
+            <button
+              class="relative p-2 rounded-md text-neutral-700 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              aria-label="Cart"
+              id="cart-icon-bubble"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0H17M9 18v.01M20 18v.01"></path>
+              </svg>
+              
+              <!-- Cart Count Badge -->
+              <div class="cart-count-bubble{% if cart == empty %} hidden{% endif %} absolute -top-1 -right-1 bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                <span aria-hidden="true">{{ cart.item_count }}</span>
+                <span class="sr-only">{{ cart.item_count }} item{% unless cart.item_count == 1 %}s{% endunless %} in cart</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay fixed inset-0 bg-black/50 z-40 lg:hidden opacity-0 invisible transition-all duration-300" id="mobile-menu-overlay"></div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu fixed top-0 left-0 w-80 h-full bg-white dark:bg-neutral-900 z-50 lg:hidden transform -translate-x-full transition-transform duration-300" id="mobile-menu">
+      <div class="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700">
+        <span class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Menu</span>
+        <button
+          class="p-2 rounded-md text-neutral-700 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          id="mobile-menu-close"
+          aria-label="Close menu"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="p-4 space-y-2" role="navigation">
+        {%- for link in linklists[section.settings.menu].links -%}
+          {%- if link.links != blank -%}
+            <!-- Accordion Menu Item -->
+            <div class="mobile-menu-item">
+              <button
+                class="flex items-center justify-between w-full text-left p-3 rounded-lg text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                aria-expanded="false"
+              >
+                <span class="font-medium">{{ link.title }}</span>
+                <svg class="w-4 h-4 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+              <div class="mobile-submenu hidden pl-4 pb-2 space-y-1">
+                {%- for child_link in link.links -%}
+                  <a
+                    href="{{ child_link.url }}"
+                    class="block p-3 rounded-lg text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors duration-300"
+                  >
+                    {{ child_link.title }}
+                  </a>
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- else -%}
+            <!-- Single Link -->
+            <a
+              href="{{ link.url }}"
+              class="block p-3 rounded-lg text-neutral-700 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-300 font-medium {% if link.active %}text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20{% endif %}"
+            >
+              {{ link.title }}
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      </nav>
+
+      <!-- Mobile Menu Footer -->
+      <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-neutral-200 dark:border-neutral-700">
+        <div class="flex items-center justify-center space-x-4">
+          <a href="{{ routes.account_url }}" class="text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300">
+            Account
+          </a>
+          <span class="text-neutral-300 dark:text-neutral-600">|</span>
+          <button id="mobile-dark-mode-toggle" class="text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300">
+            <span class="dark:hidden">Dark Mode</span>
+            <span class="hidden dark:inline">Light Mode</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="search-modal fixed inset-0 bg-black/50 z-60 opacity-0 invisible transition-all duration-300" id="search-modal">
+      <div class="flex items-start justify-center min-h-screen pt-20">
+        <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl w-full max-w-2xl mx-4 transform scale-95 transition-transform duration-300">
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Search Products</h3>
+              <button
+                class="p-2 rounded-md text-neutral-700 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                id="search-modal-close"
+                aria-label="Close search"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="relative">
+              <input
+                type="search"
+                placeholder="Search for products..."
+                class="w-full pl-12 pr-4 py-4 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-full text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                id="search-input"
+              >
+              <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <div class="mt-6" id="search-results">
+              <!-- Search results will be populated here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+</sticky-header>
+
+<script>
+  // Mobile menu functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenuClose = document.getElementById('mobile-menu-close');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+    function openMobileMenu() {
+      mobileMenu.classList.remove('-translate-x-full');
+      mobileMenuOverlay.classList.remove('opacity-0', 'invisible');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closeMobileMenu() {
+      mobileMenu.classList.add('-translate-x-full');
+      mobileMenuOverlay.classList.add('opacity-0', 'invisible');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    mobileMenuButton?.addEventListener('click', openMobileMenu);
+    mobileMenuClose?.addEventListener('click', closeMobileMenu);
+    mobileMenuOverlay?.addEventListener('click', closeMobileMenu);
+
+    // Mobile submenu toggles
+    const mobileMenuItems = document.querySelectorAll('.mobile-menu-item button');
+    mobileMenuItems.forEach(button => {
+      button.addEventListener('click', function() {
+        const submenu = this.parentNode.querySelector('.mobile-submenu');
+        const arrow = this.querySelector('svg');
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+
+        if (isExpanded) {
+          submenu.classList.add('hidden');
+          arrow.classList.remove('rotate-180');
+          this.setAttribute('aria-expanded', 'false');
+        } else {
+          submenu.classList.remove('hidden');
+          arrow.classList.add('rotate-180');
+          this.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+
+    // Search modal functionality
+    const searchButton = document.getElementById('search-button');
+    const searchModal = document.getElementById('search-modal');
+    const searchModalClose = document.getElementById('search-modal-close');
+    const searchInput = document.getElementById('search-input');
+
+    function openSearchModal() {
+      searchModal.classList.remove('opacity-0', 'invisible');
+      searchModal.querySelector('div > div').classList.remove('scale-95');
+      searchModal.querySelector('div > div').classList.add('scale-100');
+      document.body.classList.add('overflow-hidden');
+      setTimeout(() => searchInput.focus(), 300);
+    }
+
+    function closeSearchModal() {
+      searchModal.classList.add('opacity-0', 'invisible');
+      searchModal.querySelector('div > div').classList.add('scale-95');
+      searchModal.querySelector('div > div').classList.remove('scale-100');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    searchButton?.addEventListener('click', openSearchModal);
+    searchModalClose?.addEventListener('click', closeSearchModal);
+    
+    searchModal?.addEventListener('click', function(e) {
+      if (e.target === this) closeSearchModal();
+    });
+
+    // Escape key closes modals
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeMobileMenu();
+        closeSearchModal();
+      }
+    });
+
+    // Dark mode toggle
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const mobileDarkModeToggle = document.getElementById('mobile-dark-mode-toggle');
+
+    function toggleDarkMode() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+      }
+    }
+
+    darkModeToggle?.addEventListener('click', toggleDarkMode);
+    mobileDarkModeToggle?.addEventListener('click', toggleDarkMode);
+
+    // Cart drawer functionality
+    const cartButton = document.getElementById('cart-icon-bubble');
+    cartButton?.addEventListener('click', function() {
+      // This will be handled by the cart drawer component
+      document.dispatchEvent(new CustomEvent('cart:open'));
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_sticky_header",
+      "default": true,
+      "label": "Enable sticky header"
+    },
+    {
+      "type": "header",
+      "content": "Top bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_top_bar",
+      "default": false,
+      "label": "Show top bar"
+    },
+    {
+      "type": "text",
+      "id": "top_bar_text",
+      "label": "Top bar text",
+      "default": "Free shipping on orders over $99"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_currency_selector",
+      "default": true,
+      "label": "Show currency selector"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_language_selector",
+      "default": true,
+      "label": "Show language selector"
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "default": "main-menu",
+      "label": "Menu"
+    },
+    {
+      "type": "collection",
+      "id": "featured_collection",
+      "label": "Featured collection",
+      "info": "Show featured product in mega menu"
+    },
+    {
+      "type": "header",
+      "content": "Color scheme"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "options": [
+        {
+          "value": "accent-1",
+          "label": "Accent 1"
+        },
+        {
+          "value": "accent-2",
+          "label": "Accent 2"
+        },
+        {
+          "value": "background-1",
+          "label": "Background 1"
+        },
+        {
+          "value": "background-2",
+          "label": "Background 2"
+        },
+        {
+          "value": "inverse",
+          "label": "Inverse"
+        }
+      ],
+      "default": "background-1",
+      "label": "Color scheme"
+    }
+  ]
+}
+{% endschema %}

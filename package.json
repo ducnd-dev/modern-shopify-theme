@@ -1,0 +1,32 @@
+{
+  "name": "modern-shopify-theme",
+  "version": "1.0.0",
+  "description": "A modern Shopify theme built with TailwindCSS",
+  "main": "assets/theme.js",
+  "scripts": {
+    "build-css": "tailwindcss -i ./assets/input.css -o ./assets/theme.css --watch",
+    "build-css-prod": "tailwindcss -i ./assets/input.css -o ./assets/theme.css --minify",
+    "dev": "concurrently \"npm run build-css\" \"shopify theme dev\"",
+    "deploy": "npm run build-css-prod && shopify theme push"
+  },
+  "devDependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "autoprefixer": "^10.4.16",
+    "concurrently": "^8.2.2",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.6"
+  },
+  "keywords": [
+    "shopify",
+    "theme",
+    "tailwindcss",
+    "ecommerce",
+    "responsive",
+    "modern"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
