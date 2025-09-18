@@ -3,120 +3,25 @@
   The main landing page template that showcases sections
 {% endcomment %}
 
-{%- assign announcement_bar_enabled = section.settings.announcement_bar_enabled | default: true -%}
+<!-- Hero Section -->
+{%- section 'hero' -%}
 
-{% if announcement_bar_enabled %}
-  {% section 'announcement-bar' %}
-{% endif %}
+<!-- Featured Collections -->
+<div class="section-spacing">
+  {%- section 'collection-showcase' -%}
+</div>
 
-{% section 'header' %}
+<!-- Featured Products -->
+<div class="section-spacing">
+  {%- section 'product-grid' -%}
+</div>
 
-<main id="main" class="main-content" role="main">
-  <!-- Hero Section -->
-  {% section 'hero' %}
+<!-- Product Carousel -->
+<div class="section-spacing">
+  {%- section 'product-carousel' -%}
+</div>
 
-  <!-- Featured Collections -->
-  <div class="section-spacing">
-    {% section 'collection-showcase' %}
-  </div>
-
-  <!-- Featured Products -->
-  <div class="section-spacing">
-    {% section 'product-grid' %}
-  </div>
-
-  <!-- Product Carousel -->
-  <div class="section-spacing">
-    {% section 'product-carousel' %}
-  </div>
-
-  <!-- Newsletter Signup -->
-  <div class="section-spacing">
-    {% section 'newsletter' %}
-  </div>
-
-  <!-- Additional Sections (if any) -->
-  {% for section in sections %}
-    {% unless section.type == 'header' or section.type == 'footer' or section.type == 'announcement-bar' or section.type == 'hero' or section.type == 'collection-showcase' or section.type == 'product-grid' or section.type == 'product-carousel' or section.type == 'newsletter' %}
-      <div class="section-spacing">
-        {% render section %}
-      </div>
-    {% endunless %}
-  {% endfor %}
-</main>
-
-{% section 'footer' %}
-
-{% schema %}
-{
-  "name": "Homepage",
-  "class": "index-template",
-  "settings": [
-    {
-      "type": "header",
-      "content": "Homepage layout"
-    },
-    {
-      "type": "checkbox",
-      "id": "announcement_bar_enabled", 
-      "label": "Show announcement bar",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_hero",
-      "label": "Show hero section",
-      "default": true
-    },
-    {
-      "type": "checkbox", 
-      "id": "show_featured_collections",
-      "label": "Show featured collections",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_featured_products", 
-      "label": "Show featured products",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_product_carousel",
-      "label": "Show product carousel", 
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_newsletter",
-      "label": "Show newsletter signup",
-      "default": true
-    }
-  ],
-  "blocks": [
-    {
-      "type": "custom_section",
-      "name": "Custom Section",
-      "settings": [
-        {
-          "type": "text",
-          "id": "section_type",
-          "label": "Section type",
-          "info": "Enter the section filename without .liquid extension"
-        },
-        {
-          "type": "text", 
-          "id": "section_title",
-          "label": "Section title"
-        }
-      ]
-    }
-  ],
-  "presets": [
-    {
-      "name": "Homepage",
-      "blocks": []
-    }
-  ]
-}
-{% endschema %}
+<!-- Newsletter Signup -->
+<div class="section-spacing">
+  {%- section 'newsletter' -%}
+</div>

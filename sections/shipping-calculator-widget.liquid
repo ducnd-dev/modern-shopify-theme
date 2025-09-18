@@ -1,0 +1,716 @@
+{% comment %}
+  Shipping Calculator Widget
+  Real-time shipping cost calculator with multiple carriers and delivery options
+{% endcomment %}
+
+<div class="shipping-calculator-section py-16 bg-{{ section.settings.background_color }}" data-shipping-calculator>
+  <div class="container mx-auto px-4">
+    {% if section.settings.heading != blank or section.settings.subheading != blank %}
+      <div class="text-center mb-12">
+        {% if section.settings.heading != blank %}
+          <h2 class="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
+            {{ section.settings.heading }}
+          </h2>
+        {% endif %}
+        {% if section.settings.subheading != blank %}
+          <p class="text-xl text-neutral-600 dark:text-neutral-400 max-w-3xl mx-auto">
+            {{ section.settings.subheading }}
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="max-w-4xl mx-auto">
+      <!-- Main Calculator Card -->
+      <div class="bg-white dark:bg-neutral-800 rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-600 overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-6">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-2xl font-bold">Shipping Calculator</h3>
+              <p class="opacity-90">Calculate shipping costs to your location</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calculator Form -->
+        <div class="p-8">
+          <form id="shipping-calculator-form" class="space-y-6">
+            <!-- Destination Input -->
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="space-y-4">
+                <h4 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  Destination
+                </h4>
+
+                <!-- Country Selection -->
+                <div>
+                  <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                    Country
+                  </label>
+                  <select 
+                    id="shipping-country"
+                    class="w-full px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-neutral-700 dark:text-white"
+                    required
+                  >
+                    <option value="">Select Country</option>
+                    <option value="US">United States</option>
+                    <option value="CA">Canada</option>
+                    <option value="GB">United Kingdom</option>
+                    <option value="AU">Australia</option>
+                    <option value="DE">Germany</option>
+                    <option value="FR">France</option>
+                    <option value="IT">Italy</option>
+                    <option value="ES">Spain</option>
+                    <option value="JP">Japan</option>
+                    <option value="KR">South Korea</option>
+                    <option value="CN">China</option>
+                    <option value="IN">India</option>
+                    <option value="BR">Brazil</option>
+                    <option value="MX">Mexico</option>
+                    <option value="NL">Netherlands</option>
+                    <option value="SE">Sweden</option>
+                    <option value="NO">Norway</option>
+                    <option value="DK">Denmark</option>
+                    <option value="FI">Finland</option>
+                    <option value="CH">Switzerland</option>
+                  </select>
+                </div>
+
+                <!-- State/Province Selection -->
+                <div id="state-province-container" class="hidden">
+                  <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                    State/Province
+                  </label>
+                  <select 
+                    id="shipping-state"
+                    class="w-full px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-neutral-700 dark:text-white"
+                  >
+                    <option value="">Select State/Province</option>
+                  </select>
+                </div>
+
+                <!-- Postal Code -->
+                <div>
+                  <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                    Postal/ZIP Code
+                  </label>
+                  <input 
+                    type="text" 
+                    id="shipping-postal-code"
+                    class="w-full px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-neutral-700 dark:text-white"
+                    placeholder="Enter postal code"
+                  >
+                </div>
+
+                <!-- City -->
+                <div>
+                  <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                    City
+                  </label>
+                  <input 
+                    type="text" 
+                    id="shipping-city"
+                    class="w-full px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-neutral-700 dark:text-white"
+                    placeholder="Enter city"
+                  >
+                </div>
+              </div>
+
+              <!-- Package Details -->
+              <div class="space-y-4">
+                <h4 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                  </svg>
+                  Package Details
+                </h4>
+
+                <!-- Weight -->
+                <div>
+                  <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                    Weight
+                  </label>
+                  <div class="flex gap-2">
+                    <input 
+                      type="number" 
+                      id="package-weight"
+                      class="flex-1 px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-neutral-700 dark:text-white"
+                      placeholder="1.0"
+                      step="0.1"
+                      min="0.1"
+                      value="1.0"
+                    >
+                    <select 
+                      id="weight-unit"
+                      class="px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-neutral-700 dark:text-white"
+                    >
+                      <option value="kg">kg</option>
+                      <option value="lbs">lbs</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Dimensions -->
+                <div>
+                  <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                    Dimensions (L × W × H)
+                  </label>
+                  <div class="grid grid-cols-3 gap-2">
+                    <input 
+                      type="number" 
+                      id="package-length"
+                      class="px-3 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-neutral-700 dark:text-white text-sm"
+                      placeholder="20"
+                      min="1"
+                      value="20"
+                    >
+                    <input 
+                      type="number" 
+                      id="package-width"
+                      class="px-3 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-neutral-700 dark:text-white text-sm"
+                      placeholder="15"
+                      min="1"
+                      value="15"
+                    >
+                    <input 
+                      type="number" 
+                      id="package-height"
+                      class="px-3 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-neutral-700 dark:text-white text-sm"
+                      placeholder="10"
+                      min="1"
+                      value="10"
+                    >
+                  </div>
+                  <div class="flex justify-center mt-2">
+                    <select 
+                      id="dimension-unit"
+                      class="px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-neutral-700 dark:text-white text-sm"
+                    >
+                      <option value="cm">cm</option>
+                      <option value="in">in</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Package Value -->
+                <div>
+                  <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                    Package Value
+                  </label>
+                  <div class="flex gap-2">
+                    <span class="px-4 py-3 bg-neutral-100 dark:bg-neutral-600 border border-neutral-300 dark:border-neutral-600 rounded-l-lg text-neutral-700 dark:text-neutral-300">$</span>
+                    <input 
+                      type="number" 
+                      id="package-value"
+                      class="flex-1 px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-r-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-neutral-700 dark:text-white"
+                      placeholder="100.00"
+                      step="0.01"
+                      min="0"
+                      value="100.00"
+                    >
+                  </div>
+                </div>
+
+                <!-- Insurance -->
+                <div class="flex items-center gap-3">
+                  <input 
+                    type="checkbox" 
+                    id="insurance-required"
+                    class="w-5 h-5 text-primary-600 bg-white dark:bg-neutral-700 border-neutral-300 dark:border-neutral-600 rounded focus:ring-primary-500 focus:ring-2"
+                  >
+                  <label for="insurance-required" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    Add shipping insurance
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Calculate Button -->
+            <div class="text-center pt-6">
+              <button 
+                type="submit"
+                class="inline-flex items-center gap-3 bg-primary-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-primary-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                id="calculate-shipping-btn"
+              >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+                Calculate Shipping
+              </button>
+            </div>
+          </form>
+
+          <!-- Loading State -->
+          <div id="shipping-loading" class="hidden text-center py-8">
+            <div class="inline-flex items-center gap-3 text-primary-600">
+              <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary-600 border-t-transparent"></div>
+              <span class="text-lg font-medium">Calculating shipping rates...</span>
+            </div>
+          </div>
+
+          <!-- Results Section -->
+          <div id="shipping-results" class="hidden mt-8">
+            <div class="border-t border-neutral-200 dark:border-neutral-600 pt-8">
+              <h4 class="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-6 flex items-center gap-2">
+                <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Available Shipping Options
+              </h4>
+
+              <div id="shipping-options" class="space-y-4">
+                <!-- Shipping options will be populated here -->
+              </div>
+
+              <!-- Additional Info -->
+              <div class="mt-8 p-6 bg-blue-50 dark:bg-blue-900 rounded-xl">
+                <div class="flex items-start gap-3">
+                  <svg class="w-6 h-6 text-blue-600 dark:text-blue-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <div>
+                    <h5 class="font-semibold text-blue-900 dark:text-blue-100 mb-2">Important Information</h5>
+                    <ul class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                      <li>• Delivery times are estimates and may vary</li>
+                      <li>• Additional fees may apply for remote locations</li>
+                      <li>• Insurance is recommended for valuable items</li>
+                      <li>• Customs fees may apply for international shipments</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error State -->
+          <div id="shipping-error" class="hidden mt-8">
+            <div class="p-6 bg-red-50 dark:bg-red-900 rounded-xl border border-red-200 dark:border-red-700">
+              <div class="flex items-start gap-3">
+                <svg class="w-6 h-6 text-red-600 dark:text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <div>
+                  <h5 class="font-semibold text-red-900 dark:text-red-100 mb-2">Unable to Calculate Shipping</h5>
+                  <p class="text-sm text-red-800 dark:text-red-200" id="error-message">
+                    Please check your address details and try again.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      {% if section.settings.show_quick_actions %}
+        <div class="mt-8 grid md:grid-cols-3 gap-6">
+          <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-600 p-6 text-center">
+            <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-neutral-900 dark:text-neutral-100 mb-2">Free Shipping</h4>
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">On orders over $50</p>
+          </div>
+
+          <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-600 p-6 text-center">
+            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-neutral-900 dark:text-neutral-100 mb-2">Express Delivery</h4>
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">Next-day delivery available</p>
+          </div>
+
+          <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-600 p-6 text-center">
+            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-neutral-900 dark:text-neutral-100 mb-2">Global Shipping</h4>
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">We ship worldwide</p>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+  // Shipping Calculator Manager
+  class ShippingCalculatorManager {
+    constructor() {
+      this.form = document.getElementById('shipping-calculator-form');
+      this.loadingEl = document.getElementById('shipping-loading');
+      this.resultsEl = document.getElementById('shipping-results');
+      this.errorEl = document.getElementById('shipping-error');
+      this.optionsEl = document.getElementById('shipping-options');
+      
+      this.states = {
+        'US': [
+          { code: 'AL', name: 'Alabama' },
+          { code: 'AK', name: 'Alaska' },
+          { code: 'AZ', name: 'Arizona' },
+          { code: 'AR', name: 'Arkansas' },
+          { code: 'CA', name: 'California' },
+          { code: 'CO', name: 'Colorado' },
+          { code: 'CT', name: 'Connecticut' },
+          { code: 'DE', name: 'Delaware' },
+          { code: 'FL', name: 'Florida' },
+          { code: 'GA', name: 'Georgia' },
+          { code: 'HI', name: 'Hawaii' },
+          { code: 'ID', name: 'Idaho' },
+          { code: 'IL', name: 'Illinois' },
+          { code: 'IN', name: 'Indiana' },
+          { code: 'IA', name: 'Iowa' },
+          { code: 'KS', name: 'Kansas' },
+          { code: 'KY', name: 'Kentucky' },
+          { code: 'LA', name: 'Louisiana' },
+          { code: 'ME', name: 'Maine' },
+          { code: 'MD', name: 'Maryland' },
+          { code: 'MA', name: 'Massachusetts' },
+          { code: 'MI', name: 'Michigan' },
+          { code: 'MN', name: 'Minnesota' },
+          { code: 'MS', name: 'Mississippi' },
+          { code: 'MO', name: 'Missouri' },
+          { code: 'MT', name: 'Montana' },
+          { code: 'NE', name: 'Nebraska' },
+          { code: 'NV', name: 'Nevada' },
+          { code: 'NH', name: 'New Hampshire' },
+          { code: 'NJ', name: 'New Jersey' },
+          { code: 'NM', name: 'New Mexico' },
+          { code: 'NY', name: 'New York' },
+          { code: 'NC', name: 'North Carolina' },
+          { code: 'ND', name: 'North Dakota' },
+          { code: 'OH', name: 'Ohio' },
+          { code: 'OK', name: 'Oklahoma' },
+          { code: 'OR', name: 'Oregon' },
+          { code: 'PA', name: 'Pennsylvania' },
+          { code: 'RI', name: 'Rhode Island' },
+          { code: 'SC', name: 'South Carolina' },
+          { code: 'SD', name: 'South Dakota' },
+          { code: 'TN', name: 'Tennessee' },
+          { code: 'TX', name: 'Texas' },
+          { code: 'UT', name: 'Utah' },
+          { code: 'VT', name: 'Vermont' },
+          { code: 'VA', name: 'Virginia' },
+          { code: 'WA', name: 'Washington' },
+          { code: 'WV', name: 'West Virginia' },
+          { code: 'WI', name: 'Wisconsin' },
+          { code: 'WY', name: 'Wyoming' }
+        ],
+        'CA': [
+          { code: 'AB', name: 'Alberta' },
+          { code: 'BC', name: 'British Columbia' },
+          { code: 'MB', name: 'Manitoba' },
+          { code: 'NB', name: 'New Brunswick' },
+          { code: 'NL', name: 'Newfoundland and Labrador' },
+          { code: 'NS', name: 'Nova Scotia' },
+          { code: 'ON', name: 'Ontario' },
+          { code: 'PE', name: 'Prince Edward Island' },
+          { code: 'QC', name: 'Quebec' },
+          { code: 'SK', name: 'Saskatchewan' },
+          { code: 'NT', name: 'Northwest Territories' },
+          { code: 'NU', name: 'Nunavut' },
+          { code: 'YT', name: 'Yukon' }
+        ]
+      };
+
+      this.init();
+    }
+
+    init() {
+      this.bindEvents();
+      this.updateStateOptions();
+    }
+
+    bindEvents() {
+      // Country change
+      document.getElementById('shipping-country').addEventListener('change', () => {
+        this.updateStateOptions();
+      });
+
+      // Form submission
+      this.form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.calculateShipping();
+      });
+    }
+
+    updateStateOptions() {
+      const countrySelect = document.getElementById('shipping-country');
+      const stateContainer = document.getElementById('state-province-container');
+      const stateSelect = document.getElementById('shipping-state');
+      
+      const country = countrySelect.value;
+      
+      if (this.states[country]) {
+        stateContainer.classList.remove('hidden');
+        stateSelect.innerHTML = '<option value="">Select State/Province</option>';
+        
+        this.states[country].forEach(state => {
+          const option = document.createElement('option');
+          option.value = state.code;
+          option.textContent = state.name;
+          stateSelect.appendChild(option);
+        });
+        
+        stateSelect.required = true;
+      } else {
+        stateContainer.classList.add('hidden');
+        stateSelect.required = false;
+      }
+    }
+
+    async calculateShipping() {
+      this.showLoading();
+      
+      // Collect form data
+      const formData = {
+        country: document.getElementById('shipping-country').value,
+        state: document.getElementById('shipping-state').value,
+        postalCode: document.getElementById('shipping-postal-code').value,
+        city: document.getElementById('shipping-city').value,
+        weight: parseFloat(document.getElementById('package-weight').value),
+        weightUnit: document.getElementById('weight-unit').value,
+        length: parseFloat(document.getElementById('package-length').value),
+        width: parseFloat(document.getElementById('package-width').value),
+        height: parseFloat(document.getElementById('package-height').value),
+        dimensionUnit: document.getElementById('dimension-unit').value,
+        value: parseFloat(document.getElementById('package-value').value),
+        insurance: document.getElementById('insurance-required').checked
+      };
+
+      try {
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Generate mock shipping rates
+        const rates = this.generateShippingRates(formData);
+        this.showResults(rates, formData);
+        
+      } catch (error) {
+        this.showError('Unable to calculate shipping rates. Please try again.');
+      }
+    }
+
+    generateShippingRates(formData) {
+      const baseRates = {
+        'US': { standard: 5.99, express: 12.99, overnight: 24.99 },
+        'CA': { standard: 8.99, express: 16.99, overnight: 29.99 },
+        'GB': { standard: 12.99, express: 22.99, overnight: 39.99 },
+        'AU': { standard: 15.99, express: 25.99, overnight: 45.99 },
+        'default': { standard: 18.99, express: 28.99, overnight: 49.99 }
+      };
+
+      const rates = baseRates[formData.country] || baseRates.default;
+      
+      // Weight multiplier
+      const weightMultiplier = Math.max(1, Math.ceil(formData.weight / 2));
+      
+      // Insurance cost
+      const insuranceCost = formData.insurance ? Math.max(2.99, formData.value * 0.02) : 0;
+
+      return [
+        {
+          carrier: 'Standard Shipping',
+          service: 'Economy',
+          cost: (rates.standard * weightMultiplier + insuranceCost).toFixed(2),
+          currency: 'USD',
+          deliveryTime: '5-7 business days',
+          tracking: true,
+          icon: '📦',
+          features: ['Tracking included', 'Signature not required']
+        },
+        {
+          carrier: 'Express Shipping',
+          service: 'Priority',
+          cost: (rates.express * weightMultiplier + insuranceCost).toFixed(2),
+          currency: 'USD',
+          deliveryTime: '2-3 business days',
+          tracking: true,
+          icon: '🚚',
+          features: ['Priority handling', 'Tracking included', 'Signature required']
+        },
+        {
+          carrier: 'Overnight Shipping',
+          service: 'Express',
+          cost: (rates.overnight * weightMultiplier + insuranceCost).toFixed(2),
+          currency: 'USD',
+          deliveryTime: '1 business day',
+          tracking: true,
+          icon: '✈️',
+          features: ['Next-day delivery', 'Priority handling', 'Signature required', 'Insurance included']
+        }
+      ];
+    }
+
+    showLoading() {
+      this.resultsEl.classList.add('hidden');
+      this.errorEl.classList.add('hidden');
+      this.loadingEl.classList.remove('hidden');
+    }
+
+    showResults(rates, formData) {
+      this.loadingEl.classList.add('hidden');
+      this.errorEl.classList.add('hidden');
+      
+      // Clear previous results
+      this.optionsEl.innerHTML = '';
+      
+      // Add shipping options
+      rates.forEach((rate, index) => {
+        const optionEl = document.createElement('div');
+        optionEl.className = 'shipping-option bg-white dark:bg-neutral-700 rounded-xl border border-neutral-200 dark:border-neutral-600 p-6 hover:border-primary-300 dark:hover:border-primary-600 transition-colors cursor-pointer';
+        
+        optionEl.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="text-2xl">${rate.icon}</div>
+              <div>
+                <h5 class="font-semibold text-neutral-900 dark:text-neutral-100 text-lg">${rate.carrier}</h5>
+                <p class="text-sm text-neutral-600 dark:text-neutral-400">${rate.service} • ${rate.deliveryTime}</p>
+                <div class="flex flex-wrap gap-2 mt-2">
+                  ${rate.features.map(feature => `
+                    <span class="text-xs bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-2 py-1 rounded-full">${feature}</span>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                $${rate.cost}
+              </div>
+              <p class="text-sm text-neutral-600 dark:text-neutral-400">${rate.currency}</p>
+            </div>
+          </div>
+        `;
+        
+        // Add click handler
+        optionEl.addEventListener('click', () => {
+          this.selectShippingOption(rate, optionEl);
+        });
+        
+        this.optionsEl.appendChild(optionEl);
+      });
+      
+      this.resultsEl.classList.remove('hidden');
+    }
+
+    selectShippingOption(rate, element) {
+      // Remove previous selections
+      document.querySelectorAll('.shipping-option').forEach(el => {
+        el.classList.remove('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900');
+      });
+      
+      // Mark as selected
+      element.classList.add('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900');
+      
+      // Store selected rate
+      this.selectedRate = rate;
+      
+      // Show success message
+      this.showNotification(`Selected ${rate.carrier} - $${rate.cost}`, 'success');
+    }
+
+    showError(message) {
+      this.loadingEl.classList.add('hidden');
+      this.resultsEl.classList.add('hidden');
+      
+      document.getElementById('error-message').textContent = message;
+      this.errorEl.classList.remove('hidden');
+    }
+
+    showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 text-white font-medium ${
+        type === 'success' ? 'bg-green-500' : 
+        type === 'error' ? 'bg-red-500' : 
+        'bg-blue-500'
+      }`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
+  }
+
+  // Initialize when DOM is ready
+  document.addEventListener('DOMContentLoaded', function() {
+    window.shippingCalculatorManager = new ShippingCalculatorManager();
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Shipping Calculator Widget",
+  "tag": "section",
+  "class": "section-shipping-calculator",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Calculate Shipping Costs"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Get accurate shipping rates for your order before you buy"
+    },
+    {
+      "type": "select",
+      "id": "background_color",
+      "label": "Background Color",
+      "options": [
+        {
+          "value": "transparent",
+          "label": "Transparent"
+        },
+        {
+          "value": "white",
+          "label": "White"
+        },
+        {
+          "value": "neutral-50",
+          "label": "Light Gray"
+        }
+      ],
+      "default": "neutral-50"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_actions",
+      "label": "Show Quick Actions",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shipping Calculator Widget",
+      "settings": {
+        "heading": "Calculate Shipping Costs",
+        "subheading": "Get accurate shipping rates for your order before you buy",
+        "show_quick_actions": true
+      }
+    }
+  ]
+}
+{% endschema %}

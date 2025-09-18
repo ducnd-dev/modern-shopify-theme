@@ -1,0 +1,545 @@
+{% comment %}
+  Article Template
+  Displays a single blog article with content, comments, and related articles
+{% endcomment %}
+
+<div class="article-template min-h-screen bg-neutral-50 dark:bg-neutral-900">
+  <!-- Article Header -->
+  <div class="bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700">
+    <div class="container mx-auto px-4 py-16">
+      <div class="max-w-4xl mx-auto">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400 mb-8">
+          <a href="{{ routes.root_url }}" class="hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors">
+            {{ 'general.breadcrumbs.home' | t | default: 'Home' }}
+          </a>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+          <a href="{{ blog.url }}" class="hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors">
+            {{ blog.title }}
+          </a>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+          <span class="text-neutral-700 dark:text-neutral-300">{{ article.title | truncate: 50 }}</span>
+        </nav>
+
+        <!-- Article Meta -->
+        <div class="flex flex-wrap items-center gap-6 text-sm text-neutral-500 dark:text-neutral-400 mb-6">
+          <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}" class="flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            {{ article.published_at | date: '%B %d, %Y' }}
+          </time>
+          {% if article.author != blank %}
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              {{ 'blogs.article.by_author' | t: author: article.author | default: article.author }}
+            </span>
+          {% endif %}
+          {% if article.comment_post_url and blog.moderated? == false %}
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+              </svg>
+              {{ article.comments_count }} 
+              {% if article.comments_count == 1 %}comment{% else %}comments{% endif %}
+            </span>
+          {% endif %}
+          <span class="flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+            {{ article.content | strip_html | split: ' ' | size }} min read
+          </span>
+        </div>
+
+        <!-- Article Title -->
+        <h1 class="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-neutral-100 mb-6 leading-tight">
+          {{ article.title }}
+        </h1>
+
+        <!-- Article Tags -->
+        {% if article.tags.size > 0 %}
+          <div class="flex flex-wrap gap-2 mb-8">
+            {% for tag in article.tags %}
+              <a 
+                href="{{ blog.url }}/tagged/{{ tag | handle }}"
+                class="inline-flex items-center px-3 py-1.5 text-sm font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-200 dark:hover:bg-primary-900/50 transition-colors"
+              >
+                {{ tag }}
+              </a>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-12">
+      <!-- Main Content -->
+      <div class="lg:col-span-3">
+        <article class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+          <!-- Featured Image -->
+          {% if article.image %}
+            <div class="aspect-[16/9] overflow-hidden">
+              <img 
+                src="{{ article.image | image_url: width: 1200 }}"
+                alt="{{ article.image.alt | default: article.title }}"
+                class="w-full h-full object-cover"
+              >
+            </div>
+          {% endif %}
+
+          <!-- Article Content -->
+          <div class="p-8 md:p-12">
+            <div class="prose prose-lg prose-neutral dark:prose-invert max-w-none
+              prose-headings:font-bold prose-headings:text-neutral-900 dark:prose-headings:text-neutral-100
+              prose-p:text-neutral-600 dark:prose-p:text-neutral-400 prose-p:leading-relaxed
+              prose-a:text-primary-600 dark:prose-a:text-primary-400 prose-a:no-underline hover:prose-a:underline
+              prose-strong:text-neutral-900 dark:prose-strong:text-neutral-100
+              prose-blockquote:border-l-4 prose-blockquote:border-primary-500 prose-blockquote:bg-primary-50 dark:prose-blockquote:bg-primary-900/20 prose-blockquote:p-4 prose-blockquote:rounded-r-lg
+              prose-pre:bg-neutral-100 dark:prose-pre:bg-neutral-700 prose-pre:border prose-pre:border-neutral-200 dark:prose-pre:border-neutral-600
+              prose-code:bg-neutral-100 dark:prose-code:bg-neutral-700 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
+              prose-img:rounded-lg prose-img:shadow-lg
+              prose-hr:border-neutral-200 dark:prose-hr:border-neutral-700">
+              {{ article.content }}
+            </div>
+
+            <!-- Social Sharing -->
+            <div class="border-t border-neutral-200 dark:border-neutral-700 pt-8 mt-12">
+              <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
+                {{ 'blogs.article.share' | t | default: 'Share this article' }}
+              </h3>
+              <div class="flex flex-wrap gap-3">
+                <a 
+                  href="https://twitter.com/intent/tweet?text={{ article.title | url_encode }}&url={{ shop.url }}{{ article.url }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                  </svg>
+                  Twitter
+                </a>
+                <a 
+                  href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url }}{{ article.url }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                  Facebook
+                </a>
+                <a 
+                  href="https://www.linkedin.com/sharing/share-offsite/?url={{ shop.url }}{{ article.url }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  </svg>
+                  LinkedIn
+                </a>
+                <button 
+                  onclick="copyToClipboard('{{ shop.url }}{{ article.url }}')"
+                  class="inline-flex items-center gap-2 px-4 py-2 bg-neutral-600 hover:bg-neutral-700 text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                  </svg>
+                  Copy Link
+                </button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Article Navigation -->
+        {% if blog.previous_article or blog.next_article %}
+          <div class="mt-8">
+            <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% if blog.previous_article %}
+                  <a href="{{ blog.previous_article.url }}" class="group flex items-center gap-4 p-4 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors">
+                    <div class="flex-shrink-0">
+                      <svg class="w-6 h-6 text-neutral-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                      </svg>
+                    </div>
+                    <div class="min-w-0">
+                      <p class="text-sm text-neutral-500 dark:text-neutral-400 mb-1">Previous Article</p>
+                      <h4 class="font-medium text-neutral-900 dark:text-neutral-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors line-clamp-2">
+                        {{ blog.previous_article.title }}
+                      </h4>
+                    </div>
+                  </a>
+                {% endif %}
+                
+                {% if blog.next_article %}
+                  <a href="{{ blog.next_article.url }}" class="group flex items-center gap-4 p-4 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors {% unless blog.previous_article %}md:col-start-2{% endunless %}">
+                    <div class="min-w-0 order-2 md:order-1 text-right">
+                      <p class="text-sm text-neutral-500 dark:text-neutral-400 mb-1">Next Article</p>
+                      <h4 class="font-medium text-neutral-900 dark:text-neutral-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors line-clamp-2">
+                        {{ blog.next_article.title }}
+                      </h4>
+                    </div>
+                    <div class="flex-shrink-0 order-1 md:order-2">
+                      <svg class="w-6 h-6 text-neutral-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                    </div>
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Comments Section -->
+        {% if blog.comments_enabled? %}
+          <div class="mt-8">
+            <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-8">
+              {% if article.comments_count > 0 %}
+                <h3 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-8">
+                  {{ article.comments_count }} 
+                  {% if article.comments_count == 1 %}Comment{% else %}Comments{% endif %}
+                </h3>
+
+                <!-- Comments List -->
+                <div class="space-y-8 mb-12">
+                  {% paginate article.comments by 5 %}
+                    {% for comment in article.comments %}
+                      <div class="flex gap-4 {% unless comment.status == 'published' %}opacity-50{% endunless %}">
+                        <!-- Avatar -->
+                        <div class="flex-shrink-0">
+                          <div class="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+                            <span class="text-primary-700 dark:text-primary-300 font-medium text-lg">
+                              {{ comment.author | slice: 0 | upcase }}
+                            </span>
+                          </div>
+                        </div>
+
+                        <!-- Comment Content -->
+                        <div class="flex-1">
+                          <div class="bg-neutral-50 dark:bg-neutral-700 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-2">
+                              <h4 class="font-medium text-neutral-900 dark:text-neutral-100">
+                                {{ comment.author }}
+                              </h4>
+                              <time class="text-sm text-neutral-500 dark:text-neutral-400" datetime="{{ comment.created_at | date: '%Y-%m-%d' }}">
+                                {{ comment.created_at | date: '%B %d, %Y at %I:%M %p' }}
+                              </time>
+                            </div>
+                            <div class="text-neutral-600 dark:text-neutral-400">
+                              {{ comment.content }}
+                            </div>
+                          </div>
+                          {% unless comment.status == 'published' %}
+                            <p class="text-sm text-yellow-600 dark:text-yellow-400 mt-2">
+                              Your comment is awaiting moderation.
+                            </p>
+                          {% endunless %}
+                        </div>
+                      </div>
+                    {% endfor %}
+
+                    {% if paginate.pages > 1 %}
+                      <nav class="flex justify-center mt-8">
+                        <div class="flex items-center gap-2">
+                          {% if paginate.previous %}
+                            <a href="{{ paginate.previous.url }}" class="px-3 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-50 dark:hover:bg-neutral-600">
+                              Previous
+                            </a>
+                          {% endif %}
+
+                          {% for part in paginate.parts %}
+                            {% if part.is_link %}
+                              <a href="{{ part.url }}" class="px-3 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-50 dark:hover:bg-neutral-600">
+                                {{ part.title }}
+                              </a>
+                            {% else %}
+                              <span class="px-3 py-2 text-sm font-medium text-white bg-primary-600 border border-primary-600 rounded-md">
+                                {{ part.title }}
+                              </span>
+                            {% endif %}
+                          {% endfor %}
+
+                          {% if paginate.next %}
+                            <a href="{{ paginate.next.url }}" class="px-3 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-50 dark:hover:bg-neutral-600">
+                              Next
+                            </a>
+                          {% endif %}
+                        </div>
+                      </nav>
+                    {% endif %}
+                  {% endpaginate %}
+                </div>
+              {% endif %}
+
+              <!-- Comment Form -->
+              {% if article.comment_post_url %}
+                <div class="border-t border-neutral-200 dark:border-neutral-700 pt-8">
+                  <h3 class="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-6">
+                    {{ 'blogs.comments.title' | t | default: 'Leave a comment' }}
+                  </h3>
+
+                  {% form 'new_comment', article %}
+                    {% if form.posted_successfully? %}
+                      <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
+                        <div class="flex items-center">
+                          <svg class="w-5 h-5 text-green-600 dark:text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                          </svg>
+                          <p class="text-green-800 dark:text-green-200">
+                            {% if blog.moderated? %}
+                              {{ 'blogs.comments.success_moderated' | t | default: 'Your comment was posted successfully! We will publish it in a little while, as our blog is moderated.' }}
+                            {% else %}
+                              {{ 'blogs.comments.success' | t | default: 'Your comment was posted successfully! Thank you!' }}
+                            {% endif %}
+                          </p>
+                        </div>
+                      </div>
+                    {% endif %}
+
+                    {% if form.errors %}
+                      <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+                        <div class="flex items-center mb-2">
+                          <svg class="w-5 h-5 text-red-600 dark:text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                          </svg>
+                          <h4 class="text-red-800 dark:text-red-200 font-medium">
+                            {{ 'blogs.comments.error_heading' | t | default: 'Please correct the following:' }}
+                          </h4>
+                        </div>
+                        <ul class="text-red-700 dark:text-red-300 text-sm space-y-1">
+                          {% for field in form.errors %}
+                            <li>{{ form.errors.messages[field] }}</li>
+                          {% endfor %}
+                        </ul>
+                      </div>
+                    {% endif %}
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                      <div>
+                        <label for="CommentAuthor" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                          {{ 'blogs.comments.name' | t | default: 'Name' }} *
+                        </label>
+                        <input
+                          type="text"
+                          name="comment[author]"
+                          id="CommentAuthor"
+                          class="w-full px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                          value="{{ form.author }}"
+                          autocomplete="name"
+                          required
+                        >
+                      </div>
+                      <div>
+                        <label for="CommentEmail" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                          {{ 'blogs.comments.email' | t | default: 'Email' }} *
+                        </label>
+                        <input
+                          type="email"
+                          name="comment[email]"
+                          id="CommentEmail"
+                          class="w-full px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                          value="{{ form.email }}"
+                          autocomplete="email"
+                          required
+                        >
+                      </div>
+                    </div>
+
+                    <div class="mb-6">
+                      <label for="CommentBody" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                        {{ 'blogs.comments.message' | t | default: 'Comment' }} *
+                      </label>
+                      <textarea
+                        name="comment[body]"
+                        id="CommentBody"
+                        rows="6"
+                        class="w-full px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 resize-vertical"
+                        placeholder="{{ 'blogs.comments.message_placeholder' | t | default: 'Write your comment here...' }}"
+                        required
+                      >{{ form.body }}</textarea>
+                    </div>
+
+                    {% if blog.moderated? %}
+                      <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-6">
+                        {{ 'blogs.comments.moderated' | t | default: 'Please note, comments need to be approved before they are published.' }}
+                      </p>
+                    {% endif %}
+
+                    <button
+                      type="submit"
+                      class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                    >
+                      {{ 'blogs.comments.post' | t | default: 'Post Comment' }}
+                    </button>
+                  {% endform %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Sidebar -->
+      <div class="lg:col-span-1">
+        <div class="sticky top-8 space-y-8">
+          <!-- Author Bio -->
+          {% if article.author != blank %}
+            <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6">
+              <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
+                {{ 'blogs.article.about_author' | t | default: 'About the Author' }}
+              </h3>
+              <div class="flex items-center gap-4 mb-4">
+                <div class="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+                  <span class="text-primary-700 dark:text-primary-300 font-bold text-2xl">
+                    {{ article.author | slice: 0 | upcase }}
+                  </span>
+                </div>
+                <div>
+                  <h4 class="font-medium text-neutral-900 dark:text-neutral-100">{{ article.author }}</h4>
+                  <p class="text-sm text-neutral-600 dark:text-neutral-400">Content Writer</p>
+                </div>
+              </div>
+              <p class="text-neutral-600 dark:text-neutral-400 text-sm">
+                {{ 'blogs.article.author_bio' | t | default: 'Passionate about sharing insights and stories that matter.' }}
+              </p>
+            </div>
+          {% endif %}
+
+          <!-- Related Articles -->
+          {% assign related_articles = blog.articles | where: 'published_at' | where_not: 'id', article.id %}
+          {% if related_articles.size > 0 %}
+            <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6">
+              <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
+                {{ 'blogs.article.related_posts' | t | default: 'Related Articles' }}
+              </h3>
+              <div class="space-y-4">
+                {% for related_article in related_articles limit: 4 %}
+                  <article class="group">
+                    {% if related_article.image %}
+                      <div class="aspect-[16/10] mb-3 overflow-hidden rounded-lg">
+                        <img 
+                          src="{{ related_article.image | image_url: width: 300 }}"
+                          alt="{{ related_article.image.alt | default: related_article.title }}"
+                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                        >
+                      </div>
+                    {% endif %}
+                    <h4 class="font-medium text-neutral-900 dark:text-neutral-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors mb-2">
+                      <a href="{{ related_article.url }}" class="line-clamp-2">
+                        {{ related_article.title }}
+                      </a>
+                    </h4>
+                    <time class="text-sm text-neutral-500 dark:text-neutral-400" datetime="{{ related_article.published_at | date: '%Y-%m-%d' }}">
+                      {{ related_article.published_at | date: '%b %d, %Y' }}
+                    </time>
+                  </article>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Newsletter Signup -->
+          <div class="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl border border-primary-200 dark:border-primary-800 p-6">
+            <h3 class="text-lg font-semibold text-primary-900 dark:text-primary-100 mb-3">
+              {{ 'blogs.article.newsletter_title' | t | default: 'Stay Updated' }}
+            </h3>
+            <p class="text-primary-700 dark:text-primary-300 text-sm mb-4">
+              {{ 'blogs.article.newsletter_description' | t | default: 'Get the latest articles delivered to your inbox.' }}
+            </p>
+            {% render 'newsletter-form', context: 'article-sidebar' %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+      // Show success message
+      const button = event.target.closest('button');
+      const originalText = button.innerHTML;
+      button.innerHTML = `
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        Copied!
+      `;
+      button.classList.remove('bg-neutral-600', 'hover:bg-neutral-700');
+      button.classList.add('bg-green-600', 'hover:bg-green-700');
+      
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.classList.remove('bg-green-600', 'hover:bg-green-700');
+        button.classList.add('bg-neutral-600', 'hover:bg-neutral-700');
+      }, 2000);
+    });
+  }
+</script>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .prose {
+    max-width: none;
+  }
+
+  .prose img {
+    margin: 2rem auto;
+  }
+
+  .prose blockquote {
+    font-style: normal;
+    border-left-width: 4px;
+    margin: 2rem 0;
+  }
+
+  .prose pre {
+    overflow-x: auto;
+    border-radius: 0.5rem;
+  }
+
+  .prose code {
+    font-size: 0.875rem;
+  }
+
+  .prose h2, .prose h3, .prose h4 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .prose p {
+    margin-bottom: 1.5rem;
+  }
+
+  .prose ul, .prose ol {
+    margin: 1.5rem 0;
+    padding-left: 1.5rem;
+  }
+
+  .prose li {
+    margin: 0.5rem 0;
+  }
+</style>

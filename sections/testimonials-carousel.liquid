@@ -1,0 +1,474 @@
+{% comment %}
+  Testimonials Carousel Section
+  Advanced testimonials section with carousel, rating stars, and customer photos
+{% endcomment %}
+
+<div class="testimonials-carousel-section py-16 bg-{{ section.settings.background_color }}">
+  <div class="container mx-auto px-4">
+    {% if section.settings.heading != blank or section.settings.subheading != blank %}
+      <div class="text-center mb-12">
+        {% if section.settings.heading != blank %}
+          <h2 class="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
+            {{ section.settings.heading }}
+          </h2>
+        {% endif %}
+        {% if section.settings.subheading != blank %}
+          <p class="text-xl text-neutral-600 dark:text-neutral-400 max-w-3xl mx-auto">
+            {{ section.settings.subheading }}
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if section.blocks.size > 0 %}
+      <div class="relative">
+        <!-- Testimonials Container -->
+        <div class="testimonials-slider overflow-hidden" data-testimonials-slider>
+          <div class="testimonials-track flex transition-transform duration-500 ease-in-out" data-testimonials-track>
+            {% for block in section.blocks %}
+              {% case block.type %}
+                {% when 'testimonial' %}
+                  <div class="testimonial-slide w-full flex-shrink-0 px-4" data-testimonial-slide>
+                    <div class="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700 p-8 max-w-4xl mx-auto">
+                      <!-- Rating Stars -->
+                      {% if block.settings.rating > 0 %}
+                        <div class="flex justify-center mb-6">
+                          {% for i in (1..5) %}
+                            <svg class="w-6 h-6 {% if i <= block.settings.rating %}text-yellow-400{% else %}text-neutral-300 dark:text-neutral-600{% endif %}" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+
+                      <!-- Testimonial Content -->
+                      {% if block.settings.testimonial != blank %}
+                        <blockquote class="text-lg md:text-xl text-neutral-700 dark:text-neutral-300 text-center mb-8 leading-relaxed">
+                          <span class="text-primary-500 text-4xl leading-none">"</span>
+                          {{ block.settings.testimonial }}
+                          <span class="text-primary-500 text-4xl leading-none">"</span>
+                        </blockquote>
+                      {% endif %}
+
+                      <!-- Customer Info -->
+                      <div class="flex items-center justify-center">
+                        {% if block.settings.customer_image != blank %}
+                          <div class="w-16 h-16 rounded-full overflow-hidden mr-4 border-4 border-primary-100 dark:border-primary-900">
+                            <img 
+                              src="{{ block.settings.customer_image | image_url: width: 64 }}" 
+                              alt="{{ block.settings.customer_name }}"
+                              class="w-full h-full object-cover"
+                              loading="lazy"
+                            >
+                          </div>
+                        {% else %}
+                          <div class="w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center mr-4">
+                            <svg class="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                          </div>
+                        {% endif %}
+
+                        <div class="text-center">
+                          {% if block.settings.customer_name != blank %}
+                            <h4 class="font-semibold text-neutral-900 dark:text-neutral-100">
+                              {{ block.settings.customer_name }}
+                            </h4>
+                          {% endif %}
+                          {% if block.settings.customer_title != blank %}
+                            <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                              {{ block.settings.customer_title }}
+                            </p>
+                          {% endif %}
+                          {% if block.settings.location != blank %}
+                            <p class="text-sm text-neutral-500 dark:text-neutral-500">
+                              {{ block.settings.location }}
+                            </p>
+                          {% endif %}
+                        </div>
+                      </div>
+
+                      <!-- Verified Purchase Badge -->
+                      {% if block.settings.verified_purchase %}
+                        <div class="flex items-center justify-center mt-4">
+                          <div class="inline-flex items-center gap-2 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-3 py-1 rounded-full text-sm font-medium">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Verified Purchase
+                          </div>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+              {% endcase %}
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Navigation Arrows -->
+        {% if section.blocks.size > 1 %}
+          <button 
+            class="testimonials-prev absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white dark:bg-neutral-800 rounded-full shadow-lg border border-neutral-200 dark:border-neutral-700 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors z-10"
+            aria-label="Previous testimonial"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </button>
+
+          <button 
+            class="testimonials-next absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white dark:bg-neutral-800 rounded-full shadow-lg border border-neutral-200 dark:border-neutral-700 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors z-10"
+            aria-label="Next testimonial"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        {% endif %}
+
+        <!-- Dots Indicator -->
+        {% if section.blocks.size > 1 %}
+          <div class="flex justify-center mt-8 space-x-2">
+            {% for block in section.blocks %}
+              <button 
+                class="testimonials-dot w-3 h-3 rounded-full transition-colors {% if forloop.first %}bg-primary-600{% else %}bg-neutral-300 dark:bg-neutral-600{% endif %}"
+                data-slide="{{ forloop.index0 }}"
+                aria-label="Go to testimonial {{ forloop.index }}"
+              ></button>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Trust Indicators -->
+      {% if section.settings.show_trust_indicators %}
+        <div class="mt-16 border-t border-neutral-200 dark:border-neutral-700 pt-12">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div class="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">{{ section.settings.total_reviews | default: '1,000+' }}</div>
+              <div class="text-sm text-neutral-600 dark:text-neutral-400">Happy Customers</div>
+            </div>
+            <div>
+              <div class="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">{{ section.settings.average_rating | default: '4.9' }}</div>
+              <div class="text-sm text-neutral-600 dark:text-neutral-400">Average Rating</div>
+            </div>
+            <div>
+              <div class="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">{{ section.settings.years_experience | default: '10+' }}</div>
+              <div class="text-sm text-neutral-600 dark:text-neutral-400">Years Experience</div>
+            </div>
+            <div>
+              <div class="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">99%</div>
+              <div class="text-sm text-neutral-600 dark:text-neutral-400">Satisfaction Rate</div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% else %}
+      <!-- Empty State -->
+      <div class="text-center py-16">
+        <svg class="w-16 h-16 text-neutral-300 dark:text-neutral-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+        </svg>
+        <h3 class="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-2">No testimonials yet</h3>
+        <p class="text-neutral-600 dark:text-neutral-400">Add some testimonials to showcase customer feedback.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const slider = document.querySelector('[data-testimonials-slider]');
+    if (!slider) return;
+
+    const track = slider.querySelector('[data-testimonials-track]');
+    const slides = slider.querySelectorAll('[data-testimonial-slide]');
+    const prevBtn = slider.parentElement.querySelector('.testimonials-prev');
+    const nextBtn = slider.parentElement.querySelector('.testimonials-next');
+    const dots = slider.parentElement.querySelectorAll('.testimonials-dot');
+
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+    
+    if (totalSlides <= 1) return;
+
+    function updateSlider() {
+      const translateX = -currentSlide * 100;
+      track.style.transform = `translateX(${translateX}%)`;
+
+      // Update dots
+      dots.forEach((dot, index) => {
+        if (index === currentSlide) {
+          dot.classList.remove('bg-neutral-300', 'dark:bg-neutral-600');
+          dot.classList.add('bg-primary-600');
+        } else {
+          dot.classList.remove('bg-primary-600');
+          dot.classList.add('bg-neutral-300', 'dark:bg-neutral-600');
+        }
+      });
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      updateSlider();
+    }
+
+    function prevSlide() {
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      updateSlider();
+    }
+
+    function goToSlide(index) {
+      currentSlide = index;
+      updateSlider();
+    }
+
+    // Event listeners
+    if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+    if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => goToSlide(index));
+    });
+
+    // Auto-play
+    {% if section.settings.autoplay %}
+      setInterval(nextSlide, {{ section.settings.autoplay_speed | default: 5000 }});
+    {% endif %}
+
+    // Touch/swipe support
+    let startX = 0;
+    let isDragging = false;
+
+    slider.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      isDragging = true;
+    });
+
+    slider.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+    });
+
+    slider.addEventListener('touchend', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+
+      const endX = e.changedTouches[0].clientX;
+      const deltaX = startX - endX;
+
+      if (Math.abs(deltaX) > 50) {
+        if (deltaX > 0) {
+          nextSlide();
+        } else {
+          prevSlide();
+        }
+      }
+    });
+
+    // Keyboard navigation
+    slider.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        prevSlide();
+      } else if (e.key === 'ArrowRight') {
+        nextSlide();
+      }
+    });
+  });
+</script>
+
+<style>
+  .testimonials-carousel-section .testimonials-track {
+    will-change: transform;
+  }
+  
+  .testimonials-carousel-section .testimonials-dot {
+    cursor: pointer;
+  }
+  
+  .testimonials-carousel-section .testimonials-dot:hover {
+    transform: scale(1.2);
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Testimonials Carousel",
+  "tag": "section",
+  "class": "section-testimonials-carousel",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "What Our Customers Say"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Don't just take our word for it - see what our customers have to say about their experience."
+    },
+    {
+      "type": "select",
+      "id": "background_color",
+      "label": "Background Color",
+      "options": [
+        {
+          "value": "transparent",
+          "label": "Transparent"
+        },
+        {
+          "value": "neutral-50",
+          "label": "Light Gray"
+        },
+        {
+          "value": "neutral-100",
+          "label": "Gray"
+        },
+        {
+          "value": "primary-50",
+          "label": "Primary Light"
+        }
+      ],
+      "default": "neutral-50"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Auto-play testimonials",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Auto-play speed (ms)",
+      "min": 3000,
+      "max": 10000,
+      "step": 1000,
+      "default": 5000
+    },
+    {
+      "type": "header",
+      "content": "Trust Indicators"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_indicators",
+      "label": "Show trust indicators",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "total_reviews",
+      "label": "Total Reviews",
+      "default": "1,000+"
+    },
+    {
+      "type": "text",
+      "id": "average_rating",
+      "label": "Average Rating",
+      "default": "4.9"
+    },
+    {
+      "type": "text",
+      "id": "years_experience",
+      "label": "Years Experience",
+      "default": "10+"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "testimonial",
+          "label": "Testimonial",
+          "default": "This product exceeded my expectations! The quality is amazing and the customer service was outstanding."
+        },
+        {
+          "type": "text",
+          "id": "customer_name",
+          "label": "Customer Name",
+          "default": "Sarah Johnson"
+        },
+        {
+          "type": "text",
+          "id": "customer_title",
+          "label": "Customer Title",
+          "default": "Verified Buyer"
+        },
+        {
+          "type": "text",
+          "id": "location",
+          "label": "Location",
+          "default": "New York, NY"
+        },
+        {
+          "type": "image_picker",
+          "id": "customer_image",
+          "label": "Customer Photo"
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Rating (stars)",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "checkbox",
+          "id": "verified_purchase",
+          "label": "Verified Purchase",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials Carousel",
+      "blocks": [
+        {
+          "type": "testimonial",
+          "settings": {
+            "testimonial": "This product exceeded my expectations! The quality is amazing and the customer service was outstanding.",
+            "customer_name": "Sarah Johnson",
+            "customer_title": "Verified Buyer",
+            "location": "New York, NY",
+            "rating": 5,
+            "verified_purchase": true
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "testimonial": "Fast shipping, great packaging, and exactly what I ordered. Will definitely shop here again!",
+            "customer_name": "Mike Chen",
+            "customer_title": "Repeat Customer",
+            "location": "Los Angeles, CA",
+            "rating": 5,
+            "verified_purchase": true
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "testimonial": "Outstanding customer support and high-quality products. This store has earned my loyalty.",
+            "customer_name": "Emily Rodriguez",
+            "customer_title": "VIP Customer",
+            "location": "Miami, FL",
+            "rating": 5,
+            "verified_purchase": true
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

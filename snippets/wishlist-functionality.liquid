@@ -1,0 +1,634 @@
+{% comment %}
+  Wishlist Functionality Snippet
+  Advanced wishlist system with local storage, sharing, and sync capabilities
+{% endcomment %}
+
+<!-- Wishlist Modal -->
+<div id="wishlist-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4" data-wishlist-modal>
+  <div class="bg-white dark:bg-neutral-800 rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+    <!-- Modal Header -->
+    <div class="p-6 border-b border-neutral-200 dark:border-neutral-600 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+        </svg>
+        <h3 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+          My Wishlist
+          <span id="wishlist-count" class="text-lg text-neutral-500 dark:text-neutral-400">(0 items)</span>
+        </h3>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <!-- Share Wishlist -->
+        <button 
+          id="share-wishlist"
+          class="p-2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+          title="Share Wishlist"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+          </svg>
+        </button>
+        
+        <!-- Clear All -->
+        <button 
+          id="clear-wishlist"
+          class="p-2 text-neutral-400 hover:text-red-500 transition-colors"
+          title="Clear Wishlist"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+        </button>
+        
+        <!-- Close Modal -->
+        <button 
+          id="close-wishlist"
+          class="p-2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+          aria-label="Close wishlist"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="overflow-y-auto max-h-[calc(80vh-140px)]">
+      <!-- Wishlist Items -->
+      <div id="wishlist-items" class="p-6">
+        <!-- Items will be populated here -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="wishlist-empty" class="hidden text-center py-16">
+        <svg class="w-20 h-20 text-neutral-300 dark:text-neutral-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+        </svg>
+        <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">Your wishlist is empty</h3>
+        <p class="text-neutral-600 dark:text-neutral-400 mb-6">Save items you love to your wishlist and shop them later.</p>
+        <button 
+          id="start-shopping"
+          class="bg-primary-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-primary-700 transition-colors"
+        >
+          Start Shopping
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div id="wishlist-footer" class="hidden p-6 border-t border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-700">
+      <div class="flex items-center justify-between">
+        <div class="text-sm text-neutral-600 dark:text-neutral-400">
+          <span id="wishlist-total-items">0</span> items • 
+          <span id="wishlist-total-value">$0.00</span> total value
+        </div>
+        <div class="flex gap-3">
+          <button 
+            id="add-all-to-cart"
+            class="bg-neutral-200 dark:bg-neutral-600 text-neutral-700 dark:text-neutral-300 px-4 py-2 rounded-lg font-medium hover:bg-neutral-300 dark:hover:bg-neutral-500 transition-colors"
+          >
+            Add All to Cart
+          </button>
+          <button 
+            id="continue-shopping"
+            class="bg-primary-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-700 transition-colors"
+          >
+            Continue Shopping
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Wishlist Floating Button -->
+<button 
+  id="wishlist-toggle"
+  class="fixed bottom-20 right-4 w-14 h-14 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-600 rounded-full shadow-lg flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:text-red-500 dark:hover:text-red-400 transition-all duration-300 hover:scale-110 z-40"
+  title="View Wishlist"
+>
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+  </svg>
+  <span id="wishlist-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-semibold hidden">0</span>
+</button>
+
+<!-- Share Modal -->
+<div id="share-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+  <div class="bg-white dark:bg-neutral-800 rounded-xl max-w-md w-full p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h4 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Share Wishlist</h4>
+      <button id="close-share-modal" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="space-y-4">
+      <!-- Share Link -->
+      <div>
+        <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Share Link</label>
+        <div class="flex gap-2">
+          <input 
+            type="text" 
+            id="share-link"
+            readonly
+            class="flex-1 px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-neutral-50 dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 text-sm"
+          >
+          <button 
+            id="copy-link"
+            class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
+          >
+            Copy
+          </button>
+        </div>
+      </div>
+      
+      <!-- Social Share -->
+      <div>
+        <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Share on Social</label>
+        <div class="flex gap-2">
+          <button class="social-share flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium" data-platform="facebook">
+            Facebook
+          </button>
+          <button class="social-share flex-1 bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition-colors text-sm font-medium" data-platform="twitter">
+            Twitter
+          </button>
+          <button class="social-share flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium" data-platform="whatsapp">
+            WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Wishlist Management Class
+  class WishlistManager {
+    constructor() {
+      this.storageKey = 'shopify_wishlist';
+      this.wishlist = this.loadWishlist();
+      this.init();
+    }
+
+    init() {
+      this.bindEvents();
+      this.updateUI();
+      this.addWishlistButtons();
+    }
+
+    loadWishlist() {
+      try {
+        const stored = localStorage.getItem(this.storageKey);
+        return stored ? JSON.parse(stored) : [];
+      } catch (error) {
+        console.error('Error loading wishlist:', error);
+        return [];
+      }
+    }
+
+    saveWishlist() {
+      try {
+        localStorage.setItem(this.storageKey, JSON.stringify(this.wishlist));
+        this.updateUI();
+        this.dispatchWishlistEvent();
+      } catch (error) {
+        console.error('Error saving wishlist:', error);
+      }
+    }
+
+    addToWishlist(product) {
+      const exists = this.wishlist.find(item => item.id === product.id);
+      if (!exists) {
+        this.wishlist.push({
+          id: product.id,
+          title: product.title,
+          price: product.price,
+          image: product.image,
+          url: product.url,
+          available: product.available !== false,
+          addedAt: new Date().toISOString()
+        });
+        this.saveWishlist();
+        this.showNotification(`${product.title} added to wishlist`, 'success');
+        return true;
+      } else {
+        this.showNotification(`${product.title} is already in your wishlist`, 'info');
+        return false;
+      }
+    }
+
+    removeFromWishlist(productId) {
+      const index = this.wishlist.findIndex(item => item.id === productId);
+      if (index !== -1) {
+        const product = this.wishlist[index];
+        this.wishlist.splice(index, 1);
+        this.saveWishlist();
+        this.showNotification(`${product.title} removed from wishlist`, 'success');
+        return true;
+      }
+      return false;
+    }
+
+    isInWishlist(productId) {
+      return this.wishlist.some(item => item.id === productId);
+    }
+
+    clearWishlist() {
+      if (this.wishlist.length === 0) return;
+      
+      if (confirm('Are you sure you want to clear your entire wishlist?')) {
+        this.wishlist = [];
+        this.saveWishlist();
+        this.showNotification('Wishlist cleared', 'success');
+      }
+    }
+
+    updateUI() {
+      const count = this.wishlist.length;
+      
+      // Update badge
+      const badge = document.getElementById('wishlist-badge');
+      const countSpan = document.getElementById('wishlist-count');
+      
+      if (badge) {
+        if (count > 0) {
+          badge.textContent = count;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
+      
+      if (countSpan) {
+        countSpan.textContent = `(${count} item${count !== 1 ? 's' : ''})`;
+      }
+
+      // Update wishlist buttons
+      document.querySelectorAll('[data-wishlist-btn]').forEach(btn => {
+        const productId = btn.getAttribute('data-product-id');
+        const isInWishlist = this.isInWishlist(productId);
+        
+        if (isInWishlist) {
+          btn.classList.add('active');
+          btn.querySelector('svg').style.fill = 'currentColor';
+          btn.title = 'Remove from wishlist';
+        } else {
+          btn.classList.remove('active');
+          btn.querySelector('svg').style.fill = 'none';
+          btn.title = 'Add to wishlist';
+        }
+      });
+    }
+
+    renderWishlist() {
+      const container = document.getElementById('wishlist-items');
+      const emptyState = document.getElementById('wishlist-empty');
+      const footer = document.getElementById('wishlist-footer');
+      const totalItems = document.getElementById('wishlist-total-items');
+      const totalValue = document.getElementById('wishlist-total-value');
+
+      if (this.wishlist.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        footer.classList.add('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      footer.classList.remove('hidden');
+
+      // Calculate total value
+      const total = this.wishlist.reduce((sum, item) => {
+        const price = parseFloat(item.price.replace(/[^0-9.]/g, '')) || 0;
+        return sum + price;
+      }, 0);
+
+      if (totalItems) totalItems.textContent = this.wishlist.length;
+      if (totalValue) totalValue.textContent = `$${total.toFixed(2)}`;
+
+      // Render items
+      container.innerHTML = this.wishlist.map(item => `
+        <div class="wishlist-item flex items-center gap-4 p-4 border border-neutral-200 dark:border-neutral-600 rounded-lg mb-4 bg-white dark:bg-neutral-700/50">
+          <div class="w-20 h-20 bg-neutral-100 dark:bg-neutral-600 rounded-lg overflow-hidden flex-shrink-0">
+            <img 
+              src="${item.image}" 
+              alt="${item.title}"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            >
+          </div>
+          
+          <div class="flex-1 min-w-0">
+            <h4 class="font-semibold text-neutral-900 dark:text-neutral-100 truncate">
+              <a href="${item.url}" class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                ${item.title}
+              </a>
+            </h4>
+            <p class="text-primary-600 dark:text-primary-400 font-bold mt-1">${item.price}</p>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+              Added ${new Date(item.addedAt).toLocaleDateString()}
+            </p>
+            ${!item.available ? '<p class="text-xs text-red-500 mt-1">Out of stock</p>' : ''}
+          </div>
+          
+          <div class="flex flex-col gap-2">
+            <button 
+              class="add-to-cart-btn px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors ${!item.available ? 'opacity-50 cursor-not-allowed' : ''}"
+              data-product-id="${item.id}"
+              ${!item.available ? 'disabled' : ''}
+            >
+              ${item.available ? 'Add to Cart' : 'Out of Stock'}
+            </button>
+            <button 
+              class="remove-from-wishlist px-4 py-2 border border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 rounded-lg text-sm font-medium hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:border-red-300 dark:hover:border-red-600 transition-colors"
+              data-product-id="${item.id}"
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      // Bind remove buttons
+      container.querySelectorAll('.remove-from-wishlist').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const productId = e.target.getAttribute('data-product-id');
+          this.removeFromWishlist(productId);
+          this.renderWishlist();
+        });
+      });
+
+      // Bind add to cart buttons
+      container.querySelectorAll('.add-to-cart-btn:not([disabled])').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const productId = e.target.getAttribute('data-product-id');
+          this.addToCart(productId);
+        });
+      });
+    }
+
+    addToCart(productId) {
+      // In a real implementation, this would add the item to Shopify cart
+      console.log('Adding to cart:', productId);
+      this.showNotification('Added to cart!', 'success');
+      
+      // Optionally remove from wishlist after adding to cart
+      // this.removeFromWishlist(productId);
+      // this.renderWishlist();
+    }
+
+    addAllToCart() {
+      const availableItems = this.wishlist.filter(item => item.available);
+      if (availableItems.length === 0) {
+        this.showNotification('No available items to add to cart', 'info');
+        return;
+      }
+
+      // In a real implementation, this would add all items to cart
+      console.log('Adding all to cart:', availableItems);
+      this.showNotification(`${availableItems.length} items added to cart!`, 'success');
+    }
+
+    shareWishlist() {
+      if (this.wishlist.length === 0) {
+        this.showNotification('Your wishlist is empty', 'info');
+        return;
+      }
+
+      // Generate shareable link (in real implementation, this would be a server endpoint)
+      const shareableData = btoa(JSON.stringify(this.wishlist.map(item => item.id)));
+      const shareLink = `${window.location.origin}/wishlist?data=${shareableData}`;
+      
+      document.getElementById('share-link').value = shareLink;
+      document.getElementById('share-modal').classList.remove('hidden');
+    }
+
+    addWishlistButtons() {
+      // Add wishlist buttons to product cards that don't have them
+      document.querySelectorAll('.product-card, [data-product-card]').forEach(card => {
+        if (card.querySelector('[data-wishlist-btn]')) return;
+
+        const productId = card.getAttribute('data-product-id') || 
+                         card.querySelector('[data-product-id]')?.getAttribute('data-product-id');
+        
+        if (!productId) return;
+
+        const button = document.createElement('button');
+        button.className = 'wishlist-btn absolute top-2 right-2 w-8 h-8 bg-white dark:bg-neutral-800 rounded-full shadow-md flex items-center justify-center text-neutral-400 hover:text-red-500 transition-colors z-10';
+        button.setAttribute('data-wishlist-btn', '');
+        button.setAttribute('data-product-id', productId);
+        button.innerHTML = `
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+          </svg>
+        `;
+
+        if (card.style.position !== 'absolute' && card.style.position !== 'relative') {
+          card.style.position = 'relative';
+        }
+        
+        card.appendChild(button);
+      });
+    }
+
+    bindEvents() {
+      // Modal controls
+      document.getElementById('wishlist-toggle').addEventListener('click', () => {
+        this.renderWishlist();
+        document.getElementById('wishlist-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      });
+
+      document.getElementById('close-wishlist').addEventListener('click', () => {
+        document.getElementById('wishlist-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      });
+
+      document.getElementById('clear-wishlist').addEventListener('click', () => {
+        this.clearWishlist();
+        this.renderWishlist();
+      });
+
+      document.getElementById('share-wishlist').addEventListener('click', () => {
+        this.shareWishlist();
+      });
+
+      document.getElementById('add-all-to-cart').addEventListener('click', () => {
+        this.addAllToCart();
+      });
+
+      document.getElementById('continue-shopping').addEventListener('click', () => {
+        document.getElementById('wishlist-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      });
+
+      document.getElementById('start-shopping').addEventListener('click', () => {
+        window.location.href = '/collections/all';
+      });
+
+      // Share modal
+      document.getElementById('close-share-modal').addEventListener('click', () => {
+        document.getElementById('share-modal').classList.add('hidden');
+      });
+
+      document.getElementById('copy-link').addEventListener('click', () => {
+        const shareLink = document.getElementById('share-link');
+        shareLink.select();
+        document.execCommand('copy');
+        this.showNotification('Link copied to clipboard!', 'success');
+      });
+
+      // Social sharing
+      document.querySelectorAll('.social-share').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const platform = e.target.getAttribute('data-platform');
+          const shareLink = document.getElementById('share-link').value;
+          const text = 'Check out my wishlist!';
+          
+          let url = '';
+          switch (platform) {
+            case 'facebook':
+              url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}`;
+              break;
+            case 'twitter':
+              url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareLink)}`;
+              break;
+            case 'whatsapp':
+              url = `https://wa.me/?text=${encodeURIComponent(text + ' ' + shareLink)}`;
+              break;
+          }
+          
+          if (url) {
+            window.open(url, '_blank', 'width=600,height=400');
+          }
+        });
+      });
+
+      // Wishlist button clicks
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('[data-wishlist-btn]')) {
+          e.preventDefault();
+          const btn = e.target.closest('[data-wishlist-btn]');
+          const productId = btn.getAttribute('data-product-id');
+          
+          // Get product data (in real implementation, this would come from the page or API)
+          const productCard = btn.closest('.product-card, [data-product-card]');
+          const product = {
+            id: productId,
+            title: productCard.querySelector('.product-title, h3, h4')?.textContent?.trim() || 'Product',
+            price: productCard.querySelector('.price, .product-price')?.textContent?.trim() || '$0.00',
+            image: productCard.querySelector('img')?.src || '',
+            url: productCard.querySelector('a')?.href || '#',
+            available: !productCard.querySelector('.sold-out, .out-of-stock')
+          };
+
+          if (this.isInWishlist(productId)) {
+            this.removeFromWishlist(productId);
+          } else {
+            this.addToWishlist(product);
+          }
+        }
+      });
+
+      // Close modals on outside click
+      document.addEventListener('click', (e) => {
+        if (e.target.id === 'wishlist-modal') {
+          document.getElementById('wishlist-modal').classList.add('hidden');
+          document.body.style.overflow = 'auto';
+        }
+        if (e.target.id === 'share-modal') {
+          document.getElementById('share-modal').classList.add('hidden');
+        }
+      });
+    }
+
+    showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 text-white font-medium ${
+        type === 'success' ? 'bg-green-500' : 
+        type === 'error' ? 'bg-red-500' : 
+        'bg-blue-500'
+      }`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
+
+    dispatchWishlistEvent() {
+      const event = new CustomEvent('wishlistUpdated', {
+        detail: { wishlist: this.wishlist, count: this.wishlist.length }
+      });
+      document.dispatchEvent(event);
+    }
+
+    // Public API methods
+    getWishlist() {
+      return [...this.wishlist];
+    }
+
+    getWishlistCount() {
+      return this.wishlist.length;
+    }
+  }
+
+  // Initialize wishlist when DOM is ready
+  document.addEventListener('DOMContentLoaded', function() {
+    window.wishlistManager = new WishlistManager();
+    
+    // Re-scan for new wishlist buttons when content is added dynamically
+    const observer = new MutationObserver(() => {
+      window.wishlistManager.addWishlistButtons();
+      window.wishlistManager.updateUI();
+    });
+    
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  });
+
+  // Global functions for external use
+  window.addToWishlist = function(product) {
+    return window.wishlistManager?.addToWishlist(product);
+  };
+
+  window.removeFromWishlist = function(productId) {
+    return window.wishlistManager?.removeFromWishlist(productId);
+  };
+
+  window.openWishlist = function() {
+    document.getElementById('wishlist-toggle').click();
+  };
+</script>
+
+<style>
+  .wishlist-btn.active {
+    color: #ef4444;
+  }
+  
+  .wishlist-btn.active svg {
+    fill: currentColor;
+  }
+  
+  .wishlist-btn:hover {
+    transform: scale(1.1);
+  }
+  
+  #wishlist-badge {
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+</style>

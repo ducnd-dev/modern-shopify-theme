@@ -1,0 +1,307 @@
+{% comment %}
+  Customer Register Template
+  Registration page for new customers
+{% endcomment %}
+
+<div class="customer-register min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-900 dark:to-neutral-800">
+  <div class="container mx-auto px-4 py-16">
+    <div class="max-w-md mx-auto">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
+          {{ 'customer.register.title' | t | default: 'Create Account' }}
+        </h1>
+        <p class="text-neutral-600 dark:text-neutral-400">
+          Join us to start your shopping journey
+        </p>
+      </div>
+
+      <!-- Register Form Card -->
+      <div class="bg-white dark:bg-neutral-800 rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+        <div class="p-8">
+          {% form 'create_customer', class: 'customer-form' %}
+            <!-- Form Errors -->
+            {%- if form.errors -%}
+              <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+                <div class="flex items-center mb-2">
+                  <svg class="w-5 h-5 text-red-600 dark:text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                  </svg>
+                  <h3 class="text-red-800 dark:text-red-200 font-medium">
+                    Please correct the following:
+                  </h3>
+                </div>
+                <ul class="text-red-700 dark:text-red-300 text-sm space-y-1">
+                  {%- for field in form.errors -%}
+                    <li>{{ form.errors.messages[field] }}</li>
+                  {%- endfor -%}
+                </ul>
+              </div>
+            {%- endif -%}
+
+            <!-- First Name Field -->
+            <div class="mb-6">
+              <label for="RegisterFirstName" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                {{ 'customer.register.first_name' | t | default: 'First Name' }}
+              </label>
+              <input
+                type="text"
+                name="customer[first_name]"
+                id="RegisterFirstName"
+                class="w-full px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                value="{{ form.first_name }}"
+                placeholder="Enter your first name"
+                autocomplete="given-name"
+                required
+              >
+            </div>
+
+            <!-- Last Name Field -->
+            <div class="mb-6">
+              <label for="RegisterLastName" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                {{ 'customer.register.last_name' | t | default: 'Last Name' }}
+              </label>
+              <input
+                type="text"
+                name="customer[last_name]"
+                id="RegisterLastName"
+                class="w-full px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                value="{{ form.last_name }}"
+                placeholder="Enter your last name"
+                autocomplete="family-name"
+                required
+              >
+            </div>
+
+            <!-- Email Field -->
+            <div class="mb-6">
+              <label for="RegisterEmail" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                {{ 'customer.register.email' | t | default: 'Email Address' }}
+              </label>
+              <input
+                type="email"
+                name="customer[email]"
+                id="RegisterEmail"
+                class="w-full px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                value="{{ form.email }}"
+                placeholder="Enter your email"
+                autocomplete="email"
+                required
+              >
+            </div>
+
+            <!-- Password Field -->
+            <div class="mb-6">
+              <label for="RegisterPassword" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                {{ 'customer.register.password' | t | default: 'Password' }}
+              </label>
+              <div class="relative">
+                <input
+                  type="password"
+                  name="customer[password]"
+                  id="RegisterPassword"
+                  class="w-full px-4 py-3 pr-12 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                  placeholder="Create a password"
+                  autocomplete="new-password"
+                  minlength="8"
+                  required
+                >
+                <button
+                  type="button"
+                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+                  onclick="togglePassword('RegisterPassword')"
+                  aria-label="Toggle password visibility"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                </button>
+              </div>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+                Must be at least 8 characters long
+              </p>
+            </div>
+
+            <!-- Password Confirmation Field (if supported) -->
+            <div class="mb-6">
+              <label for="RegisterPasswordConfirm" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                {{ 'customer.register.password_confirm' | t | default: 'Confirm Password' }}
+              </label>
+              <div class="relative">
+                <input
+                  type="password"
+                  id="RegisterPasswordConfirm"
+                  class="w-full px-4 py-3 pr-12 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                  placeholder="Confirm your password"
+                  autocomplete="new-password"
+                  minlength="8"
+                  required
+                >
+                <button
+                  type="button"
+                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+                  onclick="togglePassword('RegisterPasswordConfirm')"
+                  aria-label="Toggle password visibility"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Newsletter Subscription -->
+            <div class="mb-6">
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="customer[accepts_marketing]"
+                  id="RegisterMarketing"
+                  class="mt-1 w-4 h-4 text-primary-600 bg-neutral-100 border-neutral-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-neutral-800 focus:ring-2 dark:bg-neutral-700 dark:border-neutral-600"
+                  {% if form.accepts_marketing %}checked{% endif %}
+                >
+                <span class="text-sm text-neutral-700 dark:text-neutral-300">
+                  {{ 'customer.register.accepts_marketing' | t | default: 'Subscribe to our newsletter for exclusive offers and updates' }}
+                </span>
+              </label>
+            </div>
+
+            <!-- Terms and Privacy -->
+            <div class="mb-6">
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="RegisterTerms"
+                  class="mt-1 w-4 h-4 text-primary-600 bg-neutral-100 border-neutral-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-neutral-800 focus:ring-2 dark:bg-neutral-700 dark:border-neutral-600"
+                  required
+                >
+                <span class="text-sm text-neutral-700 dark:text-neutral-300">
+                  I agree to the 
+                  <a href="{{ pages['terms-of-service'].url | default: '#' }}" class="text-primary-600 dark:text-primary-400 hover:underline" target="_blank">Terms of Service</a>
+                  and
+                  <a href="{{ pages['privacy-policy'].url | default: '#' }}" class="text-primary-600 dark:text-primary-400 hover:underline" target="_blank">Privacy Policy</a>
+                </span>
+              </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            >
+              {{ 'customer.register.submit' | t | default: 'Create Account' }}
+            </button>
+          {% endform %}
+        </div>
+      </div>
+
+      <!-- Login Link -->
+      <div class="text-center mt-8">
+        <p class="text-neutral-600 dark:text-neutral-400 mb-4">
+          Already have an account?
+        </p>
+        <a 
+          href="{{ routes.account_login_url }}" 
+          class="inline-flex items-center gap-2 bg-neutral-100 dark:bg-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-600 text-neutral-900 dark:text-neutral-100 font-medium py-3 px-6 rounded-lg transition-all duration-300"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+          </svg>
+          {{ 'customer.register.sign_in' | t | default: 'Sign In' }}
+        </a>
+      </div>
+
+      <!-- Benefits Section -->
+      <div class="mt-12 text-center">
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-6">
+          Why create an account?
+        </h3>
+        <div class="grid gap-4">
+          <div class="flex items-center gap-3 text-left">
+            <div class="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-medium text-neutral-900 dark:text-neutral-100">Faster Checkout</h4>
+              <p class="text-sm text-neutral-600 dark:text-neutral-400">Save your information for quicker purchases</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3 text-left">
+            <div class="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-medium text-neutral-900 dark:text-neutral-100">Order History</h4>
+              <p class="text-sm text-neutral-600 dark:text-neutral-400">Track your orders and view purchase history</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3 text-left">
+            <div class="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 0v1.93a2 2 0 01-1.85 1.995L12 10z"></path>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-medium text-neutral-900 dark:text-neutral-100">Exclusive Offers</h4>
+              <p class="text-sm text-neutral-600 dark:text-neutral-400">Get access to member-only deals and discounts</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+    input.setAttribute('type', type);
+  }
+
+  // Password confirmation validation
+  document.addEventListener('DOMContentLoaded', function() {
+    const password = document.getElementById('RegisterPassword');
+    const passwordConfirm = document.getElementById('RegisterPasswordConfirm');
+    const form = document.querySelector('.customer-form');
+
+    function validatePasswordMatch() {
+      if (password.value !== passwordConfirm.value) {
+        passwordConfirm.setCustomValidity('Passwords do not match');
+      } else {
+        passwordConfirm.setCustomValidity('');
+      }
+    }
+
+    if (password && passwordConfirm) {
+      password.addEventListener('change', validatePasswordMatch);
+      passwordConfirm.addEventListener('input', validatePasswordMatch);
+    }
+
+    // Form submission validation
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        const terms = document.getElementById('RegisterTerms');
+        if (!terms.checked) {
+          e.preventDefault();
+          alert('Please accept the Terms of Service and Privacy Policy to continue.');
+          return false;
+        }
+        
+        if (password.value !== passwordConfirm.value) {
+          e.preventDefault();
+          alert('Passwords do not match. Please check and try again.');
+          return false;
+        }
+      });
+    }
+  });
+</script>

@@ -1,0 +1,175 @@
+{% comment %}
+  Page Template
+  Used for static pages like About, Contact, Privacy Policy, etc.
+{% endcomment %}
+
+<div class="page-template">
+  <!-- Breadcrumb -->
+  <div class="bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700">
+    <div class="container mx-auto px-4 py-4">
+      <nav aria-label="Breadcrumb" class="flex items-center space-x-2 text-sm">
+        <a href="{{ routes.root_url }}" class="text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+          Home
+        </a>
+        <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+        <span class="text-neutral-900 dark:text-neutral-100 font-medium">{{ page.title }}</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <div class="bg-gradient-to-br from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20">
+    <div class="container mx-auto px-4 py-16 lg:py-24">
+      <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 dark:text-neutral-100 mb-6 font-display">
+          {{ page.title }}
+        </h1>
+        
+        {%- if page.summary != blank -%}
+          <p class="text-xl text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto leading-relaxed">
+            {{ page.summary }}
+          </p>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Content -->
+  <div class="section-spacing">
+    <div class="container mx-auto px-4">
+      <div class="max-w-4xl mx-auto">
+        {%- if page.content != blank -%}
+          <div class="prose prose-lg prose-neutral dark:prose-invert max-w-none">
+            {{ page.content }}
+          </div>
+        {%- else -%}
+          <div class="text-center py-16">
+            <div class="text-6xl mb-4">📄</div>
+            <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">No Content Yet</h3>
+            <p class="text-neutral-600 dark:text-neutral-400">This page doesn't have any content yet.</p>
+          </div>
+        {%- endif -%}
+
+        <!-- Contact Form for Contact Page -->
+        {%- if page.handle == 'contact' -%}
+          <div class="mt-16 bg-neutral-50 dark:bg-neutral-800 rounded-2xl p-8 lg:p-12">
+            <h2 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-8 text-center">
+              {{ 'templates.contact.form.title' | t | default: 'Get in Touch' }}
+            </h2>
+            
+            {% form 'contact', class: 'contact-form' %}
+              {%- if form.posted_successfully? -%}
+                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 mb-8">
+                  <div class="flex items-center">
+                    <svg class="w-6 h-6 text-green-600 dark:text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-green-800 dark:text-green-200 font-medium">
+                      {{ 'templates.contact.form.post_success' | t | default: 'Thanks for contacting us. We\'ll get back to you as soon as possible.' }}
+                    </p>
+                  </div>
+                </div>
+              {%- endif -%}
+
+              {%- if form.errors -%}
+                <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-8">
+                  <h3 class="text-red-800 dark:text-red-200 font-medium mb-4">
+                    {{ 'templates.contact.form.error_heading' | t | default: 'Please adjust the following:' }}
+                  </h3>
+                  <ul class="text-red-700 dark:text-red-300 space-y-1">
+                    {%- for field in form.errors -%}
+                      <li>{{ form.errors.messages[field] }}</li>
+                    {%- endfor -%}
+                  </ul>
+                </div>
+              {%- endif -%}
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label for="ContactFormName" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                    {{ 'templates.contact.form.name' | t | default: 'Name' }} *
+                  </label>
+                  <input
+                    type="text"
+                    id="ContactFormName"
+                    name="contact[name]"
+                    value="{% if form.name %}{{ form.name }}{% endif %}"
+                    class="w-full px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                    required
+                    autocomplete="name"
+                  >
+                </div>
+                
+                <div>
+                  <label for="ContactFormEmail" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                    {{ 'templates.contact.form.email' | t | default: 'Email' }} *
+                  </label>
+                  <input
+                    type="email"
+                    id="ContactFormEmail"
+                    name="contact[email]"
+                    value="{% if form.email %}{{ form.email }}{% endif %}"
+                    class="w-full px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                    required
+                    autocomplete="email"
+                  >
+                </div>
+              </div>
+
+              <div class="mb-6">
+                <label for="ContactFormPhone" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                  {{ 'templates.contact.form.phone' | t | default: 'Phone Number' }}
+                </label>
+                <input
+                  type="tel"
+                  id="ContactFormPhone"
+                  name="contact[phone]"
+                  value="{% if form.phone %}{{ form.phone }}{% endif %}"
+                  class="w-full px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                  autocomplete="tel"
+                >
+              </div>
+
+              <div class="mb-8">
+                <label for="ContactFormMessage" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                  {{ 'templates.contact.form.comment' | t | default: 'Message' }} *
+                </label>
+                <textarea
+                  id="ContactFormMessage"
+                  name="contact[body]"
+                  rows="6"
+                  class="w-full px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 resize-vertical"
+                  required
+                >{% if form.body %}{{ form.body }}{% endif %}</textarea>
+              </div>
+
+              <div class="text-center">
+                <button
+                  type="submit"
+                  class="btn btn-primary px-8 py-3 text-lg"
+                >
+                  {{ 'templates.contact.form.send' | t | default: 'Send Message' }}
+                </button>
+              </div>
+            {% endform %}
+          </div>
+        {%- endif -%}
+
+        <!-- Back to Home -->
+        <div class="text-center mt-16">
+          <a 
+            href="{{ routes.root_url }}" 
+            class="inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium transition-colors duration-300"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Home
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

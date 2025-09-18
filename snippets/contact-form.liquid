@@ -1,0 +1,341 @@
+{% comment %}
+  Enhanced Contact Form Snippet
+  Reusable contact form component with customizable options
+  
+  Parameters:
+  - form_id: Unique identifier for the form (default: 'contact')
+  - show_subject: Show subject field (default: true)
+  - show_phone: Show phone field (default: true)
+  - show_newsletter: Show newsletter signup (default: true)
+  - compact: Use compact layout (default: false)
+  - context: Form context for analytics (default: 'general')
+{% endcomment %}
+
+{% assign form_id = form_id | default: 'contact' %}
+{% assign show_subject = show_subject | default: true %}
+{% assign show_phone = show_phone | default: true %}
+{% assign show_newsletter = show_newsletter | default: true %}
+{% assign compact = compact | default: false %}
+{% assign context = context | default: 'general' %}
+
+<div class="enhanced-contact-form" data-context="{{ context }}">
+  {% form 'contact', id: form_id, class: 'contact-form-enhanced' %}
+    <!-- Success Message -->
+    {% if form.posted_successfully? %}
+      <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
+        <div class="flex items-center">
+          <svg class="w-5 h-5 text-green-600 dark:text-green-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <div>
+            <h4 class="text-green-800 dark:text-green-200 font-medium">
+              {{ 'contact.form.post_success_title' | t | default: 'Thank you!' }}
+            </h4>
+            <p class="text-green-700 dark:text-green-300 text-sm">
+              {{ 'contact.form.post_success' | t | default: 'Your message has been sent successfully.' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Error Messages -->
+    {% if form.errors %}
+      <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+        <div class="flex items-start">
+          <svg class="w-5 h-5 text-red-600 dark:text-red-400 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+          </svg>
+          <div>
+            <h4 class="text-red-800 dark:text-red-200 font-medium mb-1">
+              {{ 'contact.form.error_heading' | t | default: 'Please correct the following:' }}
+            </h4>
+            <ul class="text-red-700 dark:text-red-300 text-sm space-y-1">
+              {% for field in form.errors %}
+                <li>{{ form.errors.messages[field] }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Form Fields -->
+    {% unless compact %}
+      <!-- Name Fields (Full Layout) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label for="{{ form_id }}_first_name" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+            {{ 'contact.form.first_name' | t | default: 'First Name' }} *
+          </label>
+          <input
+            type="text"
+            id="{{ form_id }}_first_name"
+            name="contact[first_name]"
+            class="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+            value="{{ form.first_name }}"
+            placeholder="{{ 'contact.form.first_name' | t | default: 'First Name' }}"
+            required
+          >
+        </div>
+        <div>
+          <label for="{{ form_id }}_last_name" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+            {{ 'contact.form.last_name' | t | default: 'Last Name' }} *
+          </label>
+          <input
+            type="text"
+            id="{{ form_id }}_last_name"
+            name="contact[last_name]"
+            class="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+            value="{{ form.last_name }}"
+            placeholder="{{ 'contact.form.last_name' | t | default: 'Last Name' }}"
+            required
+          >
+        </div>
+      </div>
+    {% else %}
+      <!-- Name Field (Compact Layout) -->
+      <div class="mb-4">
+        <label for="{{ form_id }}_name" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+          {{ 'contact.form.name' | t | default: 'Name' }} *
+        </label>
+        <input
+          type="text"
+          id="{{ form_id }}_name"
+          name="contact[name]"
+          class="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+          value="{{ form.name }}"
+          placeholder="{{ 'contact.form.name' | t | default: 'Your Name' }}"
+          required
+        >
+      </div>
+    {% endunless %}
+
+    <!-- Email and Phone -->
+    <div class="{% unless compact %}grid grid-cols-1 {% if show_phone %}md:grid-cols-2{% endif %} gap-4{% endunless %} mb-4">
+      <div {% if compact %}class="mb-4"{% endif %}>
+        <label for="{{ form_id }}_email" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+          {{ 'contact.form.email' | t | default: 'Email' }} *
+        </label>
+        <input
+          type="email"
+          id="{{ form_id }}_email"
+          name="contact[email]"
+          class="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+          value="{{ form.email }}"
+          placeholder="{{ 'contact.form.email_placeholder' | t | default: 'your@email.com' }}"
+          required
+        >
+      </div>
+      
+      {% if show_phone %}
+        <div {% if compact %}class="mb-4"{% endif %}>
+          <label for="{{ form_id }}_phone" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+            {{ 'contact.form.phone' | t | default: 'Phone' }}
+          </label>
+          <input
+            type="tel"
+            id="{{ form_id }}_phone"
+            name="contact[phone]"
+            class="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+            value="{{ form.phone }}"
+            placeholder="{{ 'contact.form.phone_placeholder' | t | default: '+1 (555) 123-4567' }}"
+          >
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Subject -->
+    {% if show_subject %}
+      <div class="mb-4">
+        <label for="{{ form_id }}_subject" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+          {{ 'contact.form.subject' | t | default: 'Subject' }} *
+        </label>
+        <select
+          id="{{ form_id }}_subject"
+          name="contact[subject]"
+          class="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+          required
+        >
+          <option value="">{{ 'contact.form.subject_placeholder' | t | default: 'Select a subject...' }}</option>
+          <option value="General Inquiry" {% if form.subject == 'General Inquiry' %}selected{% endif %}>
+            {{ 'contact.form.subject_general' | t | default: 'General Inquiry' }}
+          </option>
+          <option value="Product Question" {% if form.subject == 'Product Question' %}selected{% endif %}>
+            {{ 'contact.form.subject_product' | t | default: 'Product Question' }}
+          </option>
+          <option value="Order Support" {% if form.subject == 'Order Support' %}selected{% endif %}>
+            {{ 'contact.form.subject_order' | t | default: 'Order Support' }}
+          </option>
+          <option value="Technical Support" {% if form.subject == 'Technical Support' %}selected{% endif %}>
+            {{ 'contact.form.subject_technical' | t | default: 'Technical Support' }}
+          </option>
+          <option value="Other" {% if form.subject == 'Other' %}selected{% endif %}>
+            {{ 'contact.form.subject_other' | t | default: 'Other' }}
+          </option>
+        </select>
+      </div>
+    {% endif %}
+
+    <!-- Message -->
+    <div class="mb-4">
+      <label for="{{ form_id }}_message" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+        {{ 'contact.form.message' | t | default: 'Message' }} *
+      </label>
+      <textarea
+        id="{{ form_id }}_message"
+        name="contact[body]"
+        rows="{% if compact %}4{% else %}6{% endif %}"
+        class="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors resize-vertical"
+        placeholder="{{ 'contact.form.message_placeholder' | t | default: 'How can we help you?' }}"
+        required
+      >{{ form.body }}</textarea>
+    </div>
+
+    <!-- Newsletter Signup -->
+    {% if show_newsletter %}
+      <div class="mb-6">
+        <label class="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            name="contact[accepts_marketing]"
+            class="mt-1 w-4 h-4 text-primary-600 bg-neutral-100 border-neutral-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-neutral-800 focus:ring-2 dark:bg-neutral-700 dark:border-neutral-600"
+            {% if form.accepts_marketing %}checked{% endif %}
+          >
+          <span class="text-sm text-neutral-700 dark:text-neutral-300">
+            {{ 'contact.form.newsletter' | t | default: 'Subscribe to our newsletter for updates and special offers.' }}
+          </span>
+        </label>
+      </div>
+    {% endif %}
+
+    <!-- Submit Button -->
+    <button
+      type="submit"
+      class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+    >
+      {{ 'contact.form.send' | t | default: 'Send Message' }}
+    </button>
+
+    <!-- Hidden Fields for Context -->
+    <input type="hidden" name="contact[context]" value="{{ context }}">
+    {% if customer %}
+      <input type="hidden" name="contact[customer_id]" value="{{ customer.id }}">
+    {% endif %}
+  {% endform %}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('.contact-form-enhanced');
+    
+    forms.forEach(function(form) {
+      // Form validation
+      form.addEventListener('submit', function(e) {
+        const requiredFields = this.querySelectorAll('[required]');
+        let isValid = true;
+        
+        requiredFields.forEach(function(field) {
+          if (!field.value.trim()) {
+            isValid = false;
+            field.classList.add('border-red-500', 'ring-red-500');
+          } else {
+            field.classList.remove('border-red-500', 'ring-red-500');
+          }
+        });
+        
+        if (!isValid) {
+          e.preventDefault();
+          const firstInvalid = this.querySelector('.border-red-500');
+          if (firstInvalid) {
+            firstInvalid.focus();
+            firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      });
+
+      // Auto-resize textareas
+      const textareas = form.querySelectorAll('textarea');
+      textareas.forEach(function(textarea) {
+        textarea.addEventListener('input', function() {
+          this.style.height = 'auto';
+          this.style.height = this.scrollHeight + 'px';
+        });
+      });
+
+      // Real-time validation feedback
+      const inputs = form.querySelectorAll('input, textarea, select');
+      inputs.forEach(function(input) {
+        input.addEventListener('blur', function() {
+          if (this.hasAttribute('required') && !this.value.trim()) {
+            this.classList.add('border-red-300');
+          } else {
+            this.classList.remove('border-red-300');
+          }
+        });
+
+        input.addEventListener('input', function() {
+          if (this.classList.contains('border-red-500')) {
+            this.classList.remove('border-red-500', 'ring-red-500');
+          }
+        });
+      });
+
+      // Email validation
+      const emailInputs = form.querySelectorAll('input[type="email"]');
+      emailInputs.forEach(function(email) {
+        email.addEventListener('blur', function() {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (this.value && !emailRegex.test(this.value)) {
+            this.classList.add('border-red-300');
+          }
+        });
+      });
+
+      // Analytics tracking
+      form.addEventListener('submit', function() {
+        const context = this.closest('.enhanced-contact-form').dataset.context;
+        
+        // Track form submission
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'form_submit', {
+            'event_category': 'Contact',
+            'event_label': context,
+            'value': 1
+          });
+        }
+        
+        // Track subject if available
+        const subjectField = this.querySelector('select[name="contact[subject]"]');
+        if (subjectField && subjectField.value) {
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'contact_subject', {
+              'event_category': 'Contact',
+              'event_label': subjectField.value
+            });
+          }
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  .enhanced-contact-form input:focus,
+  .enhanced-contact-form textarea:focus,
+  .enhanced-contact-form select:focus {
+    box-shadow: 0 0 0 3px rgba(var(--color-primary), 0.1);
+  }
+  
+  .enhanced-contact-form .border-red-300 {
+    border-color: rgb(252 165 165);
+  }
+  
+  .enhanced-contact-form .border-red-500 {
+    border-color: rgb(239 68 68);
+  }
+  
+  .enhanced-contact-form .ring-red-500 {
+    --tw-ring-color: rgb(239 68 68);
+  }
+</style>

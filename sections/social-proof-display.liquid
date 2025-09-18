@@ -1,0 +1,858 @@
+{% comment %}
+  Social Proof Display System
+  Reviews, testimonials, ratings, and social validation widgets
+{% endcomment %}
+
+<div class="social-proof-section py-16 bg-{{ section.settings.background_color }}" data-social-proof>
+  <div class="container mx-auto px-4">
+    {% if section.settings.heading != blank or section.settings.subheading != blank %}
+      <div class="text-center mb-12">
+        {% if section.settings.heading != blank %}
+          <h2 class="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
+            {{ section.settings.heading }}
+          </h2>
+        {% endif %}
+        {% if section.settings.subheading != blank %}
+          <p class="text-xl text-neutral-600 dark:text-neutral-400 max-w-3xl mx-auto">
+            {{ section.settings.subheading }}
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="grid gap-8">
+      {% for block in section.blocks %}
+        {% case block.type %}
+          {% when 'review_stats' %}
+            <div 
+              class="review-stats-widget bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-600 p-8"
+              {{ block.shopify_attributes }}
+            >
+              <div class="grid md:grid-cols-3 gap-8 items-center">
+                <!-- Overall Rating -->
+                <div class="text-center">
+                  <div class="flex items-center justify-center mb-4">
+                    <span class="text-6xl font-bold text-primary-600 dark:text-primary-400">{{ block.settings.average_rating }}</span>
+                    <div class="ml-4">
+                      <div class="flex items-center mb-1">
+                        {% assign rating = block.settings.average_rating | round %}
+                        {% for i in (1..5) %}
+                          <svg class="w-6 h-6 {% if i <= rating %}text-yellow-400{% else %}text-neutral-300{% endif %}" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                        {% endfor %}
+                      </div>
+                      <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                        Based on {{ block.settings.total_reviews }} reviews
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Rating Breakdown -->
+                <div class="space-y-2">
+                  {% for i in (5..1) %}
+                    {% assign percentage = 0 %}
+                    {% case i %}
+                      {% when 5 %}
+                        {% assign percentage = block.settings.five_star_percentage %}
+                      {% when 4 %}
+                        {% assign percentage = block.settings.four_star_percentage %}
+                      {% when 3 %}
+                        {% assign percentage = block.settings.three_star_percentage %}
+                      {% when 2 %}
+                        {% assign percentage = block.settings.two_star_percentage %}
+                      {% when 1 %}
+                        {% assign percentage = block.settings.one_star_percentage %}
+                    {% endcase %}
+                    
+                    <div class="flex items-center gap-2">
+                      <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300 w-4">{{ i }}</span>
+                      <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                      <div class="flex-1 bg-neutral-200 dark:bg-neutral-600 rounded-full h-2">
+                        <div 
+                          class="bg-yellow-400 h-2 rounded-full transition-all duration-1000 ease-out"
+                          style="width: {{ percentage }}%;"
+                          data-animate-width="{{ percentage }}"
+                        ></div>
+                      </div>
+                      <span class="text-sm text-neutral-600 dark:text-neutral-400 w-10">{{ percentage }}%</span>
+                    </div>
+                  {% endfor %}
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-2 gap-4">
+                  {% if block.settings.show_verified_purchases %}
+                    <div class="text-center p-4 bg-green-50 dark:bg-green-900 rounded-lg">
+                      <div class="flex items-center justify-center mb-2">
+                        <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                      </div>
+                      <p class="text-sm font-semibold text-green-800 dark:text-green-200">{{ block.settings.verified_percentage }}%</p>
+                      <p class="text-xs text-green-600 dark:text-green-400">Verified Purchases</p>
+                    </div>
+                  {% endif %}
+
+                  {% if block.settings.show_recommend_percentage %}
+                    <div class="text-center p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+                      <div class="flex items-center justify-center mb-2">
+                        <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>
+                        </svg>
+                      </div>
+                      <p class="text-sm font-semibold text-blue-800 dark:text-blue-200">{{ block.settings.recommend_percentage }}%</p>
+                      <p class="text-xs text-blue-600 dark:text-blue-400">Would Recommend</p>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+          {% when 'recent_reviews' %}
+            <div 
+              class="recent-reviews-widget"
+              data-auto-scroll="{{ block.settings.auto_scroll }}"
+              {{ block.shopify_attributes }}
+            >
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Recent Reviews</h3>
+                
+                {% if block.settings.show_navigation %}
+                  <div class="flex gap-2">
+                    <button 
+                      class="review-prev w-10 h-10 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-600 rounded-full flex items-center justify-center text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:border-primary-300 dark:hover:border-primary-600 transition-colors"
+                    >
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                      </svg>
+                    </button>
+                    <button 
+                      class="review-next w-10 h-10 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-600 rounded-full flex items-center justify-center text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:border-primary-300 dark:hover:border-primary-600 transition-colors"
+                    >
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                    </button>
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="reviews-container overflow-hidden">
+                <div class="reviews-track flex gap-6 transition-transform duration-500 ease-in-out">
+                  {% comment %} Sample reviews - replace with actual review data {% endcomment %}
+                  {% assign sample_reviews = "John D.|5|Amazing quality and fast shipping!|Product exceeded my expectations. Will definitely order again.|2 days ago,Sarah M.|5|Love it!|Perfect fit and great material. Highly recommend!|1 week ago,Mike R.|4|Good value|Nice product for the price. Quick delivery too.|3 days ago,Emma L.|5|Excellent!|Exactly what I was looking for. Great customer service.|5 days ago" | split: "," %}
+                  
+                  {% for review_data in sample_reviews %}
+                    {% assign review_parts = review_data | split: "|" %}
+                    {% if review_parts.size >= 5 %}
+                      <div class="review-card flex-shrink-0 w-80 bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-600 p-6">
+                        <!-- Review Header -->
+                        <div class="flex items-start justify-between mb-4">
+                          <div>
+                            <h4 class="font-semibold text-neutral-900 dark:text-neutral-100">{{ review_parts[0] }}</h4>
+                            <div class="flex items-center mt-1">
+                              {% assign rating = review_parts[1] | plus: 0 %}
+                              {% for i in (1..5) %}
+                                <svg class="w-4 h-4 {% if i <= rating %}text-yellow-400{% else %}text-neutral-300{% endif %}" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                              {% endfor %}
+                            </div>
+                          </div>
+                          <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ review_parts[4] }}</span>
+                        </div>
+
+                        <!-- Review Content -->
+                        <div class="mb-4">
+                          <h5 class="font-medium text-neutral-900 dark:text-neutral-100 mb-2">{{ review_parts[2] }}</h5>
+                          <p class="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">{{ review_parts[3] }}</p>
+                        </div>
+
+                        <!-- Verified Badge -->
+                        {% if block.settings.show_verified_badges %}
+                          <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-xs text-green-600 dark:text-green-400 font-medium">Verified Purchase</span>
+                          </div>
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+          {% when 'social_media_feed' %}
+            <div 
+              class="social-media-widget bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-600 p-8"
+              {{ block.shopify_attributes }}
+            >
+              <div class="text-center mb-8">
+                <h3 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
+                  {{ block.settings.title | default: "Follow Us" }}
+                </h3>
+                <p class="text-neutral-600 dark:text-neutral-400">
+                  {{ block.settings.subtitle | default: "See what our customers are saying" }}
+                </p>
+              </div>
+
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {% comment %} Sample social posts - replace with actual social media integration {% endcomment %}
+                {% for i in (1..8) %}
+                  <div class="social-post aspect-square bg-neutral-100 dark:bg-neutral-600 rounded-lg overflow-hidden group cursor-pointer hover:shadow-lg transition-all duration-300">
+                    <div class="relative w-full h-full">
+                      <img 
+                        src="https://images.unsplash.com/photo-{{ 1500000000000 | plus: i | times: 1000000 }}?w=300&h=300&fit=crop"
+                        alt="Social post {{ i }}"
+                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                        loading="lazy"
+                      >
+                      
+                      <!-- Overlay -->
+                      <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
+                        <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-center">
+                          <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                          </svg>
+                          <p class="text-sm font-medium">View Post</p>
+                        </div>
+                      </div>
+
+                      <!-- Platform Icon -->
+                      <div class="absolute top-2 right-2">
+                        <div class="w-6 h-6 bg-white bg-opacity-90 rounded-full flex items-center justify-center">
+                          {% if block.settings.platform == 'instagram' %}
+                            <svg class="w-4 h-4 text-pink-500" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                          {% else %}
+                            <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                            </svg>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+
+              {% if block.settings.show_follow_button %}
+                <div class="text-center mt-8">
+                  <a 
+                    href="{{ block.settings.social_url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 bg-primary-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-primary-700 transition-colors"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Follow Us
+                  </a>
+                </div>
+              {% endif %}
+            </div>
+
+          {% when 'trust_indicators' %}
+            <div 
+              class="trust-indicators-widget"
+              {{ block.shopify_attributes }}
+            >
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {% if block.settings.show_customer_count %}
+                  <div class="trust-indicator text-center">
+                    <div class="w-16 h-16 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg class="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                      </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold text-primary-600 dark:text-primary-400 mb-1">
+                      {{ block.settings.customer_count }}+
+                    </h4>
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400">Happy Customers</p>
+                  </div>
+                {% endif %}
+
+                {% if block.settings.show_orders_count %}
+                  <div class="trust-indicator text-center">
+                    <div class="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                      </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">
+                      {{ block.settings.orders_count }}+
+                    </h4>
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400">Orders Delivered</p>
+                  </div>
+                {% endif %}
+
+                {% if block.settings.show_countries_count %}
+                  <div class="trust-indicator text-center">
+                    <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+                      {{ block.settings.countries_count }}+
+                    </h4>
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400">Countries Served</p>
+                  </div>
+                {% endif %}
+
+                {% if block.settings.show_satisfaction_rate %}
+                  <div class="trust-indicator text-center">
+                    <div class="w-16 h-16 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg class="w-8 h-8 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                      </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold text-yellow-600 dark:text-yellow-400 mb-1">
+                      {{ block.settings.satisfaction_rate }}%
+                    </h4>
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400">Satisfaction Rate</p>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+          {% when 'real_time_activity' %}
+            <div 
+              class="real-time-activity-widget fixed bottom-4 left-4 z-40"
+              data-activity-widget
+              {{ block.shopify_attributes }}
+            >
+              <div class="activity-notification bg-white dark:bg-neutral-800 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-600 p-4 max-w-sm transform transition-all duration-300 translate-y-full opacity-0">
+                <div class="flex items-start gap-3">
+                  <div class="w-2 h-2 bg-green-500 rounded-full mt-2 animate-pulse"></div>
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      <span class="activity-customer-name">Someone</span> from <span class="activity-location">New York</span>
+                    </p>
+                    <p class="text-xs text-neutral-600 dark:text-neutral-400">
+                      just purchased <span class="activity-product">"Premium Product"</span>
+                    </p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                      <span class="activity-time">2 minutes ago</span>
+                    </p>
+                  </div>
+                  <button class="close-activity text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+        {% endcase %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+  // Social Proof Manager
+  class SocialProofManager {
+    constructor() {
+      this.currentReviewSlide = 0;
+      this.reviewAutoplayInterval = null;
+      this.activityNotifications = this.generateActivityData();
+      this.currentActivityIndex = 0;
+      this.init();
+    }
+
+    init() {
+      this.initReviewSlider();
+      this.initRatingAnimations();
+      this.initRealTimeActivity();
+      this.bindEvents();
+    }
+
+    initReviewSlider() {
+      const containers = document.querySelectorAll('.recent-reviews-widget');
+      
+      containers.forEach(container => {
+        const track = container.querySelector('.reviews-track');
+        const prevBtn = container.querySelector('.review-prev');
+        const nextBtn = container.querySelector('.review-next');
+        const autoScroll = container.getAttribute('data-auto-scroll') === 'true';
+        
+        if (!track) return;
+
+        const cards = track.querySelectorAll('.review-card');
+        const cardWidth = 320; // card width + gap
+        const maxSlides = Math.max(0, cards.length - Math.floor(container.offsetWidth / cardWidth));
+
+        // Navigation buttons
+        if (prevBtn && nextBtn) {
+          prevBtn.addEventListener('click', () => this.slideReviews(track, 'prev', maxSlides));
+          nextBtn.addEventListener('click', () => this.slideReviews(track, 'next', maxSlides));
+        }
+
+        // Auto-scroll
+        if (autoScroll) {
+          this.startReviewAutoplay(track, maxSlides);
+          
+          // Pause on hover
+          container.addEventListener('mouseenter', () => this.stopReviewAutoplay());
+          container.addEventListener('mouseleave', () => this.startReviewAutoplay(track, maxSlides));
+        }
+      });
+    }
+
+    slideReviews(track, direction, maxSlides) {
+      if (direction === 'next' && this.currentReviewSlide < maxSlides) {
+        this.currentReviewSlide++;
+      } else if (direction === 'prev' && this.currentReviewSlide > 0) {
+        this.currentReviewSlide--;
+      } else if (direction === 'next' && this.currentReviewSlide >= maxSlides) {
+        this.currentReviewSlide = 0; // Loop back to start
+      }
+
+      const translateX = -this.currentReviewSlide * 320;
+      track.style.transform = `translateX(${translateX}px)`;
+    }
+
+    startReviewAutoplay(track, maxSlides) {
+      this.stopReviewAutoplay();
+      this.reviewAutoplayInterval = setInterval(() => {
+        this.slideReviews(track, 'next', maxSlides);
+      }, 4000);
+    }
+
+    stopReviewAutoplay() {
+      if (this.reviewAutoplayInterval) {
+        clearInterval(this.reviewAutoplayInterval);
+        this.reviewAutoplayInterval = null;
+      }
+    }
+
+    initRatingAnimations() {
+      const ratingBars = document.querySelectorAll('[data-animate-width]');
+      
+      // Intersection Observer for animations
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const bar = entry.target;
+            const targetWidth = bar.getAttribute('data-animate-width');
+            
+            setTimeout(() => {
+              bar.style.width = `${targetWidth}%`;
+            }, Math.random() * 500); // Stagger animations
+          }
+        });
+      }, { threshold: 0.5 });
+
+      ratingBars.forEach(bar => {
+        bar.style.width = '0%';
+        observer.observe(bar);
+      });
+    }
+
+    initRealTimeActivity() {
+      const activityWidget = document.querySelector('[data-activity-widget]');
+      if (!activityWidget) return;
+
+      // Show first notification after delay
+      setTimeout(() => {
+        this.showActivityNotification();
+      }, 3000);
+
+      // Continue showing notifications
+      setInterval(() => {
+        this.showActivityNotification();
+      }, 15000); // Every 15 seconds
+    }
+
+    generateActivityData() {
+      return [
+        {
+          customer: "Sarah M.",
+          location: "California",
+          product: "Premium Wireless Headphones",
+          time: "2 minutes ago"
+        },
+        {
+          customer: "John D.",
+          location: "New York",
+          product: "Smart Fitness Watch",
+          time: "5 minutes ago"
+        },
+        {
+          customer: "Emma L.",
+          location: "Texas",
+          product: "Organic Skincare Set",
+          time: "8 minutes ago"
+        },
+        {
+          customer: "Mike R.",
+          location: "Florida",
+          product: "Professional Camera Lens",
+          time: "12 minutes ago"
+        },
+        {
+          customer: "Lisa K.",
+          location: "Seattle",
+          product: "Eco-Friendly Water Bottle",
+          time: "15 minutes ago"
+        }
+      ];
+    }
+
+    showActivityNotification() {
+      const widget = document.querySelector('[data-activity-widget]');
+      const notification = widget?.querySelector('.activity-notification');
+      
+      if (!notification) return;
+
+      // Get current activity data
+      const activity = this.activityNotifications[this.currentActivityIndex];
+      this.currentActivityIndex = (this.currentActivityIndex + 1) % this.activityNotifications.length;
+
+      // Update notification content
+      notification.querySelector('.activity-customer-name').textContent = activity.customer;
+      notification.querySelector('.activity-location').textContent = activity.location;
+      notification.querySelector('.activity-product').textContent = activity.product;
+      notification.querySelector('.activity-time').textContent = activity.time;
+
+      // Show notification
+      notification.style.transform = 'translateY(0)';
+      notification.style.opacity = '1';
+
+      // Hide after delay
+      setTimeout(() => {
+        notification.style.transform = 'translateY(100%)';
+        notification.style.opacity = '0';
+      }, 5000);
+    }
+
+    bindEvents() {
+      // Close activity notifications
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('.close-activity')) {
+          const notification = e.target.closest('.activity-notification');
+          notification.style.transform = 'translateY(100%)';
+          notification.style.opacity = '0';
+        }
+      });
+
+      // Social media post clicks
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('.social-post')) {
+          const post = e.target.closest('.social-post');
+          // Add click tracking or modal functionality here
+          console.log('Social post clicked');
+        }
+      });
+    }
+  }
+
+  // Initialize when DOM is ready
+  document.addEventListener('DOMContentLoaded', function() {
+    window.socialProofManager = new SocialProofManager();
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Social Proof Display",
+  "tag": "section",
+  "class": "section-social-proof",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Trusted by Thousands"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Join our community of satisfied customers"
+    },
+    {
+      "type": "select",
+      "id": "background_color",
+      "label": "Background Color",
+      "options": [
+        {
+          "value": "transparent",
+          "label": "Transparent"
+        },
+        {
+          "value": "white",
+          "label": "White"
+        },
+        {
+          "value": "neutral-50",
+          "label": "Light Gray"
+        }
+      ],
+      "default": "neutral-50"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review_stats",
+      "name": "Review Statistics",
+      "settings": [
+        {
+          "type": "range",
+          "id": "average_rating",
+          "label": "Average Rating",
+          "min": 1,
+          "max": 5,
+          "step": 0.1,
+          "default": 4.8
+        },
+        {
+          "type": "number",
+          "id": "total_reviews",
+          "label": "Total Reviews",
+          "default": 1247
+        },
+        {
+          "type": "range",
+          "id": "five_star_percentage",
+          "label": "5 Star Percentage",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 78,
+          "unit": "%"
+        },
+        {
+          "type": "range",
+          "id": "four_star_percentage",
+          "label": "4 Star Percentage",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 15,
+          "unit": "%"
+        },
+        {
+          "type": "range",
+          "id": "three_star_percentage",
+          "label": "3 Star Percentage",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 4,
+          "unit": "%"
+        },
+        {
+          "type": "range",
+          "id": "two_star_percentage",
+          "label": "2 Star Percentage",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 2,
+          "unit": "%"
+        },
+        {
+          "type": "range",
+          "id": "one_star_percentage",
+          "label": "1 Star Percentage",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 1,
+          "unit": "%"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_verified_purchases",
+          "label": "Show Verified Purchases",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "verified_percentage",
+          "label": "Verified Purchase Percentage",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 94,
+          "unit": "%"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_recommend_percentage",
+          "label": "Show Recommend Percentage",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "recommend_percentage",
+          "label": "Would Recommend Percentage",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 96,
+          "unit": "%"
+        }
+      ]
+    },
+    {
+      "type": "recent_reviews",
+      "name": "Recent Reviews",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "auto_scroll",
+          "label": "Auto Scroll",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_navigation",
+          "label": "Show Navigation Buttons",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_verified_badges",
+          "label": "Show Verified Purchase Badges",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "social_media_feed",
+      "name": "Social Media Feed",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Follow Us"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle",
+          "default": "See what our customers are saying"
+        },
+        {
+          "type": "select",
+          "id": "platform",
+          "label": "Platform",
+          "options": [
+            {
+              "value": "instagram",
+              "label": "Instagram"
+            },
+            {
+              "value": "twitter",
+              "label": "Twitter"
+            }
+          ],
+          "default": "instagram"
+        },
+        {
+          "type": "url",
+          "id": "social_url",
+          "label": "Social Media URL"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_follow_button",
+          "label": "Show Follow Button",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "trust_indicators",
+      "name": "Trust Indicators",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_customer_count",
+          "label": "Show Customer Count",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "customer_count",
+          "label": "Customer Count",
+          "default": "10,000"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_orders_count",
+          "label": "Show Orders Count",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "orders_count",
+          "label": "Orders Count",
+          "default": "25,000"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_countries_count",
+          "label": "Show Countries Count",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "countries_count",
+          "label": "Countries Count",
+          "default": "50"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_satisfaction_rate",
+          "label": "Show Satisfaction Rate",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "satisfaction_rate",
+          "label": "Satisfaction Rate",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 98,
+          "unit": "%"
+        }
+      ]
+    },
+    {
+      "type": "real_time_activity",
+      "name": "Real-time Activity",
+      "settings": []
+    }
+  ],
+  "presets": [
+    {
+      "name": "Social Proof Display",
+      "blocks": [
+        {
+          "type": "review_stats"
+        },
+        {
+          "type": "recent_reviews"
+        },
+        {
+          "type": "trust_indicators"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

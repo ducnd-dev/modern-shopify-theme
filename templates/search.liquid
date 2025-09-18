@@ -1,0 +1,279 @@
+{% comment %}
+  Search Results Template
+  Shows search results for products, pages, articles
+{% endcomment %}
+
+{%- paginate search.results by 24 -%}
+
+<div class="search-template">
+  <!-- Search Header -->
+  <div class="bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700">
+    <div class="container mx-auto px-4 py-8">
+      <div class="max-w-2xl mx-auto text-center">
+        <h1 class="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-neutral-100 mb-6">
+          {%- if search.performed -%}
+            {%- if search.results_count == 0 -%}
+              {{ 'templates.search.no_results' | t: terms: search.terms | default: 'No results found' }}
+            {%- else -%}
+              {{ 'templates.search.results_with_count' | t: terms: search.terms, count: search.results_count | default: 'Search Results' }}
+            {%- endif -%}
+          {%- else -%}
+            {{ 'templates.search.title' | t | default: 'Search' }}
+          {%- endif -%}
+        </h1>
+
+        <!-- Search Form -->
+        <form action="{{ routes.search_url }}" method="get" role="search" class="relative">
+          <input
+            type="search"
+            name="q"
+            value="{{ search.terms | escape }}"
+            placeholder="{{ 'general.search.placeholder' | t | default: 'Search products, pages, articles...' }}"
+            class="w-full px-6 py-4 pr-14 text-lg border border-neutral-300 dark:border-neutral-600 rounded-full bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+            autocomplete="off"
+          >
+          <button
+            type="submit"
+            class="absolute right-2 top-1/2 transform -translate-y-1/2 p-3 bg-primary-600 hover:bg-primary-700 text-white rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            aria-label="{{ 'general.search.title' | t | default: 'Search' }}"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Results -->
+  {%- if search.performed -%}
+    <div class="section-spacing">
+      <div class="container mx-auto px-4">
+        {%- if search.results_count > 0 -%}
+          <!-- Results Count and Filters -->
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+            <p class="text-neutral-600 dark:text-neutral-400 mb-4 md:mb-0">
+              Showing {{ paginate.current_offset | plus: 1 }}–{{ paginate.current_offset | plus: paginate.page_size | at_most: search.results_count }} of {{ search.results_count }} results
+            </p>
+            
+            <!-- Filter Tabs -->
+            <div class="flex space-x-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1">
+              <a 
+                href="{{ routes.search_url }}?q={{ search.terms | escape }}"
+                class="px-4 py-2 text-sm font-medium rounded-md transition-colors {% unless search.types contains 'product' or search.types contains 'page' or search.types contains 'article' %}bg-white dark:bg-neutral-700 text-primary-600 dark:text-primary-400{% else %}text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100{% endunless %}"
+              >
+                All
+              </a>
+              <a 
+                href="{{ routes.search_url }}?q={{ search.terms | escape }}&type=product"
+                class="px-4 py-2 text-sm font-medium rounded-md transition-colors {% if search.types contains 'product' %}bg-white dark:bg-neutral-700 text-primary-600 dark:text-primary-400{% else %}text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100{% endif %}"
+              >
+                Products
+              </a>
+              <a 
+                href="{{ routes.search_url }}?q={{ search.terms | escape }}&type=page"
+                class="px-4 py-2 text-sm font-medium rounded-md transition-colors {% if search.types contains 'page' %}bg-white dark:bg-neutral-700 text-primary-600 dark:text-primary-400{% else %}text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100{% endif %}"
+              >
+                Pages
+              </a>
+              <a 
+                href="{{ routes.search_url }}?q={{ search.terms | escape }}&type=article"
+                class="px-4 py-2 text-sm font-medium rounded-md transition-colors {% if search.types contains 'article' %}bg-white dark:bg-neutral-700 text-primary-600 dark:text-primary-400{% else %}text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100{% endif %}"
+              >
+                Articles
+              </a>
+            </div>
+          </div>
+
+          <!-- Results Grid -->
+          <div class="space-y-8">
+            {%- for item in search.results -%}
+              <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden hover:shadow-lg transition-all duration-300">
+                <div class="p-6">
+                  <!-- Item Type Badge -->
+                  <div class="flex items-center gap-3 mb-4">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200">
+                      {%- case item.object_type -%}
+                        {%- when 'product' -%}
+                          🛍️ Product
+                        {%- when 'page' -%}
+                          📄 Page
+                        {%- when 'article' -%}
+                          📝 Article
+                        {%- else -%}
+                          📋 {{ item.object_type | capitalize }}
+                      {%- endcase -%}
+                    </span>
+                    
+                    {%- if item.object_type == 'product' and item.available -%}
+                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
+                        In Stock
+                      </span>
+                    {%- elsif item.object_type == 'product' and item.available == false -%}
+                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200">
+                        Sold Out
+                      </span>
+                    {%- endif -%}
+                  </div>
+
+                  <div class="flex gap-6">
+                    <!-- Item Image -->
+                    {%- if item.object_type == 'product' and item.featured_media -%}
+                      <div class="flex-shrink-0">
+                        <img
+                          src="{{ item.featured_media | image_url: width: 120 }}"
+                          alt="{{ item.featured_media.alt | escape }}"
+                          class="w-20 h-20 object-cover rounded-lg"
+                          loading="lazy"
+                          width="80"
+                          height="80"
+                        >
+                      </div>
+                    {%- elsif item.object_type == 'article' and item.image -%}
+                      <div class="flex-shrink-0">
+                        <img
+                          src="{{ item.image | image_url: width: 120 }}"
+                          alt="{{ item.image.alt | escape }}"
+                          class="w-20 h-20 object-cover rounded-lg"
+                          loading="lazy"
+                          width="80"
+                          height="80"
+                        >
+                      </div>
+                    {%- endif -%}
+
+                    <!-- Item Content -->
+                    <div class="flex-1 min-w-0">
+                      <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
+                        <a href="{{ item.url }}" class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                          {{ item.title }}
+                        </a>
+                      </h3>
+
+                      {%- if item.object_type == 'product' and item.price -%}
+                        <div class="flex items-center gap-2 mb-3">
+                          {%- if item.compare_at_price > item.price -%}
+                            <span class="text-lg font-bold text-red-600 dark:text-red-400">
+                              {{ item.price | money }}
+                            </span>
+                            <span class="text-sm text-neutral-500 dark:text-neutral-400 line-through">
+                              {{ item.compare_at_price | money }}
+                            </span>
+                          {%- else -%}
+                            <span class="text-lg font-bold text-neutral-900 dark:text-neutral-100">
+                              {{ item.price | money }}
+                            </span>
+                          {%- endif -%}
+                        </div>
+                      {%- endif -%}
+
+                      {%- if item.summary != blank -%}
+                        <p class="text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-2">
+                          {{ item.summary | strip_html | truncate: 160 }}
+                        </p>
+                      {%- elsif item.content != blank -%}
+                        <p class="text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-2">
+                          {{ item.content | strip_html | truncate: 160 }}
+                        </p>
+                      {%- endif -%}
+
+                      <a 
+                        href="{{ item.url }}" 
+                        class="inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium transition-colors"
+                      >
+                        {%- case item.object_type -%}
+                          {%- when 'product' -%}
+                            View Product
+                          {%- when 'page' -%}
+                            Read More
+                          {%- when 'article' -%}
+                            Read Article
+                          {%- else -%}
+                            View Details
+                        {%- endcase -%}
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {%- endfor -%}
+          </div>
+
+          <!-- Pagination -->
+          {%- if paginate.pages > 1 -%}
+            <div class="mt-12">
+              {%- render 'pagination', paginate: paginate -%}
+            </div>
+          {%- endif -%}
+
+        {%- else -%}
+          <!-- No Results -->
+          <div class="text-center py-16">
+            <div class="text-6xl mb-6">🔍</div>
+            <h3 class="text-2xl font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
+              No results found for "{{ search.terms }}"
+            </h3>
+            <p class="text-lg text-neutral-600 dark:text-neutral-400 mb-8 max-w-md mx-auto">
+              Try adjusting your search terms or browse our collections.
+            </p>
+            <a 
+              href="{{ routes.all_products_collection_url }}" 
+              class="btn btn-primary px-8 py-3"
+            >
+              Browse All Products
+            </a>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+  {%- else -%}
+    <!-- Search Suggestions -->
+    <div class="section-spacing">
+      <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto text-center">
+          <div class="text-6xl mb-6">🔍</div>
+          <h2 class="text-2xl font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
+            What are you looking for?
+          </h2>
+          <p class="text-lg text-neutral-600 dark:text-neutral-400 mb-12">
+            Search our entire store for products, pages, and articles.
+          </p>
+
+          <!-- Popular Searches -->
+          <div class="mb-12">
+            <h3 class="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-6">Popular Searches</h3>
+            <div class="flex flex-wrap justify-center gap-3">
+              {%- assign popular_searches = 'shirts,shoes,accessories,sale,new arrivals' | split: ',' -%}
+              {%- for search_term in popular_searches -%}
+                <a 
+                  href="{{ routes.search_url }}?q={{ search_term | handle }}"
+                  class="px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-full hover:bg-primary-100 dark:hover:bg-primary-900/30 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+                >
+                  {{ search_term | capitalize }}
+                </a>
+              {%- endfor -%}
+            </div>
+          </div>
+
+          <!-- Browse Collections -->
+          <div>
+            <h3 class="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-6">Or Browse Collections</h3>
+            <a 
+              href="{{ routes.collections_url }}" 
+              class="btn btn-secondary px-8 py-3"
+            >
+              View All Collections
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+</div>
+
+{%- endpaginate -%}

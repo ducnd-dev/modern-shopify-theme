@@ -1,0 +1,905 @@
+{% comment %}
+  Promotional Banner System
+  Advanced promotional banners with animations, countdown timers, and targeting
+{% endcomment %}
+
+<div class="promotional-banners-section" data-promotional-banners>
+  {% for block in section.blocks %}
+    {% case block.type %}
+      {% when 'flash_sale_banner' %}
+        <div 
+          class="flash-sale-banner relative overflow-hidden {{ block.settings.visibility_class }}"
+          data-banner-id="{{ block.id }}"
+          data-banner-type="flash_sale"
+          data-auto-hide="{{ block.settings.auto_hide }}"
+          data-show-frequency="{{ block.settings.show_frequency }}"
+          style="background: linear-gradient(135deg, {{ block.settings.bg_color_start }}, {{ block.settings.bg_color_end }});"
+          {{ block.shopify_attributes }}
+        >
+          <!-- Animated Background Elements -->
+          <div class="absolute inset-0 opacity-10">
+            <div class="floating-elements">
+              <div class="floating-element absolute w-4 h-4 bg-white rounded-full animate-float-1"></div>
+              <div class="floating-element absolute w-6 h-6 bg-white rounded-full animate-float-2"></div>
+              <div class="floating-element absolute w-3 h-3 bg-white rounded-full animate-float-3"></div>
+            </div>
+          </div>
+
+          <div class="container mx-auto px-4 py-4 relative z-10">
+            <div class="flex items-center justify-between">
+              <!-- Content -->
+              <div class="flex items-center gap-4">
+                {% if block.settings.icon != blank %}
+                  <div class="flex-shrink-0">
+                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      {{ block.settings.icon }}
+                    </svg>
+                  </div>
+                {% endif %}
+
+                <div class="flex flex-col md:flex-row md:items-center md:gap-4">
+                  {% if block.settings.title != blank %}
+                    <h3 class="text-lg md:text-xl font-bold text-white">
+                      {{ block.settings.title }}
+                    </h3>
+                  {% endif %}
+
+                  {% if block.settings.description != blank %}
+                    <p class="text-white opacity-90 text-sm md:text-base">
+                      {{ block.settings.description }}
+                    </p>
+                  {% endif %}
+
+                  <!-- Countdown Timer -->
+                  {% if block.settings.show_countdown and block.settings.end_date != blank %}
+                    <div 
+                      class="countdown-timer flex items-center gap-2 text-white font-semibold"
+                      data-end-date="{{ block.settings.end_date }}"
+                    >
+                      <span class="text-sm opacity-90">Ends in:</span>
+                      <div class="flex gap-1">
+                        <span class="countdown-days bg-white bg-opacity-20 px-2 py-1 rounded text-sm">00</span>
+                        <span>:</span>
+                        <span class="countdown-hours bg-white bg-opacity-20 px-2 py-1 rounded text-sm">00</span>
+                        <span>:</span>
+                        <span class="countdown-minutes bg-white bg-opacity-20 px-2 py-1 rounded text-sm">00</span>
+                        <span>:</span>
+                        <span class="countdown-seconds bg-white bg-opacity-20 px-2 py-1 rounded text-sm">00</span>
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- CTA -->
+              <div class="flex items-center gap-3">
+                {% if block.settings.cta_text != blank and block.settings.cta_url != blank %}
+                  <a 
+                    href="{{ block.settings.cta_url }}"
+                    class="bg-white text-neutral-900 px-6 py-2 rounded-full font-semibold hover:bg-opacity-90 transition-all duration-300 transform hover:scale-105 whitespace-nowrap"
+                    data-banner-cta
+                  >
+                    {{ block.settings.cta_text }}
+                  </a>
+                {% endif %}
+
+                <!-- Close Button -->
+                {% if block.settings.dismissible %}
+                  <button 
+                    class="close-banner text-white hover:text-opacity-70 transition-colors"
+                    data-close-banner="{{ block.id }}"
+                    aria-label="Close banner"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress Bar (for limited time offers) -->
+          {% if block.settings.show_progress %}
+            <div class="absolute bottom-0 left-0 right-0 h-1 bg-white bg-opacity-20">
+              <div 
+                class="progress-bar h-full bg-white transition-all duration-1000 ease-out"
+                data-progress-bar
+                style="width: 0%;"
+              ></div>
+            </div>
+          {% endif %}
+        </div>
+
+      {% when 'announcement_banner' %}
+        <div 
+          class="announcement-banner bg-{{ block.settings.bg_color }} {{ block.settings.visibility_class }}"
+          data-banner-id="{{ block.id }}"
+          data-banner-type="announcement"
+          {{ block.shopify_attributes }}
+        >
+          <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-center text-center">
+              {% if block.settings.scrolling_text %}
+                <div class="scrolling-text-container overflow-hidden whitespace-nowrap">
+                  <div class="scrolling-text inline-block text-{{ block.settings.text_color }} animate-scroll">
+                    {{ block.settings.message }}
+                  </div>
+                </div>
+              {% else %}
+                <p class="text-{{ block.settings.text_color }} text-sm md:text-base">
+                  {{ block.settings.message }}
+                </p>
+              {% endif %}
+
+              {% if block.settings.dismissible %}
+                <button 
+                  class="close-banner ml-4 text-{{ block.settings.text_color }} hover:opacity-70 transition-opacity"
+                  data-close-banner="{{ block.id }}"
+                  aria-label="Close announcement"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+      {% when 'sticky_promotion' %}
+        <div 
+          class="sticky-promotion fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-80 bg-{{ block.settings.bg_color }} rounded-lg shadow-lg border border-{{ block.settings.border_color }} z-40 transform transition-all duration-300"
+          data-banner-id="{{ block.id }}"
+          data-banner-type="sticky"
+          data-sticky-banner
+          {{ block.shopify_attributes }}
+        >
+          <div class="p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex-1">
+                {% if block.settings.title != blank %}
+                  <h4 class="font-semibold text-{{ block.settings.text_color }} text-sm mb-1">
+                    {{ block.settings.title }}
+                  </h4>
+                {% endif %}
+                
+                {% if block.settings.message != blank %}
+                  <p class="text-{{ block.settings.text_color }} text-xs opacity-90">
+                    {{ block.settings.message }}
+                  </p>
+                {% endif %}
+
+                {% if block.settings.cta_text != blank and block.settings.cta_url != blank %}
+                  <a 
+                    href="{{ block.settings.cta_url }}"
+                    class="inline-block mt-2 bg-primary-600 text-white px-4 py-2 rounded-lg text-xs font-medium hover:bg-primary-700 transition-colors"
+                  >
+                    {{ block.settings.cta_text }}
+                  </a>
+                {% endif %}
+              </div>
+
+              <button 
+                class="close-banner text-{{ block.settings.text_color }} hover:opacity-70 transition-opacity flex-shrink-0"
+                data-close-banner="{{ block.id }}"
+                aria-label="Close promotion"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      {% when 'exit_intent_popup' %}
+        <div 
+          id="exit-intent-popup-{{ block.id }}"
+          class="exit-intent-popup fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4"
+          data-banner-id="{{ block.id }}"
+          data-banner-type="exit_intent"
+          {{ block.shopify_attributes }}
+        >
+          <div class="bg-white dark:bg-neutral-800 rounded-xl max-w-md w-full overflow-hidden shadow-2xl transform transition-all duration-300 scale-95">
+            <!-- Header -->
+            {% if block.settings.image != blank %}
+              <div class="aspect-video overflow-hidden">
+                <img 
+                  src="{{ block.settings.image | image_url: width: 600 }}" 
+                  alt="{{ block.settings.title | escape }}"
+                  class="w-full h-full object-cover"
+                >
+              </div>
+            {% endif %}
+
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  {% if block.settings.title != blank %}
+                    <h3 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
+                      {{ block.settings.title }}
+                    </h3>
+                  {% endif %}
+                  
+                  {% if block.settings.subtitle != blank %}
+                    <p class="text-neutral-600 dark:text-neutral-400">
+                      {{ block.settings.subtitle }}
+                    </p>
+                  {% endif %}
+                </div>
+
+                <button 
+                  class="close-banner text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+                  data-close-banner="{{ block.id }}"
+                  aria-label="Close popup"
+                >
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Discount Code -->
+              {% if block.settings.discount_code != blank %}
+                <div class="bg-neutral-100 dark:bg-neutral-700 rounded-lg p-4 mb-4 text-center">
+                  <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-2">Use code:</p>
+                  <div class="flex items-center justify-center gap-2">
+                    <code class="bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 px-3 py-1 rounded font-mono text-lg font-semibold">
+                      {{ block.settings.discount_code }}
+                    </code>
+                    <button 
+                      class="copy-code text-neutral-400 hover:text-primary-600 transition-colors"
+                      data-copy-text="{{ block.settings.discount_code }}"
+                      title="Copy code"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              {% endif %}
+
+              <!-- Email Signup -->
+              {% if block.settings.collect_email %}
+                <form class="email-signup-form mb-4" data-email-form>
+                  <div class="flex gap-2">
+                    <input 
+                      type="email" 
+                      placeholder="Enter your email"
+                      class="flex-1 px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-neutral-700 dark:text-white"
+                      required
+                    >
+                    <button 
+                      type="submit"
+                      class="bg-primary-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-700 transition-colors"
+                    >
+                      Subscribe
+                    </button>
+                  </div>
+                </form>
+              {% endif %}
+
+              <!-- CTA Buttons -->
+              <div class="flex gap-3">
+                {% if block.settings.primary_cta_text != blank and block.settings.primary_cta_url != blank %}
+                  <a 
+                    href="{{ block.settings.primary_cta_url }}"
+                    class="flex-1 bg-primary-600 text-white px-6 py-3 rounded-lg text-center font-semibold hover:bg-primary-700 transition-colors"
+                  >
+                    {{ block.settings.primary_cta_text }}
+                  </a>
+                {% endif %}
+
+                {% if block.settings.secondary_cta_text != blank %}
+                  <button 
+                    class="flex-1 border border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 px-6 py-3 rounded-lg font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors close-banner"
+                    data-close-banner="{{ block.id }}"
+                  >
+                    {{ block.settings.secondary_cta_text }}
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+    {% endcase %}
+  {% endfor %}
+</div>
+
+<script>
+  // Promotional Banners Manager
+  class PromotionalBannersManager {
+    constructor() {
+      this.dismissedBanners = this.loadDismissedBanners();
+      this.exitIntentTriggered = false;
+      this.init();
+    }
+
+    init() {
+      this.bindEvents();
+      this.initCountdownTimers();
+      this.initProgressBars();
+      this.handleBannerVisibility();
+      this.initExitIntent();
+      this.initStickyBanners();
+    }
+
+    loadDismissedBanners() {
+      try {
+        const stored = localStorage.getItem('dismissed_banners');
+        return stored ? JSON.parse(stored) : {};
+      } catch {
+        return {};
+      }
+    }
+
+    saveDismissedBanners() {
+      try {
+        localStorage.setItem('dismissed_banners', JSON.stringify(this.dismissedBanners));
+      } catch (error) {
+        console.error('Error saving dismissed banners:', error);
+      }
+    }
+
+    dismissBanner(bannerId, duration = null) {
+      const banner = document.querySelector(`[data-banner-id="${bannerId}"]`);
+      if (!banner) return;
+
+      // Add to dismissed list
+      this.dismissedBanners[bannerId] = {
+        dismissedAt: Date.now(),
+        duration: duration // null = permanent, number = milliseconds
+      };
+      this.saveDismissedBanners();
+
+      // Hide banner with animation
+      banner.style.transform = 'translateY(-100%)';
+      banner.style.opacity = '0';
+      
+      setTimeout(() => {
+        banner.style.display = 'none';
+      }, 300);
+    }
+
+    handleBannerVisibility() {
+      const banners = document.querySelectorAll('[data-banner-id]');
+      
+      banners.forEach(banner => {
+        const bannerId = banner.getAttribute('data-banner-id');
+        const autoHide = banner.getAttribute('data-auto-hide');
+        const showFrequency = banner.getAttribute('data-show-frequency');
+        
+        // Check if banner is dismissed
+        const dismissed = this.dismissedBanners[bannerId];
+        if (dismissed) {
+          if (dismissed.duration) {
+            // Check if dismissal has expired
+            if (Date.now() - dismissed.dismissedAt > dismissed.duration) {
+              delete this.dismissedBanners[bannerId];
+              this.saveDismissedBanners();
+            } else {
+              banner.style.display = 'none';
+              return;
+            }
+          } else {
+            banner.style.display = 'none';
+            return;
+          }
+        }
+
+        // Handle show frequency
+        if (showFrequency) {
+          const lastShown = localStorage.getItem(`banner_${bannerId}_last_shown`);
+          const now = Date.now();
+          
+          if (lastShown) {
+            const timeSinceShown = now - parseInt(lastShown);
+            const frequency = this.parseFrequency(showFrequency);
+            
+            if (timeSinceShown < frequency) {
+              banner.style.display = 'none';
+              return;
+            }
+          }
+          
+          localStorage.setItem(`banner_${bannerId}_last_shown`, now.toString());
+        }
+
+        // Auto-hide after duration
+        if (autoHide) {
+          const duration = this.parseDuration(autoHide);
+          setTimeout(() => {
+            this.dismissBanner(bannerId, null);
+          }, duration);
+        }
+      });
+    }
+
+    parseFrequency(frequency) {
+      // Parse frequency like "1d", "2h", "30m"
+      const match = frequency.match(/(\d+)([dhm])/);
+      if (!match) return 0;
+      
+      const [, amount, unit] = match;
+      const multipliers = { m: 60000, h: 3600000, d: 86400000 };
+      
+      return parseInt(amount) * (multipliers[unit] || 0);
+    }
+
+    parseDuration(duration) {
+      // Parse duration like "5s", "30s", "2m"
+      const match = duration.match(/(\d+)([sm])/);
+      if (!match) return 5000;
+      
+      const [, amount, unit] = match;
+      const multipliers = { s: 1000, m: 60000 };
+      
+      return parseInt(amount) * (multipliers[unit] || 1000);
+    }
+
+    initCountdownTimers() {
+      const timers = document.querySelectorAll('.countdown-timer[data-end-date]');
+      
+      timers.forEach(timer => {
+        const endDate = new Date(timer.getAttribute('data-end-date'));
+        if (isNaN(endDate)) return;
+
+        const updateTimer = () => {
+          const now = new Date();
+          const diff = endDate - now;
+          
+          if (diff <= 0) {
+            timer.innerHTML = '<span class="text-red-400">Expired</span>';
+            return;
+          }
+          
+          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+          
+          timer.querySelector('.countdown-days').textContent = days.toString().padStart(2, '0');
+          timer.querySelector('.countdown-hours').textContent = hours.toString().padStart(2, '0');
+          timer.querySelector('.countdown-minutes').textContent = minutes.toString().padStart(2, '0');
+          timer.querySelector('.countdown-seconds').textContent = seconds.toString().padStart(2, '0');
+        };
+        
+        updateTimer();
+        setInterval(updateTimer, 1000);
+      });
+    }
+
+    initProgressBars() {
+      const progressBars = document.querySelectorAll('[data-progress-bar]');
+      
+      progressBars.forEach(bar => {
+        const banner = bar.closest('[data-banner-id]');
+        const autoHide = banner?.getAttribute('data-auto-hide');
+        
+        if (autoHide) {
+          const duration = this.parseDuration(autoHide);
+          
+          // Animate progress bar
+          setTimeout(() => {
+            bar.style.width = '100%';
+          }, 100);
+          
+          bar.style.transitionDuration = `${duration}ms`;
+        }
+      });
+    }
+
+    initExitIntent() {
+      let exitIntentEnabled = true;
+      
+      const handleMouseLeave = (e) => {
+        if (e.clientY <= 0 && !this.exitIntentTriggered && exitIntentEnabled) {
+          this.exitIntentTriggered = true;
+          this.showExitIntentPopup();
+        }
+      };
+      
+      document.addEventListener('mouseleave', handleMouseLeave);
+      
+      // Disable exit intent for mobile
+      if (window.innerWidth <= 768) {
+        exitIntentEnabled = false;
+      }
+    }
+
+    showExitIntentPopup() {
+      const popup = document.querySelector('[data-banner-type="exit_intent"]');
+      if (!popup) return;
+      
+      const bannerId = popup.getAttribute('data-banner-id');
+      
+      // Check if already dismissed
+      if (this.dismissedBanners[bannerId]) return;
+      
+      popup.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      
+      // Animate in
+      setTimeout(() => {
+        popup.querySelector('.bg-white, .dark\\:bg-neutral-800').style.transform = 'scale(1)';
+      }, 50);
+    }
+
+    initStickyBanners() {
+      const stickyBanners = document.querySelectorAll('[data-sticky-banner]');
+      
+      stickyBanners.forEach(banner => {
+        const bannerId = banner.getAttribute('data-banner-id');
+        
+        // Check if dismissed
+        if (this.dismissedBanners[bannerId]) {
+          banner.style.display = 'none';
+          return;
+        }
+        
+        // Show after delay
+        setTimeout(() => {
+          banner.style.transform = 'translateY(0)';
+        }, 2000);
+      });
+    }
+
+    bindEvents() {
+      // Close buttons
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('[data-close-banner]')) {
+          const button = e.target.closest('[data-close-banner]');
+          const bannerId = button.getAttribute('data-close-banner');
+          
+          // Special handling for exit intent popup
+          const popup = button.closest('[data-banner-type="exit_intent"]');
+          if (popup) {
+            popup.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+          }
+          
+          this.dismissBanner(bannerId);
+        }
+      });
+
+      // Copy discount codes
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('.copy-code')) {
+          const button = e.target.closest('.copy-code');
+          const textToCopy = button.getAttribute('data-copy-text');
+          
+          navigator.clipboard.writeText(textToCopy).then(() => {
+            this.showNotification('Code copied!', 'success');
+          });
+        }
+      });
+
+      // Email signup forms
+      document.addEventListener('submit', (e) => {
+        if (e.target.closest('[data-email-form]')) {
+          e.preventDefault();
+          const form = e.target.closest('[data-email-form]');
+          const email = form.querySelector('input[type="email"]').value;
+          
+          // Here you would integrate with your email service
+          this.showNotification('Thanks for subscribing!', 'success');
+          form.reset();
+        }
+      });
+
+      // Close popup on outside click
+      document.addEventListener('click', (e) => {
+        const popup = e.target.closest('.exit-intent-popup');
+        if (popup && e.target === popup) {
+          const bannerId = popup.getAttribute('data-banner-id');
+          popup.classList.add('hidden');
+          document.body.style.overflow = 'auto';
+          this.dismissBanner(bannerId);
+        }
+      });
+    }
+
+    showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 text-white font-medium ${
+        type === 'success' ? 'bg-green-500' : 
+        type === 'error' ? 'bg-red-500' : 
+        'bg-blue-500'
+      }`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
+  }
+
+  // Initialize when DOM is ready
+  document.addEventListener('DOMContentLoaded', function() {
+    window.promotionalBannersManager = new PromotionalBannersManager();
+  });
+</script>
+
+<style>
+  @keyframes float-1 {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+  }
+  
+  @keyframes float-2 {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-30px) rotate(-180deg); }
+  }
+  
+  @keyframes float-3 {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(90deg); }
+  }
+  
+  @keyframes scroll {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+
+  .animate-float-1 { animation: float-1 6s ease-in-out infinite; }
+  .animate-float-2 { animation: float-2 8s ease-in-out infinite; }
+  .animate-float-3 { animation: float-3 7s ease-in-out infinite; }
+  .animate-scroll { animation: scroll 20s linear infinite; }
+
+  .floating-element:nth-child(1) { top: 20%; left: 10%; }
+  .floating-element:nth-child(2) { top: 60%; right: 15%; }
+  .floating-element:nth-child(3) { bottom: 30%; left: 20%; }
+</style>
+
+{% schema %}
+{
+  "name": "Promotional Banners",
+  "tag": "section",
+  "class": "section-promotional-banners",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "flash_sale_banner",
+      "name": "Flash Sale Banner",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "🔥 Flash Sale"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description",
+          "default": "Up to 50% off everything!"
+        },
+        {
+          "type": "color",
+          "id": "bg_color_start",
+          "label": "Background Start Color",
+          "default": "#ff6b6b"
+        },
+        {
+          "type": "color",
+          "id": "bg_color_end",
+          "label": "Background End Color",
+          "default": "#ff8e53"
+        },
+        {
+          "type": "text",
+          "id": "cta_text",
+          "label": "CTA Text",
+          "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "cta_url",
+          "label": "CTA URL"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_countdown",
+          "label": "Show Countdown Timer",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "end_date",
+          "label": "End Date",
+          "info": "Format: YYYY-MM-DD HH:MM:SS"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_progress",
+          "label": "Show Progress Bar",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "dismissible",
+          "label": "Dismissible",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "auto_hide",
+          "label": "Auto Hide After",
+          "info": "e.g., 30s, 2m (seconds/minutes)",
+          "placeholder": "30s"
+        }
+      ]
+    },
+    {
+      "type": "announcement_banner",
+      "name": "Announcement Banner",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "message",
+          "label": "Message",
+          "default": "Free shipping on orders over $50!"
+        },
+        {
+          "type": "select",
+          "id": "bg_color",
+          "label": "Background Color",
+          "options": [
+            { "value": "neutral-900", "label": "Dark" },
+            { "value": "primary-600", "label": "Primary" },
+            { "value": "green-600", "label": "Green" },
+            { "value": "blue-600", "label": "Blue" },
+            { "value": "red-600", "label": "Red" }
+          ],
+          "default": "neutral-900"
+        },
+        {
+          "type": "select",
+          "id": "text_color",
+          "label": "Text Color",
+          "options": [
+            { "value": "white", "label": "White" },
+            { "value": "neutral-900", "label": "Dark" }
+          ],
+          "default": "white"
+        },
+        {
+          "type": "checkbox",
+          "id": "scrolling_text",
+          "label": "Scrolling Text",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "dismissible",
+          "label": "Dismissible",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "sticky_promotion",
+      "name": "Sticky Promotion",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Limited Time Offer"
+        },
+        {
+          "type": "textarea",
+          "id": "message",
+          "label": "Message",
+          "default": "Get 20% off your first order!"
+        },
+        {
+          "type": "text",
+          "id": "cta_text",
+          "label": "CTA Text",
+          "default": "Claim Offer"
+        },
+        {
+          "type": "url",
+          "id": "cta_url",
+          "label": "CTA URL"
+        },
+        {
+          "type": "select",
+          "id": "bg_color",
+          "label": "Background Color",
+          "options": [
+            { "value": "white", "label": "White" },
+            { "value": "primary-50", "label": "Light Primary" },
+            { "value": "green-50", "label": "Light Green" }
+          ],
+          "default": "white"
+        },
+        {
+          "type": "select",
+          "id": "text_color",
+          "label": "Text Color",
+          "options": [
+            { "value": "neutral-900", "label": "Dark" },
+            { "value": "primary-900", "label": "Primary Dark" }
+          ],
+          "default": "neutral-900"
+        }
+      ]
+    },
+    {
+      "type": "exit_intent_popup",
+      "name": "Exit Intent Popup",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Wait! Don't Leave Yet"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle",
+          "default": "Save 15% on your first order"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "discount_code",
+          "label": "Discount Code",
+          "default": "SAVE15"
+        },
+        {
+          "type": "checkbox",
+          "id": "collect_email",
+          "label": "Collect Email",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "primary_cta_text",
+          "label": "Primary CTA Text",
+          "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "primary_cta_url",
+          "label": "Primary CTA URL"
+        },
+        {
+          "type": "text",
+          "id": "secondary_cta_text",
+          "label": "Secondary CTA Text",
+          "default": "No Thanks"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Promotional Banners",
+      "blocks": [
+        {
+          "type": "flash_sale_banner",
+          "settings": {
+            "title": "🔥 Flash Sale",
+            "description": "Up to 50% off everything!",
+            "cta_text": "Shop Now",
+            "show_countdown": true,
+            "dismissible": true
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

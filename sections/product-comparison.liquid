@@ -1,0 +1,676 @@
+{% comment %}
+  Product Comparison Section
+  Advanced product comparison tool with side-by-side feature comparison
+{% endcomment %}
+
+<div class="product-comparison-section py-16 bg-{{ section.settings.background_color }}">
+  <div class="container mx-auto px-4">
+    {% if section.settings.heading != blank or section.settings.subheading != blank %}
+      <div class="text-center mb-12">
+        {% if section.settings.heading != blank %}
+          <h2 class="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
+            {{ section.settings.heading }}
+          </h2>
+        {% endif %}
+        {% if section.settings.subheading != blank %}
+          <p class="text-xl text-neutral-600 dark:text-neutral-400 max-w-3xl mx-auto">
+            {{ section.settings.subheading }}
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="max-w-7xl mx-auto">
+      <!-- Product Selector -->
+      <div class="mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-product-selector>
+          {% for i in (1..3) %}
+            <div class="comparison-slot bg-white dark:bg-neutral-800 rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-600 p-6 text-center transition-all duration-300 hover:border-primary-500" data-slot="{{ i }}">
+              <div class="product-placeholder">
+                <svg class="w-16 h-16 text-neutral-300 dark:text-neutral-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                <h3 class="text-lg font-medium text-neutral-600 dark:text-neutral-400 mb-2">
+                  Select Product {{ i }}
+                </h3>
+                <button 
+                  class="select-product-btn bg-primary-600 text-white px-4 py-2 rounded-full font-medium hover:bg-primary-700 transition-colors"
+                  data-slot="{{ i }}"
+                >
+                  Choose Product
+                </button>
+              </div>
+              
+              <div class="product-selected hidden">
+                <div class="relative">
+                  <img class="product-image w-24 h-24 object-cover rounded-lg mx-auto mb-4" src="" alt="">
+                  <button class="remove-product absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600 transition-colors">×</button>
+                </div>
+                <h4 class="product-title font-semibold text-neutral-900 dark:text-neutral-100 mb-2"></h4>
+                <p class="product-price text-primary-600 dark:text-primary-400 font-bold"></p>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Compare Button -->
+      <div class="text-center mb-8">
+        <button 
+          id="compare-btn"
+          class="compare-btn bg-primary-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-primary-700 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled
+        >
+          <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 00-2-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          Compare Products
+        </button>
+      </div>
+
+      <!-- Comparison Table -->
+      <div class="comparison-table-container hidden" data-comparison-table>
+        <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-neutral-50 dark:bg-neutral-700">
+                <tr>
+                  <th class="text-left p-6 font-semibold text-neutral-900 dark:text-neutral-100 w-1/4">Features</th>
+                  <th class="text-center p-6 font-semibold text-neutral-900 dark:text-neutral-100 product-header" data-product="1"></th>
+                  <th class="text-center p-6 font-semibold text-neutral-900 dark:text-neutral-100 product-header" data-product="2"></th>
+                  <th class="text-center p-6 font-semibold text-neutral-900 dark:text-neutral-100 product-header" data-product="3"></th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-neutral-200 dark:divide-neutral-600">
+                <!-- Product Images -->
+                <tr>
+                  <td class="p-6 font-medium text-neutral-900 dark:text-neutral-100">Product</td>
+                  <td class="p-6 text-center product-cell" data-product="1">
+                    <div class="product-info">
+                      <img class="w-20 h-20 object-cover rounded-lg mx-auto mb-2" src="" alt="">
+                      <h4 class="font-semibold text-sm text-neutral-900 dark:text-neutral-100"></h4>
+                    </div>
+                  </td>
+                  <td class="p-6 text-center product-cell" data-product="2">
+                    <div class="product-info">
+                      <img class="w-20 h-20 object-cover rounded-lg mx-auto mb-2" src="" alt="">
+                      <h4 class="font-semibold text-sm text-neutral-900 dark:text-neutral-100"></h4>
+                    </div>
+                  </td>
+                  <td class="p-6 text-center product-cell" data-product="3">
+                    <div class="product-info">
+                      <img class="w-20 h-20 object-cover rounded-lg mx-auto mb-2" src="" alt="">
+                      <h4 class="font-semibold text-sm text-neutral-900 dark:text-neutral-100"></h4>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Price -->
+                <tr class="bg-neutral-25 dark:bg-neutral-750">
+                  <td class="p-6 font-medium text-neutral-900 dark:text-neutral-100">Price</td>
+                  <td class="p-6 text-center product-price-cell" data-product="1">
+                    <span class="text-lg font-bold text-primary-600 dark:text-primary-400"></span>
+                  </td>
+                  <td class="p-6 text-center product-price-cell" data-product="2">
+                    <span class="text-lg font-bold text-primary-600 dark:text-primary-400"></span>
+                  </td>
+                  <td class="p-6 text-center product-price-cell" data-product="3">
+                    <span class="text-lg font-bold text-primary-600 dark:text-primary-400"></span>
+                  </td>
+                </tr>
+
+                <!-- Rating -->
+                <tr>
+                  <td class="p-6 font-medium text-neutral-900 dark:text-neutral-100">Rating</td>
+                  <td class="p-6 text-center product-rating-cell" data-product="1">
+                    <div class="flex justify-center items-center gap-1">
+                      <div class="stars flex"></div>
+                      <span class="text-sm text-neutral-600 dark:text-neutral-400 ml-2"></span>
+                    </div>
+                  </td>
+                  <td class="p-6 text-center product-rating-cell" data-product="2">
+                    <div class="flex justify-center items-center gap-1">
+                      <div class="stars flex"></div>
+                      <span class="text-sm text-neutral-600 dark:text-neutral-400 ml-2"></span>
+                    </div>
+                  </td>
+                  <td class="p-6 text-center product-rating-cell" data-product="3">
+                    <div class="flex justify-center items-center gap-1">
+                      <div class="stars flex"></div>
+                      <span class="text-sm text-neutral-600 dark:text-neutral-400 ml-2"></span>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Availability -->
+                <tr class="bg-neutral-25 dark:bg-neutral-750">
+                  <td class="p-6 font-medium text-neutral-900 dark:text-neutral-100">Availability</td>
+                  <td class="p-6 text-center product-stock-cell" data-product="1">
+                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium"></span>
+                  </td>
+                  <td class="p-6 text-center product-stock-cell" data-product="2">
+                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium"></span>
+                  </td>
+                  <td class="p-6 text-center product-stock-cell" data-product="3">
+                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium"></span>
+                  </td>
+                </tr>
+
+                <!-- Custom Features -->
+                {% for block in section.blocks %}
+                  {% case block.type %}
+                    {% when 'comparison_feature' %}
+                      <tr {% cycle '', 'class="bg-neutral-25 dark:bg-neutral-750"' %}>
+                        <td class="p-6 font-medium text-neutral-900 dark:text-neutral-100">
+                          {{ block.settings.feature_name }}
+                        </td>
+                        <td class="p-6 text-center text-neutral-600 dark:text-neutral-400" data-feature="{{ block.settings.feature_name | handle }}" data-product="1">
+                          {{ block.settings.product_1_value | default: '—' }}
+                        </td>
+                        <td class="p-6 text-center text-neutral-600 dark:text-neutral-400" data-feature="{{ block.settings.feature_name | handle }}" data-product="2">
+                          {{ block.settings.product_2_value | default: '—' }}
+                        </td>
+                        <td class="p-6 text-center text-neutral-600 dark:text-neutral-400" data-feature="{{ block.settings.feature_name | handle }}" data-product="3">
+                          {{ block.settings.product_3_value | default: '—' }}
+                        </td>
+                      </tr>
+                  {% endcase %}
+                {% endfor %}
+
+                <!-- Actions -->
+                <tr class="bg-neutral-50 dark:bg-neutral-700">
+                  <td class="p-6 font-medium text-neutral-900 dark:text-neutral-100">Actions</td>
+                  <td class="p-6 text-center product-action-cell" data-product="1">
+                    <div class="space-y-2">
+                      <button class="view-product-btn w-full bg-primary-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-700 transition-colors">
+                        View Product
+                      </button>
+                      <button class="add-to-cart-btn w-full border border-primary-600 text-primary-600 px-4 py-2 rounded-lg font-medium hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors">
+                        Add to Cart
+                      </button>
+                    </div>
+                  </td>
+                  <td class="p-6 text-center product-action-cell" data-product="2">
+                    <div class="space-y-2">
+                      <button class="view-product-btn w-full bg-primary-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-700 transition-colors">
+                        View Product
+                      </button>
+                      <button class="add-to-cart-btn w-full border border-primary-600 text-primary-600 px-4 py-2 rounded-lg font-medium hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors">
+                        Add to Cart
+                      </button>
+                    </div>
+                  </td>
+                  <td class="p-6 text-center product-action-cell" data-product="3">
+                    <div class="space-y-2">
+                      <button class="view-product-btn w-full bg-primary-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-700 transition-colors">
+                        View Product
+                      </button>
+                      <button class="add-to-cart-btn w-full border border-primary-600 text-primary-600 px-4 py-2 rounded-lg font-medium hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors">
+                        Add to Cart
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Clear Comparison -->
+        <div class="text-center mt-6">
+          <button 
+            id="clear-comparison"
+            class="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 font-medium transition-colors"
+          >
+            Clear Comparison
+          </button>
+        </div>
+      </div>
+
+      <!-- Product Selection Modal -->
+      <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-neutral-800 rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+          <div class="p-6 border-b border-neutral-200 dark:border-neutral-600 flex items-center justify-between">
+            <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100">Select a Product</h3>
+            <button id="close-modal" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="p-6 overflow-y-auto max-h-[60vh]">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="product-grid">
+              <!-- Products will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const comparisonData = {
+      products: {},
+      selectedSlot: null
+    };
+
+    // Sample products data (in real implementation, this would come from Shopify API)
+    const sampleProducts = [
+      {
+        id: 1,
+        title: 'Premium Wireless Headphones',
+        price: '$199.99',
+        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300',
+        rating: 4.5,
+        reviews: 128,
+        available: true,
+        url: '/products/premium-headphones'
+      },
+      {
+        id: 2,
+        title: 'Sport Bluetooth Earbuds',
+        price: '$89.99',
+        image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300',
+        rating: 4.3,
+        reviews: 89,
+        available: true,
+        url: '/products/sport-earbuds'
+      },
+      {
+        id: 3,
+        title: 'Studio Monitor Headphones',
+        price: '$299.99',
+        image: 'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=300',
+        rating: 4.8,
+        reviews: 67,
+        available: false,
+        url: '/products/studio-monitors'
+      }
+    ];
+
+    // Initialize
+    const selectButtons = document.querySelectorAll('.select-product-btn');
+    const removeButtons = document.querySelectorAll('.remove-product');
+    const compareBtn = document.getElementById('compare-btn');
+    const clearBtn = document.getElementById('clear-comparison');
+    const modal = document.getElementById('product-modal');
+    const closeModal = document.getElementById('close-modal');
+    const productGrid = document.getElementById('product-grid');
+    const comparisonTable = document.querySelector('[data-comparison-table]');
+
+    // Event listeners
+    selectButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        comparisonData.selectedSlot = this.getAttribute('data-slot');
+        showProductModal();
+      });
+    });
+
+    compareBtn.addEventListener('click', showComparison);
+    clearBtn.addEventListener('click', clearComparison);
+    closeModal.addEventListener('click', hideProductModal);
+
+    // Modal functions
+    function showProductModal() {
+      populateProductGrid();
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function hideProductModal() {
+      modal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+
+    function populateProductGrid() {
+      productGrid.innerHTML = '';
+      
+      sampleProducts.forEach(product => {
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card bg-neutral-50 dark:bg-neutral-700 rounded-lg p-4 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-600 transition-colors';
+        productCard.innerHTML = `
+          <img src="${product.image}" alt="${product.title}" class="w-full h-32 object-cover rounded-lg mb-3">
+          <h4 class="font-semibold text-neutral-900 dark:text-neutral-100 mb-2 text-sm">${product.title}</h4>
+          <p class="text-primary-600 dark:text-primary-400 font-bold mb-2">${product.price}</p>
+          <div class="flex items-center gap-1 text-sm text-neutral-600 dark:text-neutral-400">
+            ${generateStars(product.rating)}
+            <span class="ml-1">(${product.reviews})</span>
+          </div>
+        `;
+        
+        productCard.addEventListener('click', () => selectProduct(product));
+        productGrid.appendChild(productCard);
+      });
+    }
+
+    function selectProduct(product) {
+      const slot = comparisonData.selectedSlot;
+      comparisonData.products[slot] = product;
+      
+      updateSlotDisplay(slot, product);
+      updateCompareButton();
+      hideProductModal();
+    }
+
+    function updateSlotDisplay(slot, product) {
+      const slotElement = document.querySelector(`[data-slot="${slot}"]`);
+      const placeholder = slotElement.querySelector('.product-placeholder');
+      const selected = slotElement.querySelector('.product-selected');
+      
+      placeholder.classList.add('hidden');
+      selected.classList.remove('hidden');
+      
+      selected.querySelector('.product-image').src = product.image;
+      selected.querySelector('.product-image').alt = product.title;
+      selected.querySelector('.product-title').textContent = product.title;
+      selected.querySelector('.product-price').textContent = product.price;
+      
+      // Add remove functionality
+      const removeBtn = selected.querySelector('.remove-product');
+      removeBtn.addEventListener('click', () => removeProduct(slot));
+    }
+
+    function removeProduct(slot) {
+      delete comparisonData.products[slot];
+      
+      const slotElement = document.querySelector(`[data-slot="${slot}"]`);
+      const placeholder = slotElement.querySelector('.product-placeholder');
+      const selected = slotElement.querySelector('.product-selected');
+      
+      selected.classList.add('hidden');
+      placeholder.classList.remove('hidden');
+      
+      updateCompareButton();
+      
+      if (Object.keys(comparisonData.products).length < 2) {
+        comparisonTable.classList.add('hidden');
+      }
+    }
+
+    function updateCompareButton() {
+      const productCount = Object.keys(comparisonData.products).length;
+      compareBtn.disabled = productCount < 2;
+      compareBtn.textContent = productCount < 2 ? 
+        `Select ${2 - productCount} more product${2 - productCount > 1 ? 's' : ''} to compare` : 
+        'Compare Products';
+    }
+
+    function showComparison() {
+      populateComparisonTable();
+      comparisonTable.classList.remove('hidden');
+      comparisonTable.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function populateComparisonTable() {
+      // Update headers
+      [1, 2, 3].forEach(slot => {
+        const header = document.querySelector(`.product-header[data-product="${slot}"]`);
+        const product = comparisonData.products[slot];
+        
+        if (product) {
+          header.textContent = product.title;
+          header.classList.remove('hidden');
+        } else {
+          header.textContent = '';
+          header.classList.add('hidden');
+        }
+      });
+
+      // Update product info
+      [1, 2, 3].forEach(slot => {
+        const product = comparisonData.products[slot];
+        const cell = document.querySelector(`.product-cell[data-product="${slot}"]`);
+        
+        if (product) {
+          const img = cell.querySelector('img');
+          const title = cell.querySelector('h4');
+          
+          img.src = product.image;
+          img.alt = product.title;
+          title.textContent = product.title;
+          
+          cell.style.display = 'table-cell';
+        } else {
+          cell.style.display = 'none';
+        }
+      });
+
+      // Update prices
+      [1, 2, 3].forEach(slot => {
+        const product = comparisonData.products[slot];
+        const cell = document.querySelector(`.product-price-cell[data-product="${slot}"] span`);
+        
+        if (product && cell) {
+          cell.textContent = product.price;
+          cell.closest('td').style.display = 'table-cell';
+        } else if (cell) {
+          cell.closest('td').style.display = 'none';
+        }
+      });
+
+      // Update ratings
+      [1, 2, 3].forEach(slot => {
+        const product = comparisonData.products[slot];
+        const cell = document.querySelector(`.product-rating-cell[data-product="${slot}"]`);
+        
+        if (product && cell) {
+          const starsContainer = cell.querySelector('.stars');
+          const reviewsText = cell.querySelector('span');
+          
+          starsContainer.innerHTML = generateStars(product.rating);
+          reviewsText.textContent = `(${product.reviews})`;
+          
+          cell.style.display = 'table-cell';
+        } else if (cell) {
+          cell.style.display = 'none';
+        }
+      });
+
+      // Update stock
+      [1, 2, 3].forEach(slot => {
+        const product = comparisonData.products[slot];
+        const cell = document.querySelector(`.product-stock-cell[data-product="${slot}"] span`);
+        
+        if (product && cell) {
+          if (product.available) {
+            cell.className = 'inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+            cell.innerHTML = '● In Stock';
+          } else {
+            cell.className = 'inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
+            cell.innerHTML = '● Out of Stock';
+          }
+          
+          cell.closest('td').style.display = 'table-cell';
+        } else if (cell) {
+          cell.closest('td').style.display = 'none';
+        }
+      });
+
+      // Update action buttons
+      [1, 2, 3].forEach(slot => {
+        const product = comparisonData.products[slot];
+        const cell = document.querySelector(`.product-action-cell[data-product="${slot}"]`);
+        
+        if (product && cell) {
+          const viewBtn = cell.querySelector('.view-product-btn');
+          const cartBtn = cell.querySelector('.add-to-cart-btn');
+          
+          viewBtn.addEventListener('click', () => {
+            window.location.href = product.url;
+          });
+          
+          cartBtn.addEventListener('click', () => {
+            // Add to cart functionality
+            console.log('Add to cart:', product.title);
+          });
+          
+          if (!product.available) {
+            cartBtn.disabled = true;
+            cartBtn.textContent = 'Out of Stock';
+            cartBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          }
+          
+          cell.style.display = 'table-cell';
+        } else if (cell) {
+          cell.style.display = 'none';
+        }
+      });
+    }
+
+    function clearComparison() {
+      comparisonData.products = {};
+      
+      // Reset all slots
+      [1, 2, 3].forEach(slot => {
+        const slotElement = document.querySelector(`[data-slot="${slot}"]`);
+        const placeholder = slotElement.querySelector('.product-placeholder');
+        const selected = slotElement.querySelector('.product-selected');
+        
+        selected.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+      });
+      
+      comparisonTable.classList.add('hidden');
+      updateCompareButton();
+    }
+
+    function generateStars(rating) {
+      const fullStars = Math.floor(rating);
+      const hasHalfStar = rating % 1 !== 0;
+      let stars = '';
+      
+      for (let i = 0; i < fullStars; i++) {
+        stars += '<svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>';
+      }
+      
+      if (hasHalfStar) {
+        stars += '<svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" clip-path="inset(0 50% 0 0)"></path></svg>';
+      }
+      
+      const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+      for (let i = 0; i < emptyStars; i++) {
+        stars += '<svg class="w-4 h-4 text-neutral-300 dark:text-neutral-600" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>';
+      }
+      
+      return stars;
+    }
+
+    // Close modal on outside click
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        hideProductModal();
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Product Comparison",
+  "tag": "section",
+  "class": "section-product-comparison",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Compare Products"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Select up to 3 products to compare features, prices, and specifications side by side."
+    },
+    {
+      "type": "select",
+      "id": "background_color",
+      "label": "Background Color",
+      "options": [
+        {
+          "value": "transparent",
+          "label": "Transparent"
+        },
+        {
+          "value": "white",
+          "label": "White"
+        },
+        {
+          "value": "neutral-50",
+          "label": "Light Gray"
+        }
+      ],
+      "default": "neutral-50"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "comparison_feature",
+      "name": "Comparison Feature",
+      "settings": [
+        {
+          "type": "text",
+          "id": "feature_name",
+          "label": "Feature Name",
+          "default": "Battery Life"
+        },
+        {
+          "type": "text",
+          "id": "product_1_value",
+          "label": "Product 1 Value",
+          "default": "24 hours"
+        },
+        {
+          "type": "text",
+          "id": "product_2_value",
+          "label": "Product 2 Value",
+          "default": "18 hours"
+        },
+        {
+          "type": "text",
+          "id": "product_3_value",
+          "label": "Product 3 Value",
+          "default": "30 hours"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Comparison",
+      "blocks": [
+        {
+          "type": "comparison_feature",
+          "settings": {
+            "feature_name": "Battery Life",
+            "product_1_value": "24 hours",
+            "product_2_value": "18 hours", 
+            "product_3_value": "30 hours"
+          }
+        },
+        {
+          "type": "comparison_feature",
+          "settings": {
+            "feature_name": "Weight",
+            "product_1_value": "250g",
+            "product_2_value": "180g",
+            "product_3_value": "320g"
+          }
+        },
+        {
+          "type": "comparison_feature",
+          "settings": {
+            "feature_name": "Bluetooth Version",
+            "product_1_value": "5.2",
+            "product_2_value": "5.0",
+            "product_3_value": "5.3"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,581 @@
+{% comment %}
+  Size Guide Modal Snippet
+  Reusable size guide modal with interactive sizing charts and fit recommendations
+{% endcomment %}
+
+<div id="size-guide-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4" data-size-guide-modal>
+  <div class="bg-white dark:bg-neutral-800 rounded-xl max-w-5xl w-full max-h-[90vh] overflow-hidden">
+    <!-- Modal Header -->
+    <div class="p-6 border-b border-neutral-200 dark:border-neutral-600 flex items-center justify-between">
+      <h3 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Size Guide</h3>
+      <button 
+        id="close-size-guide" 
+        class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+        aria-label="Close size guide"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="overflow-y-auto max-h-[calc(90vh-120px)]">
+      <!-- Size Calculator -->
+      <div class="p-6 border-b border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-700">
+        <h4 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">Find Your Perfect Size</h4>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Measurement Input -->
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                Height (cm)
+              </label>
+              <input 
+                type="number" 
+                id="height-input"
+                placeholder="170"
+                class="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              >
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                Weight (kg)
+              </label>
+              <input 
+                type="number" 
+                id="weight-input"
+                placeholder="70"
+                class="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              >
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                Chest/Bust (cm)
+              </label>
+              <input 
+                type="number" 
+                id="chest-input"
+                placeholder="90"
+                class="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              >
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                Waist (cm)
+              </label>
+              <input 
+                type="number" 
+                id="waist-input"
+                placeholder="75"
+                class="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              >
+            </div>
+
+            <button 
+              id="calculate-size"
+              class="w-full bg-primary-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+            >
+              Calculate My Size
+            </button>
+          </div>
+
+          <!-- Size Recommendation -->
+          <div class="space-y-4">
+            <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 border border-neutral-200 dark:border-neutral-600">
+              <h5 class="font-semibold text-neutral-900 dark:text-neutral-100 mb-3">Recommended Size</h5>
+              
+              <div id="size-recommendation" class="hidden">
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
+                    <span class="text-2xl font-bold text-primary-600 dark:text-primary-400" id="recommended-size">M</span>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-neutral-900 dark:text-neutral-100">Size Medium</p>
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400">Based on your measurements</p>
+                  </div>
+                </div>
+                
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-neutral-600 dark:text-neutral-400">Fit:</span>
+                    <span class="font-medium text-neutral-900 dark:text-neutral-100" id="fit-type">Regular Fit</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-neutral-600 dark:text-neutral-400">Confidence:</span>
+                    <span class="font-medium text-green-600 dark:text-green-400" id="confidence-level">95%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div id="size-placeholder" class="text-center text-neutral-500 dark:text-neutral-400">
+                <svg class="w-12 h-12 mx-auto mb-2 text-neutral-300 dark:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+                <p>Enter your measurements to get a size recommendation</p>
+              </div>
+            </div>
+
+            <!-- Size Tips -->
+            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <h6 class="font-semibold text-blue-900 dark:text-blue-100 mb-2">💡 Sizing Tips</h6>
+              <ul class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                <li>• Measure yourself wearing light clothing</li>
+                <li>• Use a flexible measuring tape</li>
+                <li>• Ask someone to help for accuracy</li>
+                <li>• When in doubt, size up for comfort</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Size Charts -->
+      <div class="p-6">
+        <!-- Chart Tabs -->
+        <div class="flex border-b border-neutral-200 dark:border-neutral-600 mb-6">
+          <button 
+            class="size-chart-tab active px-4 py-2 font-medium text-primary-600 dark:text-primary-400 border-b-2 border-primary-600 dark:border-primary-400"
+            data-chart="clothing"
+          >
+            Clothing
+          </button>
+          <button 
+            class="size-chart-tab px-4 py-2 font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+            data-chart="shoes"
+          >
+            Shoes
+          </button>
+          <button 
+            class="size-chart-tab px-4 py-2 font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+            data-chart="accessories"
+          >
+            Accessories
+          </button>
+        </div>
+
+        <!-- Clothing Chart -->
+        <div id="clothing-chart" class="size-chart-content">
+          <h5 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">Clothing Size Chart</h5>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full border border-neutral-200 dark:border-neutral-600 rounded-lg overflow-hidden">
+              <thead class="bg-neutral-50 dark:bg-neutral-700">
+                <tr>
+                  <th class="px-4 py-3 text-left font-semibold text-neutral-900 dark:text-neutral-100">Size</th>
+                  <th class="px-4 py-3 text-center font-semibold text-neutral-900 dark:text-neutral-100">Chest (cm)</th>
+                  <th class="px-4 py-3 text-center font-semibold text-neutral-900 dark:text-neutral-100">Waist (cm)</th>
+                  <th class="px-4 py-3 text-center font-semibold text-neutral-900 dark:text-neutral-100">Hip (cm)</th>
+                  <th class="px-4 py-3 text-center font-semibold text-neutral-900 dark:text-neutral-100">Length (cm)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-neutral-200 dark:divide-neutral-600">
+                <tr class="size-row hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors" data-size="XS">
+                  <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-neutral-100">XS</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">80-84</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">60-64</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">86-90</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">65</td>
+                </tr>
+                <tr class="size-row hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors" data-size="S">
+                  <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-neutral-100">S</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">84-88</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">64-68</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">90-94</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">67</td>
+                </tr>
+                <tr class="size-row hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors" data-size="M">
+                  <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-neutral-100">M</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">88-92</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">68-72</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">94-98</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">69</td>
+                </tr>
+                <tr class="size-row hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors" data-size="L">
+                  <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-neutral-100">L</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">92-96</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">72-76</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">98-102</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">71</td>
+                </tr>
+                <tr class="size-row hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors" data-size="XL">
+                  <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-neutral-100">XL</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">96-100</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">76-80</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">102-106</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">73</td>
+                </tr>
+                <tr class="size-row hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors" data-size="XXL">
+                  <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-neutral-100">XXL</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">100-104</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">80-84</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">106-110</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">75</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Shoes Chart -->
+        <div id="shoes-chart" class="size-chart-content hidden">
+          <h5 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">Shoe Size Chart</h5>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full border border-neutral-200 dark:border-neutral-600 rounded-lg overflow-hidden">
+              <thead class="bg-neutral-50 dark:bg-neutral-700">
+                <tr>
+                  <th class="px-4 py-3 text-left font-semibold text-neutral-900 dark:text-neutral-100">US Size</th>
+                  <th class="px-4 py-3 text-center font-semibold text-neutral-900 dark:text-neutral-100">EU Size</th>
+                  <th class="px-4 py-3 text-center font-semibold text-neutral-900 dark:text-neutral-100">UK Size</th>
+                  <th class="px-4 py-3 text-center font-semibold text-neutral-900 dark:text-neutral-100">Foot Length (cm)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-neutral-200 dark:divide-neutral-600">
+                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors">
+                  <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-neutral-100">6</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">39</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">5.5</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">24.1</td>
+                </tr>
+                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors">
+                  <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-neutral-100">7</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">40</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">6.5</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">24.8</td>
+                </tr>
+                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors">
+                  <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-neutral-100">8</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">41</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">7.5</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">25.4</td>
+                </tr>
+                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors">
+                  <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-neutral-100">9</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">42</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">8.5</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">26.0</td>
+                </tr>
+                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors">
+                  <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-neutral-100">10</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">43</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">9.5</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">26.7</td>
+                </tr>
+                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors">
+                  <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-neutral-100">11</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">44</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">10.5</td>
+                  <td class="px-4 py-3 text-center text-neutral-600 dark:text-neutral-400">27.3</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Accessories Chart -->
+        <div id="accessories-chart" class="size-chart-content hidden">
+          <h5 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">Accessories Size Chart</h5>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Ring Sizes -->
+            <div>
+              <h6 class="font-semibold text-neutral-900 dark:text-neutral-100 mb-3">Ring Sizes</h6>
+              <div class="overflow-x-auto">
+                <table class="w-full border border-neutral-200 dark:border-neutral-600 rounded-lg overflow-hidden text-sm">
+                  <thead class="bg-neutral-50 dark:bg-neutral-700">
+                    <tr>
+                      <th class="px-3 py-2 text-left font-semibold text-neutral-900 dark:text-neutral-100">US</th>
+                      <th class="px-3 py-2 text-center font-semibold text-neutral-900 dark:text-neutral-100">EU</th>
+                      <th class="px-3 py-2 text-center font-semibold text-neutral-900 dark:text-neutral-100">Diameter (mm)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-neutral-200 dark:divide-neutral-600">
+                    <tr><td class="px-3 py-2">5</td><td class="px-3 py-2 text-center">49</td><td class="px-3 py-2 text-center">15.6</td></tr>
+                    <tr><td class="px-3 py-2">6</td><td class="px-3 py-2 text-center">52</td><td class="px-3 py-2 text-center">16.5</td></tr>
+                    <tr><td class="px-3 py-2">7</td><td class="px-3 py-2 text-center">54</td><td class="px-3 py-2 text-center">17.3</td></tr>
+                    <tr><td class="px-3 py-2">8</td><td class="px-3 py-2 text-center">57</td><td class="px-3 py-2 text-center">18.1</td></tr>
+                    <tr><td class="px-3 py-2">9</td><td class="px-3 py-2 text-center">59</td><td class="px-3 py-2 text-center">18.9</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Hat Sizes -->
+            <div>
+              <h6 class="font-semibold text-neutral-900 dark:text-neutral-100 mb-3">Hat Sizes</h6>
+              <div class="overflow-x-auto">
+                <table class="w-full border border-neutral-200 dark:border-neutral-600 rounded-lg overflow-hidden text-sm">
+                  <thead class="bg-neutral-50 dark:bg-neutral-700">
+                    <tr>
+                      <th class="px-3 py-2 text-left font-semibold text-neutral-900 dark:text-neutral-100">Size</th>
+                      <th class="px-3 py-2 text-center font-semibold text-neutral-900 dark:text-neutral-100">Head Circumference (cm)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-neutral-200 dark:divide-neutral-600">
+                    <tr><td class="px-3 py-2">S</td><td class="px-3 py-2 text-center">55-56</td></tr>
+                    <tr><td class="px-3 py-2">M</td><td class="px-3 py-2 text-center">57-58</td></tr>
+                    <tr><td class="px-3 py-2">L</td><td class="px-3 py-2 text-center">59-60</td></tr>
+                    <tr><td class="px-3 py-2">XL</td><td class="px-3 py-2 text-center">61-62</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Measurement Guide -->
+        <div class="mt-8 bg-neutral-50 dark:bg-neutral-700 rounded-lg p-6">
+          <h5 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">How to Measure</h5>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h6 class="font-semibold text-neutral-900 dark:text-neutral-100 mb-3">Body Measurements</h6>
+              <ul class="space-y-2 text-sm text-neutral-600 dark:text-neutral-400">
+                <li><strong>Chest:</strong> Measure around the fullest part of your chest</li>
+                <li><strong>Waist:</strong> Measure around your natural waistline</li>
+                <li><strong>Hip:</strong> Measure around the fullest part of your hips</li>
+                <li><strong>Inseam:</strong> Measure from crotch to ankle bone</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h6 class="font-semibold text-neutral-900 dark:text-neutral-100 mb-3">Foot Measurements</h6>
+              <ul class="space-y-2 text-sm text-neutral-600 dark:text-neutral-400">
+                <li><strong>Length:</strong> Measure from heel to longest toe</li>
+                <li><strong>Width:</strong> Measure across the widest part of your foot</li>
+                <li><strong>Best time:</strong> Measure feet in the evening when they're largest</li>
+                <li><strong>Both feet:</strong> Always measure both feet and use the larger measurement</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="p-6 border-t border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-700">
+      <div class="flex items-center justify-between">
+        <p class="text-sm text-neutral-600 dark:text-neutral-400">
+          Still unsure? <a href="/pages/contact" class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">Contact our sizing experts</a>
+        </p>
+        <button 
+          id="apply-size"
+          class="bg-primary-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled
+        >
+          Apply Size
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.querySelector('[data-size-guide-modal]');
+    const closeBtn = document.getElementById('close-size-guide');
+    const calculateBtn = document.getElementById('calculate-size');
+    const applyBtn = document.getElementById('apply-size');
+    const chartTabs = document.querySelectorAll('.size-chart-tab');
+    const chartContents = document.querySelectorAll('.size-chart-content');
+    
+    // Size calculation data
+    const sizeData = {
+      clothing: {
+        XS: { chest: [80, 84], waist: [60, 64] },
+        S: { chest: [84, 88], waist: [64, 68] },
+        M: { chest: [88, 92], waist: [68, 72] },
+        L: { chest: [92, 96], waist: [72, 76] },
+        XL: { chest: [96, 100], waist: [76, 80] },
+        XXL: { chest: [100, 104], waist: [80, 84] }
+      }
+    };
+
+    let recommendedSize = null;
+
+    // Open modal function (called from product pages)
+    window.openSizeGuide = function() {
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    };
+
+    // Close modal
+    function closeSizeGuide() {
+      modal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+
+    closeBtn.addEventListener('click', closeSizeGuide);
+    
+    // Close on outside click
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        closeSizeGuide();
+      }
+    });
+
+    // Chart tab switching
+    chartTabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        const chartType = this.getAttribute('data-chart');
+        
+        // Update active tab
+        chartTabs.forEach(t => {
+          t.classList.remove('active', 'text-primary-600', 'dark:text-primary-400', 'border-b-2', 'border-primary-600', 'dark:border-primary-400');
+          t.classList.add('text-neutral-600', 'dark:text-neutral-400');
+        });
+        
+        this.classList.add('active', 'text-primary-600', 'dark:text-primary-400', 'border-b-2', 'border-primary-600', 'dark:border-primary-400');
+        this.classList.remove('text-neutral-600', 'dark:text-neutral-400');
+        
+        // Show corresponding chart
+        chartContents.forEach(content => {
+          content.classList.add('hidden');
+        });
+        
+        document.getElementById(chartType + '-chart').classList.remove('hidden');
+      });
+    });
+
+    // Size calculation
+    calculateBtn.addEventListener('click', function() {
+      const height = parseFloat(document.getElementById('height-input').value);
+      const weight = parseFloat(document.getElementById('weight-input').value);
+      const chest = parseFloat(document.getElementById('chest-input').value);
+      const waist = parseFloat(document.getElementById('waist-input').value);
+
+      if (!chest || !waist) {
+        alert('Please enter at least chest and waist measurements for accurate sizing.');
+        return;
+      }
+
+      // Calculate recommended size
+      recommendedSize = calculateSize(chest, waist);
+      
+      if (recommendedSize) {
+        showSizeRecommendation(recommendedSize, chest, waist);
+        highlightSizeInChart(recommendedSize);
+        applyBtn.disabled = false;
+      } else {
+        alert('Unable to determine size. Please check your measurements or contact customer service.');
+      }
+    });
+
+    function calculateSize(chest, waist) {
+      let bestMatch = null;
+      let bestScore = 0;
+
+      for (const [size, measurements] of Object.entries(sizeData.clothing)) {
+        const chestFit = chest >= measurements.chest[0] && chest <= measurements.chest[1];
+        const waistFit = waist >= measurements.waist[0] && waist <= measurements.waist[1];
+        
+        let score = 0;
+        if (chestFit) score += 50;
+        if (waistFit) score += 50;
+        
+        // Partial matches for close measurements
+        if (!chestFit) {
+          const chestDiff = Math.min(
+            Math.abs(chest - measurements.chest[0]),
+            Math.abs(chest - measurements.chest[1])
+          );
+          if (chestDiff <= 5) score += 30; // Close match
+        }
+        
+        if (!waistFit) {
+          const waistDiff = Math.min(
+            Math.abs(waist - measurements.waist[0]),
+            Math.abs(waist - measurements.waist[1])
+          );
+          if (waistDiff <= 5) score += 30; // Close match
+        }
+
+        if (score > bestScore) {
+          bestScore = score;
+          bestMatch = size;
+        }
+      }
+
+      return bestMatch;
+    }
+
+    function showSizeRecommendation(size, chest, waist) {
+      const placeholder = document.getElementById('size-placeholder');
+      const recommendation = document.getElementById('size-recommendation');
+      const sizeElement = document.getElementById('recommended-size');
+      const fitType = document.getElementById('fit-type');
+      const confidence = document.getElementById('confidence-level');
+
+      placeholder.classList.add('hidden');
+      recommendation.classList.remove('hidden');
+      
+      sizeElement.textContent = size;
+      
+      // Determine fit type based on measurements vs size range
+      const measurements = sizeData.clothing[size];
+      const chestMid = (measurements.chest[0] + measurements.chest[1]) / 2;
+      const waistMid = (measurements.waist[0] + measurements.waist[1]) / 2;
+      
+      let fitDescription = 'Regular Fit';
+      let confidenceLevel = '95%';
+      
+      if (chest < chestMid - 2 || waist < waistMid - 2) {
+        fitDescription = 'Relaxed Fit';
+        confidenceLevel = '90%';
+      } else if (chest > chestMid + 2 || waist > waistMid + 2) {
+        fitDescription = 'Snug Fit';
+        confidenceLevel = '85%';
+      }
+      
+      fitType.textContent = fitDescription;
+      confidence.textContent = confidenceLevel;
+    }
+
+    function highlightSizeInChart(size) {
+      // Remove previous highlights
+      document.querySelectorAll('.size-row').forEach(row => {
+        row.classList.remove('bg-primary-50', 'dark:bg-primary-900/20', 'border-2', 'border-primary-500');
+      });
+      
+      // Highlight recommended size
+      const sizeRow = document.querySelector(`[data-size="${size}"]`);
+      if (sizeRow) {
+        sizeRow.classList.add('bg-primary-50', 'dark:bg-primary-900/20', 'border-2', 'border-primary-500');
+        sizeRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    // Apply size (this would integrate with product form)
+    applyBtn.addEventListener('click', function() {
+      if (recommendedSize) {
+        // In a real implementation, this would update the product form
+        const event = new CustomEvent('sizeSelected', {
+          detail: { size: recommendedSize }
+        });
+        document.dispatchEvent(event);
+        
+        closeSizeGuide();
+        
+        // Show confirmation
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+        notification.textContent = `Size ${recommendedSize} has been selected`;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      }
+    });
+
+    // Listen for size guide trigger events
+    document.addEventListener('openSizeGuide', function(e) {
+      window.openSizeGuide();
+    });
+  });
+</script>
