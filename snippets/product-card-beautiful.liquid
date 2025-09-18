@@ -348,7 +348,16 @@
   }
 </style>
 
-<div class="product-card-beautiful" data-product-id="{{ product_card_product.id }}">
+<div class="product-card-beautiful" 
+     data-product-id="{{ product_card_product.id }}"
+     data-price="{{ product_card_product.price | money_without_currency | remove: ',' }}"
+     data-compare-price="{{ product_card_product.compare_at_price | money_without_currency | remove: ',' }}"
+     data-available="{{ product_card_product.available }}"
+     data-title="{{ product_card_product.title | escape }}"
+     data-vendor="{{ product_card_product.vendor | escape }}"
+     data-type="{{ product_card_product.type | escape }}"
+     data-created="{{ product_card_product.created_at | date: '%Y-%m-%d' }}"
+>
   <!-- Product Image -->
   <div class="product-card-image-wrapper">
     {% if product_card_product.featured_media %}

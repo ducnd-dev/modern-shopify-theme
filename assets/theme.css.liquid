@@ -505,3 +505,239 @@
   @apply text-xl md:text-2xl mb-8 opacity-90;
 }
 {% endif %}
+
+/* === COLLECTION PAGE STYLES === */
+
+/* Collection Tools */
+.collection-tools {
+  @apply flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8;
+}
+
+.collection-content {
+  @apply grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8;
+}
+
+.collection-sidebar {
+  @apply lg:block hidden;
+}
+
+.collection-products {
+  @apply lg:col-span-3;
+}
+
+/* Responsive Products Grid */
+.products-grid {
+  @apply grid gap-4 sm:gap-6;
+  grid-template-columns: repeat(1, 1fr);
+}
+
+@media (min-width: 640px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* List View */
+.products-list {
+  @apply space-y-6;
+}
+
+/* Filter Modal */
+[data-filter-modal] {
+  @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50 lg:hidden transition-all duration-300;
+}
+
+[data-filter-modal].hidden {
+  @apply opacity-0 pointer-events-none;
+}
+
+[data-filter-modal] > div {
+  @apply fixed inset-y-0 left-0 w-full max-w-sm bg-white dark:bg-neutral-900 overflow-y-auto transform transition-transform duration-300 shadow-2xl;
+}
+
+/* View Toggle */
+.view-toggle {
+  @apply hidden sm:flex border border-neutral-200 dark:border-neutral-700 rounded-lg overflow-hidden;
+}
+
+.view-btn {
+  @apply px-3 py-2 transition-colors duration-300;
+}
+
+.view-btn.active {
+  @apply bg-primary-600 text-white;
+}
+
+.view-btn:not(.active) {
+  @apply bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300;
+}
+
+/* Filter Groups */
+.filter-group {
+  @apply mb-6;
+}
+
+.filter-group h4 {
+  @apply font-medium mb-3 text-neutral-900 dark:text-white;
+}
+
+.filter-group label {
+  @apply flex items-center group cursor-pointer;
+}
+
+.filter-group input[type="checkbox"] {
+  @apply rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300;
+}
+
+.filter-group span {
+  @apply ml-3 text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors duration-300;
+}
+
+/* Pagination */
+.pagination {
+  @apply mt-8 sm:mt-12;
+}
+
+.pagination .flex {
+  @apply items-center justify-center space-x-1 sm:space-x-2;
+}
+
+.pagination a,
+.pagination span {
+  @apply flex items-center justify-center w-10 h-10 rounded-lg transition-colors duration-300;
+}
+
+.pagination a {
+  @apply border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800;
+}
+
+/* Collection Header */
+.collection-header {
+  @apply mb-8 sm:mb-12 text-center;
+}
+
+.collection-header h1 {
+  @apply text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 text-neutral-900 dark:text-white;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+  @apply mb-6 sm:mb-8;
+}
+
+.breadcrumbs ol {
+  @apply flex items-center space-x-2 text-sm text-neutral-500 dark:text-neutral-400 overflow-x-auto;
+}
+
+/* Mobile Filter Toggle */
+[data-filter-toggle] {
+  @apply flex items-center justify-center px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors duration-300 lg:hidden;
+}
+
+/* Filter Count Badge */
+#filter-count {
+  @apply ml-2 bg-primary-600 text-white text-xs px-2 py-1 rounded-full;
+}
+
+/* Sort Dropdown */
+.sort-wrapper select {
+  @apply w-full sm:w-auto px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-700 dark:text-neutral-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-300;
+}
+
+/* Empty State */
+.empty-collection {
+  @apply text-center py-12 sm:py-16;
+}
+
+.empty-collection svg {
+  @apply w-16 h-16 mx-auto text-neutral-400 dark:text-neutral-600 mb-4;
+}
+
+.empty-collection h2 {
+  @apply text-xl sm:text-2xl font-semibold text-neutral-900 dark:text-white mb-2;
+}
+
+.empty-collection p {
+  @apply text-neutral-600 dark:text-neutral-400 mb-6;
+}
+
+/* Sticky Sidebar */
+@media (min-width: 1024px) {
+  .collection-sidebar .sticky {
+    @apply top-24;
+  }
+}
+
+/* Loading States */
+.products-grid.loading {
+  @apply opacity-50 pointer-events-none;
+}
+
+/* Animations */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+[data-filter-modal]:not(.hidden) > div {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.product-card.in-viewport {
+  @apply animate-fade-in;
+}
+
+/* Accessibility */
+.filter-group input[type="checkbox"]:focus {
+  @apply ring-2 ring-primary-500 ring-offset-2 dark:ring-offset-neutral-900;
+}
+
+.view-btn:focus {
+  @apply outline-none ring-2 ring-primary-500 ring-offset-2 dark:ring-offset-neutral-900;
+}
+
+[data-filter-toggle]:focus {
+  @apply outline-none ring-2 ring-primary-500 ring-offset-2 dark:ring-offset-neutral-900;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .products-grid *,
+  .filter-group *,
+  .pagination * {
+    @apply transition-none;
+  }
+  
+  [data-filter-modal] > div {
+    animation: none;
+  }
+  
+  .animate-fade-in {
+    animation: none;
+  }
+}

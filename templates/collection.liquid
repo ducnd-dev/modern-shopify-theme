@@ -1,56 +1,59 @@
 {% comment %}
-  Collection Template
+  Collection Template - Fully Responsive
   Collection listing page with filtering and sorting
 {% endcomment %}
 
-
-<main id="main" class="main-content" role="main">
-  <div class="container section-spacing">
+<main id="MainContent" class="main-content" role="main">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Breadcrumbs -->
-    <nav class="breadcrumbs mb-8" aria-label="Breadcrumb">
-      <ol class="flex items-center space-x-2 text-sm text-gray-500">
-        <li><a href="/" class="hover:text-gray-700 dark:hover:text-gray-300">Home</a></li>
-        <li class="flex items-center">
+    <nav class="breadcrumbs mb-6 sm:mb-8" aria-label="Breadcrumb">
+      <ol class="flex items-center space-x-2 text-sm text-neutral-500 dark:text-neutral-400 overflow-x-auto">
+        <li class="flex-shrink-0">
+          <a href="/" class="hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors duration-300">Home</a>
+        </li>
+        <li class="flex items-center flex-shrink-0">
           <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
           </svg>
-          <span class="text-gray-900 dark:text-white">{{ collection.title }}</span>
+          <span class="text-neutral-900 dark:text-white truncate">{{ collection.title }}</span>
         </li>
       </ol>
     </nav>
 
     <!-- Collection Header -->
-    <div class="collection-header mb-12 text-center">
-      <h1 class="text-4xl font-bold mb-4">{{ collection.title }}</h1>
+    <div class="collection-header mb-8 sm:mb-12 text-center">
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 text-neutral-900 dark:text-white">{{ collection.title }}</h1>
       {% if collection.description != blank %}
-        <div class="prose prose-lg mx-auto dark:prose-invert">
+        <div class="prose prose-sm sm:prose-base lg:prose-lg mx-auto dark:prose-invert max-w-3xl">
           {{ collection.description }}
         </div>
       {% endif %}
     </div>
 
     <!-- Collection Tools -->
-    <div class="collection-tools flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div class="collection-tools flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
       <!-- Product Count -->
-      <div class="collection-count">
-        <p class="text-sm text-gray-500">
-          Showing 
-          {% if collection.products.size > 0 %}
-            {{ paginate.current_offset | plus: 1 }}{% unless paginate.current_offset == 0 %}-{{ paginate.current_offset | plus: paginate.page_size }}{% endunless %}
-            of {{ collection.products_count }}
-          {% else %}
-            0
-          {% endif %}
-          {% if collection.products_count == 1 %}product{% else %}products{% endif %}
+      <div class="collection-count order-2 sm:order-1">
+        <p class="text-sm text-neutral-500 dark:text-neutral-400">
+          {% paginate collection.products by 12 %}
+            Showing 
+            {% if collection.products.size > 0 %}
+              {{ paginate.current_offset | plus: 1 }}{% unless paginate.current_offset == 0 %}-{{ paginate.current_offset | plus: paginate.page_size | at_most: collection.products_count }}{% endunless %}
+              of {{ collection.products_count }}
+            {% else %}
+              0
+            {% endif %}
+            {% if collection.products_count == 1 %}product{% else %}products{% endif %}
+          {% endpaginate %}
         </p>
       </div>
 
       <!-- Filters and Sort -->
-      <div class="collection-controls flex flex-col sm:flex-row gap-4">
+      <div class="collection-controls flex flex-col sm:flex-row gap-3 w-full sm:w-auto order-1 sm:order-2">
         <!-- Filter Toggle (Mobile) -->
         <button 
           type="button" 
-          class="btn btn-secondary md:hidden"
+          class="flex items-center justify-center px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors duration-300 lg:hidden"
           data-filter-toggle
           aria-label="Toggle filters"
         >
@@ -58,12 +61,41 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707v6.586a1 1 0 01-1.447.894l-4-2A1 1 0 018 18.586v-4.586a1 1 0 00-.293-.707L1.293 7.293A1 1 0 011 6.586V4z"></path>
           </svg>
           Filters
+          <span class="ml-2 bg-primary-600 text-white text-xs px-2 py-1 rounded-full hidden" id="filter-count">0</span>
         </button>
+
+        <!-- View Toggle -->
+        <div class="view-toggle hidden sm:flex border border-neutral-200 dark:border-neutral-700 rounded-lg overflow-hidden">
+          <button 
+            type="button" 
+            class="px-3 py-2 bg-primary-600 text-white view-btn active"
+            data-view="grid"
+            aria-label="Grid view"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+            </svg>
+          </button>
+          <button 
+            type="button" 
+            class="px-3 py-2 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 view-btn"
+            data-view="list"
+            aria-label="List view"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
 
         <!-- Sort -->
         <div class="sort-wrapper">
           <label for="sort-by" class="sr-only">Sort by</label>
-          <select id="sort-by" class="form-select" onchange="location.href=this.value">
+          <select 
+            id="sort-by" 
+            class="w-full sm:w-auto px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-700 dark:text-neutral-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-300" 
+            onchange="location.href=this.value"
+          >
             <option value="{{ collection.url }}?sort_by=manual" {% if collection.sort_by == 'manual' %}selected{% endif %}>Featured</option>
             <option value="{{ collection.url }}?sort_by=best-selling" {% if collection.sort_by == 'best-selling' %}selected{% endif %}>Best selling</option>
             <option value="{{ collection.url }}?sort_by=title-ascending" {% if collection.sort_by == 'title-ascending' %}selected{% endif %}>A-Z</option>
@@ -77,102 +109,135 @@
       </div>
     </div>
 
-    <div class="collection-content grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <div class="collection-content grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
       <!-- Sidebar Filters -->
       <aside class="collection-sidebar lg:block hidden" data-filters>
-        <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h3 class="text-lg font-semibold mb-6">Filters</h3>
+        <div class="sticky top-24">
+          <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm">
+            <h3 class="text-lg font-semibold mb-6 text-neutral-900 dark:text-white">Filters</h3>
 
-          <!-- Price Filter -->
-          <div class="filter-group mb-6">
-            <h4 class="font-medium mb-3">Price</h4>
-            <div class="space-y-2">
-              <label class="flex items-center">
-                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                <span class="ml-2 text-sm">Under $25</span>
-              </label>
-              <label class="flex items-center">
-                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                <span class="ml-2 text-sm">$25 - $50</span>
-              </label>
-              <label class="flex items-center">
-                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                <span class="ml-2 text-sm">$50 - $100</span>
-              </label>
-              <label class="flex items-center">
-                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                <span class="ml-2 text-sm">Over $100</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Availability Filter -->
-          <div class="filter-group mb-6">
-            <h4 class="font-medium mb-3">Availability</h4>
-            <div class="space-y-2">
-              <label class="flex items-center">
-                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                <span class="ml-2 text-sm">In stock</span>
-              </label>
-              <label class="flex items-center">
-                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                <span class="ml-2 text-sm">Out of stock</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Product Type Filter -->
-          {% assign product_types = collection.products | map: 'type' | uniq | compact %}
-          {% if product_types.size > 1 %}
+            <!-- Price Filter -->
             <div class="filter-group mb-6">
-              <h4 class="font-medium mb-3">Product Type</h4>
-              <div class="space-y-2">
-                {% for type in product_types %}
-                  <label class="flex items-center">
-                    <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="{{ type | handle }}">
-                    <span class="ml-2 text-sm">{{ type }}</span>
-                  </label>
-                {% endfor %}
+              <h4 class="font-medium mb-3 text-neutral-900 dark:text-white">Price</h4>
+              <div class="space-y-3">
+                <label class="flex items-center group cursor-pointer">
+                  <input type="checkbox" class="rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300">
+                  <span class="ml-3 text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors duration-300">Under $25</span>
+                </label>
+                <label class="flex items-center group cursor-pointer">
+                  <input type="checkbox" class="rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300">
+                  <span class="ml-3 text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors duration-300">$25 - $50</span>
+                </label>
+                <label class="flex items-center group cursor-pointer">
+                  <input type="checkbox" class="rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300">
+                  <span class="ml-3 text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors duration-300">$50 - $100</span>
+                </label>
+                <label class="flex items-center group cursor-pointer">
+                  <input type="checkbox" class="rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300">
+                  <span class="ml-3 text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors duration-300">Over $100</span>
+                </label>
               </div>
             </div>
-          {% endif %}
 
-          <!-- Vendor Filter -->
-          {% assign vendors = collection.products | map: 'vendor' | uniq | compact %}
-          {% if vendors.size > 1 %}
+            <!-- Availability Filter -->
             <div class="filter-group mb-6">
-              <h4 class="font-medium mb-3">Brand</h4>
-              <div class="space-y-2">
-                {% for vendor in vendors %}
-                  <label class="flex items-center">
-                    <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="{{ vendor | handle }}">
-                    <span class="ml-2 text-sm">{{ vendor }}</span>
-                  </label>
-                {% endfor %}
+              <h4 class="font-medium mb-3 text-neutral-900 dark:text-white">Availability</h4>
+              <div class="space-y-3">
+                <label class="flex items-center group cursor-pointer">
+                  <input type="checkbox" class="rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300">
+                  <span class="ml-3 text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors duration-300">In stock</span>
+                </label>
+                <label class="flex items-center group cursor-pointer">
+                  <input type="checkbox" class="rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300">
+                  <span class="ml-3 text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors duration-300">Out of stock</span>
+                </label>
               </div>
             </div>
-          {% endif %}
 
-          <!-- Clear Filters -->
-          <button type="button" class="btn btn-secondary w-full" onclick="clearFilters()">
-            Clear all filters
-          </button>
+            <!-- Product Type Filter -->
+            {% assign product_types = collection.products | map: 'type' | uniq | compact %}
+            {% if product_types.size > 1 %}
+              <div class="filter-group mb-6">
+                <h4 class="font-medium mb-3 text-neutral-900 dark:text-white">Product Type</h4>
+                <div class="space-y-3">
+                  {% for type in product_types %}
+                    <label class="flex items-center group cursor-pointer">
+                      <input type="checkbox" class="rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300" value="{{ type | handle }}">
+                      <span class="ml-3 text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors duration-300">{{ type }}</span>
+                    </label>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+
+            <!-- Vendor Filter -->
+            {% assign vendors = collection.products | map: 'vendor' | uniq | compact %}
+            {% if vendors.size > 1 %}
+              <div class="filter-group mb-6">
+                <h4 class="font-medium mb-3 text-neutral-900 dark:text-white">Brand</h4>
+                <div class="space-y-3">
+                  {% for vendor in vendors %}
+                    <label class="flex items-center group cursor-pointer">
+                      <input type="checkbox" class="rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-primary-500 transition-colors duration-300" value="{{ vendor | handle }}">
+                      <span class="ml-3 text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors duration-300">{{ vendor }}</span>
+                    </label>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+
+            <!-- Clear Filters -->
+            <button type="button" class="w-full px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors duration-300" onclick="clearFilters()">
+              Clear all filters
+            </button>
+          </div>
         </div>
       </aside>
 
       <!-- Mobile Filter Modal -->
-      <div class="fixed inset-0 bg-black bg-opacity-50 z-50 lg:hidden hidden" data-filter-modal>
-        <div class="fixed inset-y-0 left-0 w-full max-w-sm bg-white dark:bg-gray-900 overflow-y-auto">
+      <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 lg:hidden hidden transition-all duration-300" data-filter-modal>
+        <div class="fixed inset-y-0 left-0 w-full max-w-sm bg-white dark:bg-neutral-900 overflow-y-auto transform transition-transform duration-300 translate-x-0 shadow-2xl">
           <div class="p-6">
             <div class="flex items-center justify-between mb-6">
-              <h3 class="text-lg font-semibold">Filters</h3>
-              <button type="button" data-filter-close>
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Filters</h3>
+              <button type="button" class="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-300" data-filter-close>
+                <svg class="w-6 h-6 text-neutral-700 dark:text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
               </button>
             </div>
+            
             <!-- Same filter content as sidebar -->
+            <div class="space-y-6">
+              <!-- Copy all filter groups from sidebar here -->
+              <div class="filter-group">
+                <h4 class="font-medium mb-3 text-neutral-900 dark:text-white">Price</h4>
+                <div class="space-y-3">
+                  <label class="flex items-center group cursor-pointer">
+                    <input type="checkbox" class="rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-primary-500">
+                    <span class="ml-3 text-sm text-neutral-700 dark:text-neutral-300">Under $25</span>
+                  </label>
+                  <label class="flex items-center group cursor-pointer">
+                    <input type="checkbox" class="rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-primary-500">
+                    <span class="ml-3 text-sm text-neutral-700 dark:text-neutral-300">$25 - $50</span>
+                  </label>
+                  <label class="flex items-center group cursor-pointer">
+                    <input type="checkbox" class="rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-primary-500">
+                    <span class="ml-3 text-sm text-neutral-700 dark:text-neutral-300">$50 - $100</span>
+                  </label>
+                  <label class="flex items-center group cursor-pointer">
+                    <input type="checkbox" class="rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-primary-500">
+                    <span class="ml-3 text-sm text-neutral-700 dark:text-neutral-300">Over $100</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-6 border-t border-neutral-200 dark:border-neutral-700 mt-6">
+              <button type="button" class="w-full px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-300 font-medium" data-filter-apply>
+                Apply Filters
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -181,18 +246,69 @@
       <div class="collection-products lg:col-span-3">
         {% paginate collection.products by 12 %}
           {% if collection.products.size > 0 %}
-            <div class="products-grid">
+            <!-- Grid View -->
+            <div class="products-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" data-view-content="grid">
               {% for product in collection.products %}
-                {% render 'product-card', product: product %}
+                {% render 'product-card-beautiful', product_card_product: product %}
+              {% endfor %}
+            </div>
+
+            <!-- List View -->
+            <div class="products-list space-y-6 hidden" data-view-content="list">
+              {% for product in collection.products %}
+                <div class="flex flex-col sm:flex-row bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-700 overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                  <div class="w-full sm:w-48 h-48 sm:h-auto flex-shrink-0">
+                    {% if product.featured_media %}
+                      <img 
+                        src="{{ product.featured_media | image_url: width: 300 }}" 
+                        alt="{{ product.featured_media.alt | escape }}"
+                        class="w-full h-full object-cover"
+                        loading="lazy"
+                      >
+                    {% else %}
+                      <div class="w-full h-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+                        <svg class="w-12 h-12 text-neutral-400" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                        </svg>
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="flex-1 p-4 sm:p-6 flex flex-col justify-between">
+                    <div>
+                      <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-2">
+                        <a href="{{ product.url }}" class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300">
+                          {{ product.title }}
+                        </a>
+                      </h3>
+                      {% if product.vendor %}
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400 mb-2">{{ product.vendor }}</p>
+                      {% endif %}
+                      {% if product.description %}
+                        <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-2">{{ product.description | strip_html | truncate: 120 }}</p>
+                      {% endif %}
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span class="text-lg font-bold text-neutral-900 dark:text-white">{{ product.price | money }}</span>
+                        {% if product.compare_at_price > product.price %}
+                          <span class="text-sm text-neutral-500 dark:text-neutral-400 line-through">{{ product.compare_at_price | money }}</span>
+                        {% endif %}
+                      </div>
+                      <button class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-300 text-sm font-medium">
+                        Add to Cart
+                      </button>
+                    </div>
+                  </div>
+                </div>
               {% endfor %}
             </div>
 
             <!-- Pagination -->
             {% if paginate.pages > 1 %}
-              <nav class="pagination mt-12" aria-label="Collection pagination">
-                <div class="flex items-center justify-center space-x-2">
+              <nav class="pagination mt-8 sm:mt-12" aria-label="Collection pagination">
+                <div class="flex items-center justify-center space-x-1 sm:space-x-2">
                   {% if paginate.previous %}
-                    <a href="{{ paginate.previous.url }}" class="btn btn-secondary" aria-label="Previous page">
+                    <a href="{{ paginate.previous.url }}" class="flex items-center justify-center w-10 h-10 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors duration-300" aria-label="Previous page">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                       </svg>
@@ -201,18 +317,18 @@
 
                   {% for part in paginate.parts %}
                     {% if part.is_link %}
-                      <a href="{{ part.url }}" class="btn btn-secondary">{{ part.title }}</a>
+                      <a href="{{ part.url }}" class="flex items-center justify-center w-10 h-10 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors duration-300">{{ part.title }}</a>
                     {% else %}
                       {% if part.title == paginate.current_page %}
-                        <span class="btn btn-primary">{{ part.title }}</span>
+                        <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary-600 text-white font-medium">{{ part.title }}</span>
                       {% else %}
-                        <span class="btn btn-secondary opacity-50">{{ part.title }}</span>
+                        <span class="flex items-center justify-center w-10 h-10 rounded-lg text-neutral-400 dark:text-neutral-600">{{ part.title }}</span>
                       {% endif %}
                     {% endif %}
                   {% endfor %}
 
                   {% if paginate.next %}
-                    <a href="{{ paginate.next.url }}" class="btn btn-secondary" aria-label="Next page">
+                    <a href="{{ paginate.next.url }}" class="flex items-center justify-center w-10 h-10 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors duration-300" aria-label="Next page">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                       </svg>
@@ -223,13 +339,17 @@
             {% endif %}
           {% else %}
             <!-- Empty State -->
-            <div class="empty-collection text-center py-16">
-              <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
-              </svg>
-              <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">No products found</h2>
-              <p class="text-gray-600 dark:text-gray-400 mb-6">Try adjusting your filters or browse our other collections.</p>
-              <a href="/collections" class="btn btn-primary">Browse Collections</a>
+            <div class="empty-collection text-center py-12 sm:py-16">
+              <div class="max-w-md mx-auto">
+                <svg class="w-16 h-16 mx-auto text-neutral-400 dark:text-neutral-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                </svg>
+                <h2 class="text-xl sm:text-2xl font-semibold text-neutral-900 dark:text-white mb-2">No products found</h2>
+                <p class="text-neutral-600 dark:text-neutral-400 mb-6">Try adjusting your filters or browse our other collections.</p>
+                <a href="/collections" class="inline-flex items-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-300 font-medium">
+                  Browse Collections
+                </a>
+              </div>
             </div>
           {% endif %}
         {% endpaginate %}

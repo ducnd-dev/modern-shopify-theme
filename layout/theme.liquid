@@ -97,6 +97,7 @@
 
     {{ 'theme-compiled.css' | asset_url | stylesheet_tag }}
     {{ 'theme.css' | asset_url | stylesheet_tag }}
+    {{ 'skip-to-content.css' | asset_url | stylesheet_tag }}
 
     {%- unless settings.type_body_font.system? -%}
       <link rel="preload" as="font" href="{{ settings.type_body_font | font_url }}" type="font/woff2" crossorigin>
@@ -126,8 +127,11 @@
 
   <body class="font-body bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 transition-colors duration-300">
     <!-- Skip to content for accessibility -->
-    <a class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary-600 text-white px-4 py-2 rounded-md z-100" href="#MainContent">
-      {{ 'accessibility.skip_to_text' | t }}
+    <a class="skip-to-content" href="#MainContent">
+      <span class="skip-text">{{ 'accessibility.skip_to_text' | t }}</span>
+      <svg class="skip-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+      </svg>
     </a>
 
     <!-- Announcement Bar -->
@@ -193,6 +197,11 @@
 
     <!-- Global Cart Management -->
     <script src="{{ 'global-cart.js' | asset_url }}" defer="defer"></script>
+    
+    <!-- Page-specific scripts -->
+    {% if template.name == 'collection' %}
+      <script src="{{ 'collection.js' | asset_url }}" defer="defer"></script>
+    {% endif %}
     
     {{ 'theme.js' | asset_url | script_tag }}
 
