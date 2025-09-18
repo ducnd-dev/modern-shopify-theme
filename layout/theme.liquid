@@ -95,6 +95,7 @@
       }
     </style>
 
+    {{ 'theme-compiled.css' | asset_url | stylesheet_tag }}
     {{ 'theme.css' | asset_url | stylesheet_tag }}
 
     {%- unless settings.type_body_font.system? -%}
@@ -190,6 +191,9 @@
       <script src="{{ 'predictive-search.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
 
+    <!-- Global Cart Management -->
+    <script src="{{ 'global-cart.js' | asset_url }}" defer="defer"></script>
+    
     {{ 'theme.js' | asset_url | script_tag }}
 
     <!-- Theme Editor Scripts -->

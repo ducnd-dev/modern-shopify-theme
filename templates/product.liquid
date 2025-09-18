@@ -3,7 +3,6 @@
   Individual product page template
 {% endcomment %}
 
-{% section 'header' %}
 
 <main id="main" class="main-content" role="main">
   <div class="container section-spacing">
@@ -296,13 +295,13 @@
   </div>
 
   <!-- Related Products -->
-  {% if recommendations.products.size > 0 %}
+  {% if product_recommendations.products.size > 0 %}
     <div class="section-spacing bg-gray-50 dark:bg-gray-900">
       <div class="container">
         <h2 class="text-2xl font-bold text-center mb-12">You might also like</h2>
         <div class="products-grid">
-          {% for product in recommendations.products limit: 4 %}
-            {% render 'product-card', product: product %}
+          {% for product in product_recommendations.products limit: 4 %}
+            {% render 'product-card-beautiful', product_card_product: product %}
           {% endfor %}
         </div>
       </div>

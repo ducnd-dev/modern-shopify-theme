@@ -4,8 +4,8 @@
   "description": "A modern Shopify theme built with TailwindCSS",
   "main": "assets/theme.js",
   "scripts": {
-    "build-css": "tailwindcss -i ./assets/input.css -o ./assets/theme.css --watch",
-    "build-css-prod": "tailwindcss -i ./assets/input.css -o ./assets/theme.css --minify",
+    "build-css": "tailwindcss -i ./assets/input.css -o ./assets/theme-compiled.css --watch",
+    "build-css-prod": "tailwindcss -i ./assets/input.css -o ./assets/theme-compiled.css --minify",
     "dev": "concurrently \"npm run build-css\" \"shopify theme dev\"",
     "deploy": "npm run build-css-prod && npx shopify theme push"
   },

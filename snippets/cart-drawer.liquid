@@ -44,7 +44,7 @@
       {%- else -%}
         <div class="p-4 space-y-4">
           {%- for item in cart.items -%}
-            <div class="cart-item flex items-center space-x-4 p-4 bg-neutral-50 dark:bg-neutral-800 rounded-lg" data-index="{{ forloop.index }}">
+            <div class="cart-item flex items-center space-x-4 p-4 bg-neutral-50 dark:bg-neutral-800 rounded-lg" data-index="{{ forloop.index }}" data-key="{{ item.key }}" data-variant-id="{{ item.variant_id }}">
               <!-- Product Image -->
               <div class="flex-shrink-0 w-16 h-16 bg-neutral-100 dark:bg-neutral-700 rounded-lg overflow-hidden">
                 {%- if item.image -%}
@@ -86,6 +86,7 @@
                     class="w-8 h-8 rounded-full bg-white dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors duration-300"
                     data-quantity-change="-1"
                     data-index="{{ forloop.index }}"
+                    data-key="{{ item.key }}"
                     aria-label="Decrease quantity"
                   >
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,6 +100,7 @@
                     class="w-8 h-8 rounded-full bg-white dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors duration-300"
                     data-quantity-change="1"
                     data-index="{{ forloop.index }}"
+                    data-key="{{ item.key }}"
                     aria-label="Increase quantity"
                   >
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,6 +120,7 @@
                   class="mt-2 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 rounded p-1"
                   data-remove-item
                   data-index="{{ forloop.index }}"
+                  data-key="{{ item.key }}"
                   aria-label="Remove item"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -229,186 +232,11 @@
   </div>
 </div>
 
+<!-- Cart drawer functionality is now handled by global-cart.js -->
 <script>
-  class CartDrawer {
-    constructor() {
-      this.drawer = document.getElementById('cart-drawer');
-      this.overlay = document.getElementById('cart-drawer-overlay');
-      this.closeButton = document.getElementById('cart-drawer-close');
-      this.continueShoppingButton = document.getElementById('continue-shopping');
-      this.viewCartButton = document.getElementById('view-cart');
-      
-      this.init();
-    }
-    
-    init() {
-      this.setupEventListeners();
-      this.setupCartUpdates();
-    }
-    
-    setupEventListeners() {
-      // Open cart drawer
-      document.addEventListener('cart:open', () => this.open());
-      
-      // Close cart drawer
-      this.closeButton?.addEventListener('click', () => this.close());
-      this.overlay?.addEventListener('click', () => this.close());
-      
-      // Continue shopping
-      this.continueShoppingButton?.addEventListener('click', () => this.close());
-      
-      // View cart
-      this.viewCartButton?.addEventListener('click', () => {
-        window.location.href = '{{ routes.cart_url }}';
-      });
-      
-      // Quantity changes
-      document.addEventListener('click', (e) => {
-        if (e.target.matches('[data-quantity-change]')) {
-          e.preventDefault();
-          const change = parseInt(e.target.dataset.quantityChange);
-          const index = parseInt(e.target.dataset.index);
-          this.updateQuantity(index, change);
-        }
-        
-        if (e.target.matches('[data-remove-item]')) {
-          e.preventDefault();
-          const index = parseInt(e.target.dataset.index);
-          this.removeItem(index);
-        }
-      });
-      
-      // Escape key
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') this.close();
-      });
-    }
-    
-    setupCartUpdates() {
-      // Listen for cart updates from other components
-      document.addEventListener('cart:updated', (e) => {
-        this.updateCartContents(e.detail);
-      });
-      
-      // Listen for items added to cart
-      document.addEventListener('cart:item-added', (e) => {
-        this.showNotification(e.detail);
-        this.open();
-      });
-    }
-    
-    open() {
-      this.drawer.classList.remove('translate-x-full');
-      this.overlay.classList.remove('opacity-0', 'invisible');
-      document.body.classList.add('overflow-hidden');
-    }
-    
-    close() {
-      this.drawer.classList.add('translate-x-full');
-      this.overlay.classList.add('opacity-0', 'invisible');
-      document.body.classList.remove('overflow-hidden');
-    }
-    
-    async updateQuantity(index, change) {
-      try {
-        const cartItems = await this.getCart();
-        const item = cartItems.items[index - 1];
-        const newQuantity = Math.max(0, item.quantity + change);
-        
-        const updates = {
-          [item.key]: newQuantity
-        };
-        
-        await this.updateCart(updates);
-      } catch (error) {
-        console.error('Error updating quantity:', error);
-      }
-    }
-    
-    async removeItem(index) {
-      try {
-        const cartItems = await this.getCart();
-        const item = cartItems.items[index - 1];
-        
-        const updates = {
-          [item.key]: 0
-        };
-        
-        await this.updateCart(updates);
-      } catch (error) {
-        console.error('Error removing item:', error);
-      }
-    }
-    
-    async getCart() {
-      const response = await fetch('{{ routes.cart_url }}.json');
-      return response.json();
-    }
-    
-    async updateCart(updates) {
-      const response = await fetch('{{ routes.cart_update_url }}', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ updates })
-      });
-      
-      const cart = await response.json();
-      this.updateCartContents(cart);
-      
-      // Update cart count in header
-      this.updateCartCount(cart.item_count);
-      
-      return cart;
-    }
-    
-    updateCartContents(cart) {
-      // Update cart drawer with new contents
-      // This would typically re-render the cart items
-      location.reload(); // Simple approach - in production, you'd update the DOM
-    }
-    
-    updateCartCount(count) {
-      const cartCountElements = document.querySelectorAll('.cart-count-bubble, #cart-drawer-count');
-      cartCountElements.forEach(element => {
-        if (element.id === 'cart-drawer-count') {
-          element.textContent = count;
-        } else {
-          element.textContent = count;
-          if (count === 0) {
-            element.classList.add('hidden');
-          } else {
-            element.classList.remove('hidden');
-          }
-        }
-      });
-    }
-    
-    showNotification(item) {
-      const notification = document.getElementById('cart-notification');
-      if (!notification) return;
-      
-      const image = notification.querySelector('#cart-notification-image');
-      const title = notification.querySelector('#cart-notification-title');
-      const message = notification.querySelector('#cart-notification-message');
-      
-      if (item.image) image.src = item.image;
-      title.textContent = item.product_title;
-      message.textContent = 'Added to cart successfully!';
-      
-      // Show notification
-      notification.classList.remove('translate-x-full');
-      
-      // Hide after 3 seconds
-      setTimeout(() => {
-        notification.classList.add('translate-x-full');
-      }, 3000);
-    }
-  }
-  
-  // Initialize cart drawer
-  document.addEventListener('DOMContentLoaded', () => {
-    new CartDrawer();
+  // Ensure cart drawer is initialized when DOM is ready
+  document.addEventListener('DOMContentLoaded', function() {
+    // Cart drawer initialization is handled by global-cart.js
+    console.log('Cart drawer ready');
   });
 </script>

@@ -1,0 +1,598 @@
+{% comment %}
+  Beautiful Product Grid Section
+  Uses the enhanced product card component for consistent, beautiful product display
+{% endcomment %}
+
+<style>
+  .product-grid-beautiful-{{ section.id }} {
+    --grid-primary: {{ section.settings.primary_color | default: '#3b82f6' }};
+    --grid-secondary: {{ section.settings.secondary_color | default: '#8b5cf6' }};
+    --grid-background: {{ section.settings.background_color | default: '#ffffff' }};
+  }
+
+  .product-grid-section {
+    background: var(--grid-background);
+    padding: 4rem 0;
+    position: relative;
+  }
+
+  .product-grid-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .product-grid-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--grid-primary), var(--grid-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .product-grid-subtitle {
+    font-size: 1.125rem;
+    color: #64748b;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Grid Layout */
+  .product-grid {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .product-grid.columns-2 {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  }
+
+  .product-grid.columns-3 {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  }
+
+  .product-grid.columns-4 {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .product-grid.columns-5 {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+
+  /* Filter & Sort Controls */
+  .product-grid-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .product-grid-filters {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .filter-select {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+  }
+
+  .filter-select:focus,
+  .filter-select:hover {
+    border-color: var(--grid-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .view-toggle {
+    display: flex;
+    gap: 0.5rem;
+    background: #f8fafc;
+    padding: 4px;
+    border-radius: 12px;
+  }
+
+  .view-toggle-btn {
+    padding: 0.5rem;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #64748b;
+  }
+
+  .view-toggle-btn.active {
+    background: white;
+    color: var(--grid-primary);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .view-toggle-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Product Count */
+  .product-count {
+    color: #64748b;
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  /* Loading State */
+  .product-grid-loading {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .product-skeleton {
+    background: white;
+    border-radius: 20px;
+    padding: 1rem;
+    border: 1px solid #f1f5f9;
+  }
+
+  .skeleton-image {
+    aspect-ratio: 1;
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 16px;
+    margin-bottom: 1rem;
+  }
+
+  .skeleton-text {
+    height: 1rem;
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+  }
+
+  .skeleton-text.short {
+    width: 60%;
+  }
+
+  @keyframes loading {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* Empty State */
+  .product-grid-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #64748b;
+  }
+
+  .product-grid-empty svg {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 2rem;
+    color: #cbd5e1;
+  }
+
+  .product-grid-empty h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #374151;
+  }
+
+  /* Pagination */
+  .product-grid-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 4rem;
+  }
+
+  .pagination-nav {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .pagination-btn {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    color: #64748b;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    min-width: 44px;
+    text-align: center;
+  }
+
+  .pagination-btn:hover,
+  .pagination-btn.active {
+    border-color: var(--grid-primary);
+    background: var(--grid-primary);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .product-grid.columns-5 {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+    
+    .product-grid.columns-4 {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+  }
+
+  @media (max-width: 768px) {
+    .product-grid-title {
+      font-size: 2rem;
+    }
+    
+    .product-grid-controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .product-grid-filters {
+      justify-content: center;
+    }
+    
+    .product-grid {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .product-grid.columns-2,
+    .product-grid.columns-3,
+    .product-grid.columns-4,
+    .product-grid.columns-5 {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .product-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    .product-grid.columns-2,
+    .product-grid.columns-3,
+    .product-grid.columns-4,
+    .product-grid.columns-5 {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Background Pattern */
+  .product-grid-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+  }
+</style>
+
+<section class="product-grid-beautiful-{{ section.id }}">
+  <div class="product-grid-section">
+    <div class="container mx-auto px-4">
+      
+      <!-- Section Header -->
+      {% if section.settings.heading != blank or section.settings.description != blank %}
+        <div class="product-grid-header">
+          {% if section.settings.heading != blank %}
+            <h2 class="product-grid-title">{{ section.settings.heading }}</h2>
+          {% endif %}
+          
+          {% if section.settings.description != blank %}
+            <p class="product-grid-subtitle">{{ section.settings.description }}</p>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <!-- Controls -->
+      {% if section.settings.show_filters or section.settings.show_sort %}
+        <div class="product-grid-controls">
+          <div class="product-grid-filters">
+            {% if section.settings.show_sort %}
+              <select class="filter-select" id="sort-by">
+                <option value="manual">Featured</option>
+                <option value="price-ascending">Price: Low to High</option>
+                <option value="price-descending">Price: High to Low</option>
+                <option value="title-ascending">A-Z</option>
+                <option value="title-descending">Z-A</option>
+                <option value="created-ascending">Oldest first</option>
+                <option value="created-descending">Newest first</option>
+              </select>
+            {% endif %}
+
+            {% if section.settings.show_filters %}
+              <select class="filter-select" id="filter-availability">
+                <option value="all">All Products</option>
+                <option value="available">In Stock</option>
+                <option value="unavailable">Out of Stock</option>
+              </select>
+            {% endif %}
+          </div>
+
+          {% if section.settings.show_view_toggle %}
+            <div class="view-toggle">
+              <button class="view-toggle-btn" data-columns="2" title="2 Columns">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                </svg>
+              </button>
+              <button class="view-toggle-btn" data-columns="3" title="3 Columns">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                </svg>
+              </button>
+              <button class="view-toggle-btn active" data-columns="4" title="4 Columns">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                </svg>
+              </button>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <!-- Product Count -->
+      {% if section.settings.show_product_count %}
+        <div class="product-count">
+          Showing {{ collection.products.size | default: section.blocks.size }} of {{ collection.products.size | default: section.blocks.size }} products
+        </div>
+      {% endif %}
+
+      <!-- Product Grid -->
+      {% if section.blocks.size > 0 %}
+        <div class="product-grid columns-{{ section.settings.columns_desktop }}" id="product-grid">
+          {% for block in section.blocks %}
+            {% case block.type %}
+              {% when 'product' %}
+                {% assign product = all_products[block.settings.product] %}
+                {% if product != blank %}
+                  {% render 'product-card-beautiful',
+                    product_card_product: product,
+                    media_aspect_ratio: section.settings.image_ratio,
+                    show_secondary_image: section.settings.show_secondary_image,
+                    show_vendor: section.settings.show_vendor,
+                    show_rating: section.settings.show_rating
+                  %}
+                {% endif %}
+            {% endcase %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <!-- Empty State -->
+        <div class="product-grid-empty">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+          <h3>No products found</h3>
+          <p>Add some products to this section to get started.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const productGrid = document.getElementById('product-grid');
+  const viewToggleBtns = document.querySelectorAll('.view-toggle-btn');
+  const sortSelect = document.getElementById('sort-by');
+  const filterSelect = document.getElementById('filter-availability');
+
+  // View toggle functionality
+  viewToggleBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const columns = this.dataset.columns;
+      
+      // Update active state
+      viewToggleBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Update grid
+      if (productGrid) {
+        productGrid.className = productGrid.className.replace(/columns-\d+/, `columns-${columns}`);
+      }
+    });
+  });
+
+  // Sort functionality
+  if (sortSelect) {
+    sortSelect.addEventListener('change', function() {
+      const sortValue = this.value;
+      console.log('Sorting by:', sortValue);
+      // Implement sorting logic here
+    });
+  }
+
+  // Filter functionality
+  if (filterSelect) {
+    filterSelect.addEventListener('change', function() {
+      const filterValue = this.value;
+      console.log('Filtering by:', filterValue);
+      // Implement filtering logic here
+    });
+  }
+});
+</script>
+
+{% schema %}
+{
+  "name": "Beautiful Product Grid",
+  "tag": "section",
+  "class": "section-product-grid-beautiful",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Featured Products"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Discover our carefully curated collection of premium products."
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "Number of columns on desktop",
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image ratio",
+      "options": [
+        {
+          "value": "0.8",
+          "label": "Portrait"
+        },
+        {
+          "value": "1.0",
+          "label": "Square"
+        },
+        {
+          "value": "1.33",
+          "label": "Landscape"
+        }
+      ],
+      "default": "1.0"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "label": "Show second image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show product rating",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Show filters",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Show sort options",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_toggle",
+      "label": "Show view toggle",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "label": "Show product count",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "primary_color",
+      "label": "Primary color",
+      "default": "#3b82f6"
+    },
+    {
+      "type": "color",
+      "id": "secondary_color",
+      "label": "Secondary color",
+      "default": "#8b5cf6"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Beautiful Product Grid",
+      "blocks": [
+        {
+          "type": "product"
+        },
+        {
+          "type": "product"
+        },
+        {
+          "type": "product"
+        },
+        {
+          "type": "product"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

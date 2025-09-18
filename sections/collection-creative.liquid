@@ -1,0 +1,960 @@
+{% comment %}
+  Creative Collection Layout with Multiple Grid Options
+  Features: Magazine layout, Pinterest-style masonry, 3D grid, and Timeline layout
+{% endcomment %}
+
+<style>
+  .collection-creative-{{ section.id }} {
+    --collection-primary: {{ section.settings.primary_color | default: '#0ea5e9' }};
+    --collection-secondary: {{ section.settings.secondary_color | default: '#8b5cf6' }};
+    --collection-accent: {{ section.settings.accent_color | default: '#f59e0b' }};
+  }
+
+  /* Magazine Layout */
+  .magazine-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .magazine-item {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease;
+  }
+
+  .magazine-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  }
+
+  .magazine-item.featured {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  .magazine-image {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    transition: all 0.4s ease;
+  }
+
+  .magazine-item.featured .magazine-image {
+    height: 400px;
+  }
+
+  .magazine-item:hover .magazine-image {
+    transform: scale(1.05);
+  }
+
+  .magazine-content {
+    padding: 1.5rem;
+    position: relative;
+  }
+
+  .magazine-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .magazine-item.featured .magazine-title {
+    font-size: 2rem;
+  }
+
+  .magazine-description {
+    color: #64748b;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .magazine-price {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--collection-primary);
+    margin-bottom: 1rem;
+  }
+
+  .magazine-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--collection-accent);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  /* Masonry Layout */
+  .masonry-layout {
+    columns: 4;
+    column-gap: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .masonry-item {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+  }
+
+  .masonry-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  .masonry-image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .masonry-content {
+    padding: 1rem;
+  }
+
+  .masonry-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #1a202c;
+  }
+
+  .masonry-price {
+    color: var(--collection-primary);
+    font-weight: 700;
+    font-size: 1.125rem;
+  }
+
+  /* 3D Grid Layout */
+  .grid-3d-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    perspective: 1000px;
+  }
+
+  .grid-3d-item {
+    position: relative;
+    height: 400px;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease;
+    cursor: pointer;
+  }
+
+  .grid-3d-item:hover {
+    transform: rotateY(15deg) rotateX(5deg);
+  }
+
+  .grid-3d-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  }
+
+  .grid-3d-front {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .grid-3d-back {
+    background: white;
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+
+  .grid-3d-item:hover .grid-3d-face {
+    transform: rotateY(180deg);
+  }
+
+  .grid-3d-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+  }
+
+  .grid-3d-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .grid-3d-description {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #64748b;
+    margin-bottom: 1rem;
+  }
+
+  .grid-3d-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--collection-primary);
+    margin-bottom: 1rem;
+  }
+
+  /* Timeline Layout */
+  .timeline-layout {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .timeline-layout::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom, var(--collection-primary), var(--collection-secondary));
+    transform: translateX(-50%);
+    border-radius: 2px;
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 4rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .timeline-item:nth-child(odd) {
+    flex-direction: row;
+  }
+
+  .timeline-item:nth-child(even) {
+    flex-direction: row-reverse;
+  }
+
+  .timeline-content {
+    flex: 1;
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin: 0 2rem;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .timeline-content:hover {
+    transform: scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  .timeline-content::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 0;
+    height: 0;
+    border: 15px solid transparent;
+    transform: translateY(-50%);
+  }
+
+  .timeline-item:nth-child(odd) .timeline-content::before {
+    right: -30px;
+    border-left-color: white;
+  }
+
+  .timeline-item:nth-child(even) .timeline-content::before {
+    left: -30px;
+    border-right-color: white;
+  }
+
+  .timeline-marker {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background: var(--collection-accent);
+    border: 4px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px var(--collection-primary);
+    z-index: 10;
+  }
+
+  .timeline-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 15px;
+    margin-bottom: 1rem;
+  }
+
+  .timeline-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 0.5rem;
+  }
+
+  .timeline-description {
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .timeline-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--collection-primary);
+  }
+
+  /* Layout Selector */
+  .layout-selector {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 3rem 0;
+    flex-wrap: wrap;
+  }
+
+  .layout-btn {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 25px;
+    background: white;
+    color: #64748b;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .layout-btn:hover,
+  .layout-btn.active {
+    border-color: var(--collection-primary);
+    background: var(--collection-primary);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* Collection Header */
+  .collection-header {
+    text-align: center;
+    padding: 4rem 0;
+    background: linear-gradient(135deg, var(--collection-primary), var(--collection-secondary));
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .collection-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+    animation: patternMove 20s linear infinite;
+  }
+
+  @keyframes patternMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(60px, 60px); }
+  }
+
+  .collection-title {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .collection-description {
+    font-size: 1.125rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Filter & Sort */
+  .collection-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .filter-group {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .filter-select {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    background: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .filter-select:focus,
+  .filter-select:hover {
+    border-color: var(--collection-primary);
+    outline: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .masonry-layout {
+      columns: 3;
+    }
+    
+    .magazine-item.featured {
+      grid-column: span 1;
+      grid-row: span 1;
+    }
+    
+    .magazine-item.featured .magazine-image {
+      height: 250px;
+    }
+    
+    .magazine-item.featured .magazine-title {
+      font-size: 1.25rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .masonry-layout {
+      columns: 2;
+    }
+    
+    .timeline-layout::before {
+      left: 20px;
+    }
+    
+    .timeline-item {
+      flex-direction: row !important;
+    }
+    
+    .timeline-content {
+      margin-left: 4rem;
+      margin-right: 0;
+    }
+    
+    .timeline-marker {
+      left: 20px;
+    }
+    
+    .timeline-content::before {
+      left: -30px !important;
+      right: auto !important;
+      border-right-color: white !important;
+      border-left-color: transparent !important;
+    }
+    
+    .collection-title {
+      font-size: 2rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .masonry-layout {
+      columns: 1;
+    }
+    
+    .layout-selector {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  /* Product Actions */
+  .product-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .product-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .product-btn-primary {
+    background: var(--collection-primary);
+    color: white;
+  }
+
+  .product-btn-primary:hover {
+    background: var(--collection-secondary);
+    transform: translateY(-2px);
+  }
+
+  .product-btn-secondary {
+    background: transparent;
+    color: var(--collection-primary);
+    border: 2px solid var(--collection-primary);
+  }
+
+  .product-btn-secondary:hover {
+    background: var(--collection-primary);
+    color: white;
+  }
+
+  /* Quick View */
+  .quick-view-btn {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+  }
+
+  .magazine-item:hover .quick-view-btn,
+  .masonry-item:hover .quick-view-btn {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .quick-view-btn:hover {
+    background: var(--collection-primary);
+    color: white;
+  }
+</style>
+
+<div class="collection-creative-{{ section.id }} py-8">
+  <!-- Collection Header -->
+  <div class="collection-header">
+    <div class="container mx-auto px-4">
+      <h1 class="collection-title">{{ collection.title | default: 'Our Collection' }}</h1>
+      {% if collection.description != blank %}
+        <p class="collection-description">{{ collection.description }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4">
+    <!-- Layout Selector -->
+    <div class="layout-selector">
+      <button class="layout-btn active" data-layout="magazine">
+        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm8 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1v-2z" clip-rule="evenodd"></path>
+        </svg>
+        Magazine
+      </button>
+      <button class="layout-btn" data-layout="masonry">
+        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+        </svg>
+        Masonry
+      </button>
+      <button class="layout-btn" data-layout="grid-3d">
+        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path>
+        </svg>
+        3D Grid
+      </button>
+      <button class="layout-btn" data-layout="timeline">
+        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+        </svg>
+        Timeline
+      </button>
+    </div>
+
+    <!-- Collection Controls -->
+    <div class="collection-controls">
+      <div class="filter-group">
+        <label for="sort-by">Sort by:</label>
+        <select id="sort-by" class="filter-select">
+          <option value="manual">Featured</option>
+          <option value="price-ascending">Price: Low to High</option>
+          <option value="price-descending">Price: High to Low</option>
+          <option value="title-ascending">A-Z</option>
+          <option value="title-descending">Z-A</option>
+          <option value="created-ascending">Oldest first</option>
+          <option value="created-descending">Newest first</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="products-per-page">Show:</label>
+        <select id="products-per-page" class="filter-select">
+          <option value="12">12 products</option>
+          <option value="24">24 products</option>
+          <option value="36">36 products</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Products Container -->
+    <div id="products-container">
+      
+      <!-- Magazine Layout -->
+      <div id="magazine-layout" class="magazine-layout layout-content">
+        {% assign product_index = 0 %}
+        {% for product in collection.products limit: section.settings.products_to_show %}
+          {% assign product_index = product_index | plus: 1 %}
+          <article class="magazine-item {% if product_index == 1 or product_index == 5 or product_index == 12 %}featured{% endif %}">
+            <button class="quick-view-btn" data-product-id="{{ product.id }}">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+              </svg>
+            </button>
+            
+            {% if product.featured_media %}
+              <img src="{{ product.featured_media | image_url: width: 600 }}" 
+                   alt="{{ product.title }}" 
+                   class="magazine-image"
+                   loading="lazy">
+            {% endif %}
+            
+            {% if product.compare_at_price > product.price %}
+              <div class="magazine-badge">Sale</div>
+            {% elsif product.tags contains 'new' %}
+              <div class="magazine-badge">New</div>
+            {% endif %}
+            
+            <div class="magazine-content">
+              <h3 class="magazine-title">{{ product.title }}</h3>
+              <p class="magazine-description">{{ product.description | strip_html | truncate: 120 }}</p>
+              <div class="magazine-price">
+                {% if product.compare_at_price > product.price %}
+                  <span class="line-through text-gray-500 text-sm mr-2">{{ product.compare_at_price | money }}</span>
+                {% endif %}
+                {{ product.price | money }}
+              </div>
+              
+              <div class="product-actions">
+                <a href="{{ product.url }}" class="product-btn product-btn-primary">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5H20"></path>
+                  </svg>
+                  Add to Cart
+                </a>
+                <a href="{{ product.url }}" class="product-btn product-btn-secondary">View</a>
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+
+      <!-- Masonry Layout -->
+      <div id="masonry-layout" class="masonry-layout layout-content" style="display: none;">
+        {% for product in collection.products limit: section.settings.products_to_show %}
+          <article class="masonry-item">
+            <div class="relative">
+              <button class="quick-view-btn" data-product-id="{{ product.id }}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+              </button>
+              
+              {% if product.featured_media %}
+                <img src="{{ product.featured_media | image_url: width: 400 }}" 
+                     alt="{{ product.title }}" 
+                     class="masonry-image"
+                     loading="lazy">
+              {% endif %}
+            </div>
+            
+            <div class="masonry-content">
+              <h3 class="masonry-title">{{ product.title }}</h3>
+              <div class="masonry-price">{{ product.price | money }}</div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+
+      <!-- 3D Grid Layout -->
+      <div id="grid-3d-layout" class="grid-3d-layout layout-content" style="display: none;">
+        {% for product in collection.products limit: section.settings.products_to_show %}
+          <article class="grid-3d-item">
+            <div class="grid-3d-face grid-3d-front">
+              <h3 class="grid-3d-title">{{ product.title }}</h3>
+              <div class="text-2xl font-bold">{{ product.price | money }}</div>
+            </div>
+            
+            <div class="grid-3d-face grid-3d-back">
+              {% if product.featured_media %}
+                <img src="{{ product.featured_media | image_url: width: 300 }}" 
+                     alt="{{ product.title }}" 
+                     class="grid-3d-image"
+                     loading="lazy">
+              {% endif %}
+              
+              <h3 class="grid-3d-title text-gray-900">{{ product.title }}</h3>
+              <p class="grid-3d-description">{{ product.description | strip_html | truncate: 100 }}</p>
+              <div class="grid-3d-price">{{ product.price | money }}</div>
+              
+              <div class="product-actions">
+                <a href="{{ product.url }}" class="product-btn product-btn-primary">
+                  Add to Cart
+                </a>
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+
+      <!-- Timeline Layout -->
+      <div id="timeline-layout" class="timeline-layout layout-content" style="display: none;">
+        {% for product in collection.products limit: section.settings.products_to_show %}
+          <article class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              {% if product.featured_media %}
+                <img src="{{ product.featured_media | image_url: width: 400 }}" 
+                     alt="{{ product.title }}" 
+                     class="timeline-image"
+                     loading="lazy">
+              {% endif %}
+              
+              <h3 class="timeline-title">{{ product.title }}</h3>
+              <p class="timeline-description">{{ product.description | strip_html | truncate: 150 }}</p>
+              <div class="timeline-price">{{ product.price | money }}</div>
+              
+              <div class="product-actions">
+                <a href="{{ product.url }}" class="product-btn product-btn-primary">Add to Cart</a>
+                <a href="{{ product.url }}" class="product-btn product-btn-secondary">Learn More</a>
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if paginate.pages > 1 %}
+      <nav class="pagination flex justify-center mt-12">
+        <div class="flex gap-2">
+          {% if paginate.previous %}
+            <a href="{{ paginate.previous.url }}" class="pagination-btn">Previous</a>
+          {% endif %}
+          
+          {% for part in paginate.parts %}
+            {% if part.is_link %}
+              <a href="{{ part.url }}" class="pagination-btn">{{ part.title }}</a>
+            {% else %}
+              <span class="pagination-btn active">{{ part.title }}</span>
+            {% endif %}
+          {% endfor %}
+          
+          {% if paginate.next %}
+            <a href="{{ paginate.next.url }}" class="pagination-btn">Next</a>
+          {% endif %}
+        </div>
+      </nav>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Layout switcher
+  const layoutBtns = document.querySelectorAll('.layout-btn');
+  const layoutContents = document.querySelectorAll('.layout-content');
+  
+  layoutBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const targetLayout = this.dataset.layout;
+      
+      // Update active button
+      layoutBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Show target layout
+      layoutContents.forEach(content => {
+        if (content.id === targetLayout + '-layout') {
+          content.style.display = 'block';
+          // Trigger reflow for masonry
+          if (targetLayout === 'masonry') {
+            content.style.columnCount = '';
+            setTimeout(() => {
+              content.style.columnCount = window.innerWidth > 1024 ? '4' : 
+                                         window.innerWidth > 768 ? '3' : 
+                                         window.innerWidth > 480 ? '2' : '1';
+            }, 50);
+          }
+        } else {
+          content.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // Quick view functionality
+  const quickViewBtns = document.querySelectorAll('.quick-view-btn');
+  quickViewBtns.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const productId = this.dataset.productId;
+      // Add quick view modal logic here
+      console.log('Quick view for product:', productId);
+    });
+  });
+
+  // Responsive masonry
+  function updateMasonryColumns() {
+    const masonryLayout = document.getElementById('masonry-layout');
+    if (masonryLayout) {
+      if (window.innerWidth > 1024) {
+        masonryLayout.style.columnCount = '4';
+      } else if (window.innerWidth > 768) {
+        masonryLayout.style.columnCount = '3';
+      } else if (window.innerWidth > 480) {
+        masonryLayout.style.columnCount = '2';
+      } else {
+        masonryLayout.style.columnCount = '1';
+      }
+    }
+  }
+
+  window.addEventListener('resize', updateMasonryColumns);
+  updateMasonryColumns();
+});
+</script>
+
+<style>
+.pagination-btn {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  color: #64748b;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.pagination-btn:hover,
+.pagination-btn.active {
+  border-color: var(--collection-primary);
+  background: var(--collection-primary);
+  color: white;
+}
+</style>
+
+{% schema %}
+{
+  "name": "Creative Collection",
+  "tag": "section",
+  "class": "section-creative-collection",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 8,
+      "max": 50,
+      "step": 2,
+      "label": "Products to show",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "primary_color",
+      "label": "Primary Color",
+      "default": "#0ea5e9"
+    },
+    {
+      "type": "color",
+      "id": "secondary_color",
+      "label": "Secondary Color",
+      "default": "#8b5cf6"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#f59e0b"
+    },
+    {
+      "type": "select",
+      "id": "default_layout",
+      "label": "Default Layout",
+      "options": [
+        {
+          "value": "magazine",
+          "label": "Magazine Layout"
+        },
+        {
+          "value": "masonry",
+          "label": "Masonry Layout"
+        },
+        {
+          "value": "grid-3d",
+          "label": "3D Grid Layout"
+        },
+        {
+          "value": "timeline",
+          "label": "Timeline Layout"
+        }
+      ],
+      "default": "magazine"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Creative Collection"
+    }
+  ]
+}
+{% endschema %}
