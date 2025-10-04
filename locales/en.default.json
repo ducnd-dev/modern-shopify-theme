@@ -6,9 +6,22 @@
     },
     "search": {
       "no_results": "No results found for \"{{ terms }}\"",
+      "no_results_description": "Try adjusting your search or explore our collections.",
+      "view_all": "View All Results",
       "results_for": "Results for \"{{ terms }}\"",
       "title": "Search",
-      "placeholder": "Search products"
+      "placeholder": "Search products",
+      "input_label": "Search products",
+      "clear": "Clear search",
+      "suggestions": "Suggestions",
+      "categories": "Categories",
+      "products": "Products",
+      "collections": "Collections",
+      "recent": "Recent searches",
+      "clear_all": "Clear all"
+    },
+    "breadcrumbs": {
+      "home": "Home"
     },
     "cart": {
       "view": "View cart ({{ count }})",
@@ -18,7 +31,10 @@
       }
     },
     "share": {
-      "success_message": "Link copied to clipboard"
+      "success_message": "Link copied to clipboard",
+      "share_url": "Share URL",
+      "close": "Close",
+      "copy_to_clipboard": "Copy to clipboard"
     },
     "currency": {
       "dropdown_label": "Currency"
@@ -28,7 +44,8 @@
     },
     "payment": {
       "method": "Payment method"
-    }
+    },
+    "loading": "Loading..."
   },
   "sections": {
     "cart": {
@@ -54,6 +71,11 @@
     },
     "footer": {
       "newsletter": "Newsletter"
+    },
+    "collection_template": {
+      "title": "Collection",
+      "empty": "No products found",
+      "use_fewer_filters_html": "Use fewer filters or <a class=\"{{ class }}\" href=\"{{ link }}\">clear all</a>"
     }
   },
   "newsletter": {
@@ -61,7 +83,62 @@
     "placeholder": "Enter your email address",
     "button_label": "Subscribe",
     "success_heading": "Thank you for subscribing!",
-    "success_message": "You have been successfully subscribed to our newsletter."
+    "success_message": "You have been successfully subscribed to our newsletter.",
+    "success": "Thanks for subscribing!",
+    "email_label": "Email address",
+    "email_placeholder": "Enter your email",
+    "submit": "Subscribe"
+  },
+  "contact": {
+    "form": {
+      "title": "Contact form",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone number",
+      "comment": "Comment",
+      "send": "Send",
+      "post_success": "Thanks for contacting us. We'll get back to you as soon as possible.",
+      "post_success_title": "Thank you!",
+      "error_heading": "Please adjust the following:",
+      "email_placeholder": "your@email.com",
+      "phone_placeholder": "+1 (555) 123-4567",
+      "newsletter": "Subscribe to our newsletter for updates and special offers.",
+      "first_name": "First Name",
+      "last_name": "Last Name",
+      "subject": "Subject",
+      "subject_placeholder": "Select a subject...",
+      "subject_general": "General Inquiry",
+      "subject_order": "Order Support",
+      "subject_product": "Product Question",
+      "subject_returns": "Returns & Exchanges",
+      "subject_technical": "Technical Support",
+      "subject_partnership": "Partnership Opportunity",
+      "subject_other": "Other",
+      "order_number": "Order Number",
+      "order_number_placeholder": "#1001",
+      "message": "Message",
+      "message_placeholder": "Tell us how we can help you...",
+      "message_note": "Please provide as much detail as possible to help us assist you better."
+    },
+    "info": {
+      "title": "Get in Touch",
+      "address": "Visit Our Store",
+      "phone": "Call Us",
+      "email": "Email Us",
+      "hours": "Business Hours"
+    },
+    "faq": {
+      "title": "Quick Help",
+      "description": "Find answers to common questions.",
+      "shipping": "Shipping Information",
+      "returns": "Returns & Exchanges",
+      "size_guide": "Size Guide",
+      "general": "General FAQ"
+    },
+    "social": {
+      "title": "Follow Us",
+      "description": "Stay connected on social media for updates and support."
+    }
   },
   "accessibility": {
     "skip_to_text": "Skip to content",
@@ -85,6 +162,9 @@
       "description": "Description",
       "on_sale": "Sale",
       "product_variants": "Product variants",
+      "choose_options": "Choose options",
+      "choose_product_options": "Choose options for {{ product_name }}",
+      "available": "Available",
       "quantity": {
         "label": "Quantity",
         "input_label": "Quantity for {{ product }}",
@@ -185,7 +265,10 @@
         "comment": "Comment",
         "send": "Send",
         "post_success": "Thanks for contacting us. We'll get back to you as soon as possible.",
-        "error_heading": "Please adjust the following:"
+        "error_heading": "Please adjust the following:",
+        "email_placeholder": "your@email.com",
+        "phone_placeholder": "+1 (555) 123-4567",
+        "newsletter": "Subscribe to our newsletter for updates and special offers."
       }
     },
     "404": {
@@ -204,7 +287,10 @@
       "title": "Account",
       "details": "Account details",
       "view_addresses": "View addresses",
-      "return": "Return to Account Details"
+      "return": "Return to Account Details",
+      "sign_out": "Sign Out",
+      "navigation": "Account Menu",
+      "overview": "Overview"
     },
     "account_fallback": "Account",
     "activate_account": {
@@ -276,6 +362,9 @@
       "last_name": "Last name",
       "email": "Email",
       "password": "Password",
+      "password_confirm": "Confirm Password",
+      "accepts_marketing": "Subscribe to our newsletter for exclusive offers and updates",
+      "sign_in": "Sign In",
       "submit": "Create"
     },
     "reset_password": {
@@ -286,11 +375,73 @@
       "submit": "Reset password"
     }
   },
+  "blogs": {
+    "article": {
+      "by_author": "by {{ author }}",
+      "share": "Share this article",
+      "read_more": "Read More",
+      "about_author": "About the Author",
+      "author_bio": "Passionate about sharing insights and stories that matter.",
+      "related_posts": "Related Articles",
+      "newsletter_title": "Stay Updated",
+      "newsletter_description": "Get the latest articles delivered to your inbox."
+    },
+    "general": {
+      "no_articles": "No articles yet",
+      "back_to_home": "Back to Home",
+      "search": "Search Articles",
+      "search_placeholder": "Search...",
+      "topics": "Topics",
+      "recent_articles": "Recent Articles",
+      "newsletter_title": "Stay Updated",
+      "newsletter_description": "Get the latest articles delivered to your inbox."
+    },
+    "comments": {
+      "title": "Leave a comment",
+      "success_moderated": "Your comment was posted successfully! We will publish it in a little while, as our blog is moderated.",
+      "success": "Your comment was posted successfully! Thank you!",
+      "error_heading": "Please correct the following:",
+      "name": "Name",
+      "email": "Email",
+      "message": "Comment",
+      "message_placeholder": "Write your comment here...",
+      "moderated": "Please note, comments need to be approved before they are published.",
+      "post": "Post Comment"
+    }
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "showing": "Showing {{ first }} - {{ last }} of {{ count }} results"
+  },
   "gift_cards": {
     "issued": {
       "title": "Your {{ value }} gift card for {{ shop }}!",
       "subtext": "Here's your gift card!",
+      "gift_card": "Gift Card",
+      "amount": "Amount",
       "gift_card_code": "Gift card code",
+      "redeem_html": "Gift Card Code",
+      "initial_value": "Initial Value",
+      "expires_on": "Expires",
+      "never_expires": "Never",
+      "how_to_use": "How to Use Your Gift Card",
+      "step_1": "Shop online or visit our store",
+      "step_2": "Enter your gift card code at checkout",
+      "step_3": "The balance will be applied to your purchase",
+      "qr_code_title": "QR Code for Easy Access",
+      "qr_code_text": "Scan this QR code with your phone to access your gift card anytime",
+      "print": "Print Gift Card",
+      "send_email": "Send via Email",
+      "email_subject": "Gift Card from",
+      "email_body": "I got you a gift card!",
+      "shop_now": "Shop Now",
+      "important_notes": "Important Notes",
+      "note_1": "Keep your gift card code safe and secure",
+      "note_2": "Gift cards cannot be redeemed for cash",
+      "note_3": "If unused, gift cards remain in your account",
+      "note_4": "Contact us if you have any issues with your gift card",
       "shop_link": "Continue shopping",
       "remaining_html": "Remaining {{ balance }}",
       "add_to_apple_wallet": "Add to Apple Wallet",

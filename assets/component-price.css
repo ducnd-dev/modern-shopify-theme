@@ -1,0 +1,358 @@
+/* Component Price Styles */
+.price {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.price--inline {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+/* Price container */
+.price__container {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.price__container--stacked {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+/* Price items */
+.price-item {
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.price-item--regular {
+  font-size: 1.125rem;
+  color: #111827;
+}
+
+.price-item--large {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.price-item--small {
+  font-size: 0.875rem;
+}
+
+.price-item--compare-at {
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-decoration: line-through;
+  font-weight: 400;
+}
+
+.price-item--sale {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.price-item--savings {
+  font-size: 0.875rem;
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.price-item--unit {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 400;
+}
+
+/* Price ranges */
+.price__range {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.price__range-separator {
+  color: #6b7280;
+  margin: 0 0.25rem;
+}
+
+.price__from {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 400;
+  margin-right: 0.25rem;
+}
+
+/* Price badges */
+.price__badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.25rem;
+}
+
+.price__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  border-radius: 0.25rem;
+  white-space: nowrap;
+}
+
+.price__badge--sale {
+  background-color: #dc2626;
+  color: white;
+}
+
+.price__badge--sold-out {
+  background-color: #6b7280;
+  color: white;
+}
+
+.price__badge--new {
+  background-color: #10b981;
+  color: white;
+}
+
+.price__badge--limited {
+  background-color: #f59e0b;
+  color: white;
+}
+
+/* Sale price styling */
+.price__sale {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.price__savings {
+  margin-top: 0.25rem;
+}
+
+.price__savings-amount {
+  font-weight: 600;
+  color: #dc2626;
+}
+
+.price__savings-percentage {
+  font-size: 0.875rem;
+  color: #dc2626;
+  font-weight: 500;
+  background-color: #fef2f2;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  margin-left: 0.25rem;
+}
+
+/* Unit pricing */
+.price__unit {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+  line-height: 1.4;
+}
+
+.price__unit-separator {
+  margin: 0 0.25rem;
+}
+
+/* Installments */
+.price__installments {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+  line-height: 1.4;
+}
+
+.price__installment-amount {
+  font-weight: 500;
+  color: #111827;
+}
+
+/* Price loading state */
+.price--loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.price__skeleton {
+  background: #f3f4f6;
+  border-radius: 0.25rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.price__skeleton--regular {
+  height: 1.5rem;
+  width: 4rem;
+}
+
+.price__skeleton--compare {
+  height: 1.25rem;
+  width: 3rem;
+  margin-top: 0.25rem;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Price variants */
+.price--compact {
+  gap: 0.125rem;
+}
+
+.price--compact .price__container {
+  gap: 0.375rem;
+}
+
+.price--compact .price-item--regular {
+  font-size: 1rem;
+}
+
+.price--compact .price-item--compare-at {
+  font-size: 0.8125rem;
+}
+
+.price--large .price-item--regular {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.price--large .price-item--compare-at {
+  font-size: 1rem;
+}
+
+.price--center {
+  align-items: center;
+  text-align: center;
+}
+
+.price--right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+/* Currency symbol styling */
+.price__currency {
+  font-size: 0.875em;
+  vertical-align: top;
+  margin-right: 0.125rem;
+}
+
+/* Responsive behavior */
+@media (max-width: 640px) {
+  .price__container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .price--inline .price__container {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  
+  .price-item--regular {
+    font-size: 1rem;
+  }
+  
+  .price-item--large {
+    font-size: 1.25rem;
+  }
+  
+  .price__badges {
+    gap: 0.25rem;
+  }
+  
+  .price__badge {
+    font-size: 0.625rem;
+    padding: 0.125rem 0.375rem;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .price-item--compare-at {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+  }
+  
+  .price__badge {
+    border: 1px solid currentColor;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .price-item--regular {
+    color: #f9fafb;
+  }
+  
+  .price-item--compare-at {
+    color: #9ca3af;
+  }
+  
+  .price__installment-amount {
+    color: #f9fafb;
+  }
+  
+  .price__savings-percentage {
+    background-color: #7f1d1d;
+    color: #fecaca;
+  }
+  
+  .price__skeleton {
+    background: #374151;
+  }
+}
+
+/* Print styles */
+@media print {
+  .price__badges {
+    display: none;
+  }
+  
+  .price__savings-percentage {
+    background: none;
+    color: inherit;
+  }
+}
+
+/* Accessibility */
+.price .visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Animation for price changes */
+.price--animated {
+  transition: all 0.3s ease;
+}
+
+.price--updating {
+  transform: scale(1.02);
+  color: #3b82f6;
+}

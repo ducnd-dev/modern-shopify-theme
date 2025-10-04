@@ -1,0 +1,315 @@
+/* Collection Showcase Section Styles */
+.collection-showcase {
+  padding: 4rem 0;
+  background: #f9fafb;
+}
+
+.collection-showcase__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.collection-showcase__header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.collection-showcase__title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.collection-showcase__subtitle {
+  font-size: 1.125rem;
+  color: #6b7280;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.collection-showcase__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.collection-showcase__item {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.collection-showcase__item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.collection-showcase__image-container {
+  position: relative;
+  aspect-ratio: 4/3;
+  overflow: hidden;
+}
+
+.collection-showcase__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.collection-showcase__item:hover .collection-showcase__image {
+  transform: scale(1.05);
+}
+
+.collection-showcase__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+  display: flex;
+  align-items: flex-end;
+  padding: 1.5rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.collection-showcase__item:hover .collection-showcase__overlay {
+  opacity: 1;
+}
+
+.collection-showcase__overlay-content {
+  color: white;
+}
+
+.collection-showcase__overlay-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.collection-showcase__overlay-count {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.collection-showcase__content {
+  padding: 1.5rem;
+}
+
+.collection-showcase__name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.collection-showcase__description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.collection-showcase__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+
+.collection-showcase__count {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.collection-showcase__price-range {
+  font-weight: 500;
+  color: #111827;
+}
+
+.collection-showcase__cta {
+  text-align: center;
+}
+
+.collection-showcase__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 2rem;
+  background: #111827;
+  color: white;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: background-color 0.15s ease;
+}
+
+.collection-showcase__button:hover {
+  background: #1f2937;
+}
+
+.collection-showcase__button svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Featured collection variant */
+.collection-showcase--featured .collection-showcase__grid {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 1rem;
+}
+
+.collection-showcase--featured .collection-showcase__item:first-child {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+.collection-showcase--featured .collection-showcase__item:first-child .collection-showcase__image-container {
+  aspect-ratio: 16/9;
+}
+
+/* Compact variant */
+.collection-showcase--compact {
+  padding: 2rem 0;
+}
+
+.collection-showcase--compact .collection-showcase__grid {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.collection-showcase--compact .collection-showcase__content {
+  padding: 1rem;
+}
+
+.collection-showcase--compact .collection-showcase__name {
+  font-size: 1rem;
+}
+
+/* Badge overlay */
+.collection-showcase__badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: #ef4444;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  z-index: 2;
+}
+
+.collection-showcase__badge--new {
+  background: #10b981;
+}
+
+.collection-showcase__badge--sale {
+  background: #f59e0b;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .collection-showcase {
+    padding: 2rem 0;
+  }
+  
+  .collection-showcase__container {
+    padding: 0 0.75rem;
+  }
+  
+  .collection-showcase__header {
+    margin-bottom: 2rem;
+  }
+  
+  .collection-showcase__title {
+    font-size: 2rem;
+  }
+  
+  .collection-showcase__subtitle {
+    font-size: 1rem;
+  }
+  
+  .collection-showcase__grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .collection-showcase__content {
+    padding: 1rem;
+  }
+  
+  .collection-showcase__name {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .collection-showcase__grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .collection-showcase__title {
+    font-size: 1.75rem;
+  }
+  
+  .collection-showcase--featured .collection-showcase__grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .collection-showcase--featured .collection-showcase__item:first-child {
+    grid-column: 1;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .collection-showcase {
+    background: #111827;
+  }
+  
+  .collection-showcase__item {
+    background: #1f2937;
+  }
+  
+  .collection-showcase__title {
+    color: #f9fafb;
+  }
+  
+  .collection-showcase__name {
+    color: #f9fafb;
+  }
+  
+  .collection-showcase__button {
+    background: #f9fafb;
+    color: #111827;
+  }
+  
+  .collection-showcase__button:hover {
+    background: #e5e7eb;
+  }
+}

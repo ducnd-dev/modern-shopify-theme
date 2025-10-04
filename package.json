@@ -1,22 +1,45 @@
 {
   "name": "modern-shopify-theme",
   "version": "1.0.0",
-  "description": "A modern Shopify theme built with TailwindCSS",
+  "description": "Modern Shopify Theme Pro - High-performance theme for Shopify stores",
   "main": "assets/theme.js",
   "scripts": {
+    "build": "npm run build:css && npm run build:js",
+    "build:css": "tailwindcss -i ./assets/input.css -o ./assets/theme.css --minify",
+    "build:js": "node scripts/build-js.js",
     "build-css": "tailwindcss -i ./assets/input.css -o ./assets/theme-compiled.css --watch",
     "build-css-prod": "tailwindcss -i ./assets/input.css -o ./assets/theme-compiled.css --minify",
-    "dev": "concurrently \"npm run build-css\" \"shopify theme dev\"",
-    "deploy": "npm run build-css-prod && npx shopify theme push"
+    "dev": "concurrently \"npm run watch:css\" \"npm run watch:js\" \"shopify theme dev\"",
+    "watch:css": "tailwindcss -i ./assets/input.css -o ./assets/theme.css --watch",
+    "watch:js": "node scripts/watch-js.js",
+    "test": "npm run test:lint && npm run test:performance && npm run test:accessibility",
+    "test:lint": "echo 'Liquid linting...' && echo 'No liquid linter configured yet'",
+    "test:performance": "node scripts/performance-test.js",
+    "test:accessibility": "node scripts/accessibility-test.js",
+    "test:browsers": "node scripts/browser-test.js",
+    "deploy:dev": "npm run build && shopify theme push --store=$DEV_STORE",
+    "deploy:staging": "npm run build && shopify theme push --store=$STAGING_STORE",
+    "deploy:production": "npm run build && shopify theme push --store=$PRODUCTION_STORE --live",
+    "deploy": "npm run build-css-prod && npx shopify theme push",
+    "package": "npm run build && shopify theme package",
+    "serve": "shopify theme serve --port=9292",
+    "check": "shopify theme check",
+    "format": "echo 'Formatting files...' && echo 'Prettier not configured yet'"
   },
   "devDependencies": {
+    "@shopify/cli": "^3.50.0",
+    "@shopify/theme": "^3.50.0",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.10",
     "autoprefixer": "^10.4.16",
+    "axe-core": "^4.8.2",
+    "chokidar": "^3.5.3",
     "concurrently": "^8.2.2",
+    "lighthouse": "^11.1.0",
     "postcss": "^8.4.32",
+    "puppeteer": "^21.3.8",
     "tailwindcss": "^3.3.6"
   },
   "keywords": [
@@ -25,8 +48,13 @@
     "tailwindcss",
     "ecommerce",
     "responsive",
-    "modern"
+    "modern",
+    "performance",
+    "accessibility"
   ],
   "author": "Your Name",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
 }

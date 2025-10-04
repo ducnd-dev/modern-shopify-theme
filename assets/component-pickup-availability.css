@@ -1,0 +1,591 @@
+/* Pickup Availability Component Styles */
+.pickup-availability {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: #f9fafb;
+  overflow: hidden;
+}
+
+.pickup-availability--available {
+  border-color: #10b981;
+  background: #ecfdf5;
+}
+
+.pickup-availability--unavailable {
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.pickup-availability--error {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+/* Header */
+.pickup-availability__header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: white;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pickup-availability--available .pickup-availability__header {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.pickup-availability--unavailable .pickup-availability__header {
+  border-color: #f59e0b;
+  background: #fefce8;
+}
+
+.pickup-availability--error .pickup-availability__header {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.pickup-availability__icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  color: #6b7280;
+}
+
+.pickup-availability--available .pickup-availability__icon {
+  color: #10b981;
+}
+
+.pickup-availability--unavailable .pickup-availability__icon {
+  color: #f59e0b;
+}
+
+.pickup-availability--error .pickup-availability__icon {
+  color: #ef4444;
+}
+
+.pickup-availability__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+  flex: 1;
+}
+
+.pickup-availability__toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pickup-availability__toggle:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.pickup-availability__toggle-icon {
+  width: 1rem;
+  height: 1rem;
+  color: #6b7280;
+  transition: transform 0.15s ease;
+}
+
+.pickup-availability--expanded .pickup-availability__toggle-icon {
+  transform: rotate(180deg);
+}
+
+/* Content */
+.pickup-availability__content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.pickup-availability--expanded .pickup-availability__content {
+  max-height: 500px;
+}
+
+.pickup-availability__body {
+  padding: 1.25rem;
+}
+
+/* Status summary */
+.pickup-availability__summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.pickup-availability--available .pickup-availability__summary {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.pickup-availability--unavailable .pickup-availability__summary {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.pickup-availability--error .pickup-availability__summary {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+.pickup-availability__summary-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* Location list */
+.pickup-availability__locations {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pickup-availability__location {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  transition: all 0.15s ease;
+}
+
+.pickup-availability__location:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.pickup-availability__location--available {
+  border-left: 4px solid #10b981;
+}
+
+.pickup-availability__location--unavailable {
+  border-left: 4px solid #f59e0b;
+  opacity: 0.7;
+}
+
+.pickup-availability__location--unavailable .pickup-availability__location-content {
+  opacity: 0.8;
+}
+
+/* Location content */
+.pickup-availability__location-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  color: #6b7280;
+}
+
+.pickup-availability__location--available .pickup-availability__location-icon {
+  color: #10b981;
+}
+
+.pickup-availability__location--unavailable .pickup-availability__location-icon {
+  color: #f59e0b;
+}
+
+.pickup-availability__location-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.pickup-availability__location-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 0.25rem;
+}
+
+.pickup-availability__location-address {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0 0 0.5rem;
+  line-height: 1.4;
+}
+
+.pickup-availability__location-status {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.pickup-availability__location--available .pickup-availability__location-status {
+  color: #059669;
+}
+
+.pickup-availability__location--unavailable .pickup-availability__location-status {
+  color: #d97706;
+}
+
+.pickup-availability__location-status-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+/* Estimated time */
+.pickup-availability__location-time {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.pickup-availability__location--available .pickup-availability__location-time {
+  color: #059669;
+}
+
+/* Distance indicator */
+.pickup-availability__location-distance {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.pickup-availability__location-distance-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+/* Action buttons */
+.pickup-availability__actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.pickup-availability__action {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background: white;
+  color: #374151;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.pickup-availability__action:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.pickup-availability__action--primary {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.pickup-availability__action--primary:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.pickup-availability__action-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+/* Loading state */
+.pickup-availability--loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.pickup-availability__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 0.75rem;
+  color: #6b7280;
+}
+
+.pickup-availability__loading-spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid #f3f4f6;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: pickup-spin 1s linear infinite;
+}
+
+@keyframes pickup-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pickup-availability__loading-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Empty state */
+.pickup-availability__empty {
+  text-align: center;
+  padding: 2rem 1.25rem;
+  color: #6b7280;
+}
+
+.pickup-availability__empty-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0 auto 0.75rem;
+  color: #d1d5db;
+}
+
+.pickup-availability__empty-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.5rem;
+}
+
+.pickup-availability__empty-text {
+  font-size: 0.75rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Error state */
+.pickup-availability__error {
+  padding: 1.25rem;
+  text-align: center;
+  color: #dc2626;
+}
+
+.pickup-availability__error-icon {
+  width: 2rem;
+  height: 2rem;
+  margin: 0 auto 0.75rem;
+}
+
+.pickup-availability__error-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.pickup-availability__error-text {
+  font-size: 0.75rem;
+  margin: 0 0 1rem;
+  line-height: 1.4;
+}
+
+.pickup-availability__error-retry {
+  padding: 0.5rem 1rem;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.pickup-availability__error-retry:hover {
+  background: #b91c1c;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .pickup-availability {
+    background: #374151;
+    border-color: #4b5563;
+  }
+  
+  .pickup-availability__header {
+    background: #1f2937;
+    border-color: #4b5563;
+  }
+  
+  .pickup-availability__title {
+    color: #f9fafb;
+  }
+  
+  .pickup-availability__location {
+    background: #1f2937;
+    border-color: #4b5563;
+  }
+  
+  .pickup-availability__location:hover {
+    border-color: #6b7280;
+  }
+  
+  .pickup-availability__location-name {
+    color: #f9fafb;
+  }
+  
+  .pickup-availability__location-address {
+    color: #9ca3af;
+  }
+  
+  .pickup-availability__action {
+    background: #374151;
+    border-color: #4b5563;
+    color: #d1d5db;
+  }
+  
+  .pickup-availability__action:hover {
+    background: #4b5563;
+    border-color: #6b7280;
+  }
+  
+  .pickup-availability__empty-title {
+    color: #d1d5db;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .pickup-availability__header {
+    padding: 0.875rem 1rem;
+  }
+  
+  .pickup-availability__body {
+    padding: 1rem;
+  }
+  
+  .pickup-availability__location {
+    padding: 0.875rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .pickup-availability__location-content {
+    width: 100%;
+  }
+  
+  .pickup-availability__actions {
+    flex-direction: column;
+  }
+  
+  .pickup-availability__action {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .pickup-availability__header {
+    padding: 0.75rem;
+  }
+  
+  .pickup-availability__body {
+    padding: 0.75rem;
+  }
+  
+  .pickup-availability__summary {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .pickup-availability__location {
+    padding: 0.75rem;
+  }
+  
+  .pickup-availability__location-name {
+    font-size: 0.75rem;
+  }
+  
+  .pickup-availability__location-address,
+  .pickup-availability__location-status,
+  .pickup-availability__location-time,
+  .pickup-availability__location-distance {
+    font-size: 0.6875rem;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .pickup-availability {
+    border-width: 2px;
+  }
+  
+  .pickup-availability__location {
+    border-width: 2px;
+  }
+  
+  .pickup-availability__action {
+    border-width: 2px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .pickup-availability__content {
+    transition: none;
+  }
+  
+  .pickup-availability__toggle-icon {
+    transition: none;
+  }
+  
+  .pickup-availability__loading-spinner {
+    animation: none;
+  }
+}
+
+/* Focus styles for accessibility */
+.pickup-availability__toggle:focus,
+.pickup-availability__action:focus,
+.pickup-availability__error-retry:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .pickup-availability__toggle {
+    display: none;
+  }
+  
+  .pickup-availability__content {
+    max-height: none !important;
+  }
+  
+  .pickup-availability__actions {
+    display: none;
+  }
+  
+  .pickup-availability {
+    border: 1px solid #000;
+    background: white;
+  }
+  
+  .pickup-availability__location {
+    border: 1px solid #ccc;
+    background: white;
+  }
+}

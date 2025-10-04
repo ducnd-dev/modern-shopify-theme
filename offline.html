@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You're Offline - Modern Shopify Theme</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .offline-container {
+      max-width: 500px;
+      padding: 3rem;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .offline-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 2rem;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+    
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    
+    p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+    
+    .retry-button {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      margin: 0.5rem;
+    }
+    
+    .retry-button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+    
+    .features-list {
+      list-style: none;
+      margin: 2rem 0;
+      text-align: left;
+    }
+    
+    .features-list li {
+      padding: 0.5rem 0;
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+    }
+    
+    .features-list li::before {
+      content: "✓";
+      margin-right: 1rem;
+      color: #4ade80;
+      font-weight: bold;
+    }
+    
+    .network-status {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      font-size: 0.9rem;
+    }
+    
+    .status-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+    
+    .status-offline {
+      background: #ef4444;
+    }
+    
+    .status-online {
+      background: #22c55e;
+    }
+    
+    @media (max-width: 768px) {
+      .offline-container {
+        padding: 2rem;
+        margin: 1rem;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      p {
+        font-size: 1rem;
+      }
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
+    }
+    
+    .pulse {
+      animation: pulse 2s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="offline-icon pulse">
+      📵
+    </div>
+    
+    <h1>You're Currently Offline</h1>
+    
+    <p>
+      Don't worry! You can still browse some content that's been cached. 
+      Once you're back online, you'll have access to all features.
+    </p>
+    
+    <div class="network-status">
+      <span class="status-indicator status-offline" id="status-indicator"></span>
+      <span id="status-text">No internet connection</span>
+    </div>
+    
+    <ul class="features-list">
+      <li>Browse previously viewed products</li>
+      <li>View cached pages and content</li>
+      <li>Access your favorites list</li>
+      <li>Automatic sync when online</li>
+    </ul>
+    
+    <button class="retry-button" onclick="checkConnection()">
+      Check Connection
+    </button>
+    
+    <a href="/" class="retry-button">
+      Go to Homepage
+    </a>
+  </div>
+
+  <script>
+    let isOnline = navigator.onLine;
+    
+    function updateNetworkStatus() {
+      const statusIndicator = document.getElementById('status-indicator');
+      const statusText = document.getElementById('status-text');
+      
+      if (navigator.onLine) {
+        statusIndicator.className = 'status-indicator status-online';
+        statusText.textContent = 'Connected - Redirecting...';
+        
+        // Redirect to main site when online
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1500);
+      } else {
+        statusIndicator.className = 'status-indicator status-offline';
+        statusText.textContent = 'No internet connection';
+      }
+    }
+    
+    function checkConnection() {
+      // Force a network request to check connectivity
+      fetch('/', { 
+        method: 'HEAD',
+        cache: 'no-cache'
+      })
+      .then(() => {
+        // If successful, we're online
+        updateNetworkStatus();
+      })
+      .catch(() => {
+        // Still offline
+        const statusText = document.getElementById('status-text');
+        statusText.textContent = 'Still offline - Try again';
+        
+        setTimeout(() => {
+          statusText.textContent = 'No internet connection';
+        }, 2000);
+      });
+    }
+    
+    // Listen for online/offline events
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
+    
+    // Initial status check
+    updateNetworkStatus();
+    
+    // Periodic connection check
+    setInterval(() => {
+      if (!navigator.onLine) {
+        checkConnection();
+      }
+    }, 30000); // Check every 30 seconds
+    
+    // Service Worker registration
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+          console.log('SW registered from offline page: ', registration);
+        })
+        .catch(error => {
+          console.log('SW registration failed from offline page: ', error);
+        });
+    }
+    
+    // Cache management for offline functionality
+    if ('caches' in window) {
+      // Provide cached product browsing
+      caches.open('dynamic-v1').then(cache => {
+        cache.keys().then(requests => {
+          if (requests.length > 0) {
+            // Show cached pages option
+            const container = document.querySelector('.offline-container');
+            const cachedPagesBtn = document.createElement('button');
+            cachedPagesBtn.className = 'retry-button';
+            cachedPagesBtn.textContent = 'Browse Cached Pages';
+            cachedPagesBtn.onclick = () => {
+              // Could implement a cached pages browser here
+              window.history.back();
+            };
+            container.appendChild(cachedPagesBtn);
+          }
+        });
+      });
+    }
+  </script>
+</body>
+</html>

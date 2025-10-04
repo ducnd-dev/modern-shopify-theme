@@ -1,0 +1,77 @@
+{% comment %}
+  Main Collection Banner Section
+  Shows collection title, description and image
+{% endcomment %}
+
+{%- if section.settings.show_collection_image and collection.image -%}
+  <div class="collection-hero color-{{ section.settings.color_scheme }} gradient">
+    <div class="collection-hero__inner page-width">
+      <div class="collection-hero__text-wrapper">
+        <h1 class="collection-hero__title">
+          <span class="visually-hidden">{{ 'sections.collection_template.title' | t }}: </span>
+          {{- collection.title | escape -}}
+        </h1>
+        {%- if section.settings.show_collection_description and collection.description != blank -%}
+          <div class="collection-hero__description rte">{{ collection.description }}</div>
+        {%- endif -%}
+      </div>
+    </div>
+    {%- if collection.image -%}
+      <div class="collection-hero__image-container media">
+        <img
+          src="{{ collection.image | image_url: width: 1920 }}"
+          alt="{{ collection.image.alt | escape }}"
+          class="collection-hero__image motion-reduce"
+          width="{{ collection.image.width }}"
+          height="{{ collection.image.height }}"
+        >
+      </div>
+    {%- endif -%}
+  </div>
+{%- else -%}
+  <div class="collection-hero color-{{ section.settings.color_scheme }} gradient">
+    <div class="collection-hero__inner page-width section-{{ section.id }}-padding">
+      <div class="collection-hero__text-wrapper">
+        <h1 class="collection-hero__title">
+          <span class="visually-hidden">{{ 'sections.collection_template.title' | t }}: </span>
+          {{- collection.title | escape -}}
+        </h1>
+        {%- if section.settings.show_collection_description and collection.description != blank -%}
+          <div class="collection-hero__description rte">{{ collection.description }}</div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Collection banner",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "To change the order of the products, [visit the collection page.](/admin/collections)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_description",
+      "default": true,
+      "label": "Show collection description"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_image",
+      "default": false,
+      "label": "Show collection image"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "background-1"
+    }
+  ]
+}
+{% endschema %}

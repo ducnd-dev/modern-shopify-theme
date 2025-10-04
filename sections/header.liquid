@@ -326,19 +326,33 @@
                 </svg>
               </button>
             </div>
-            <div class="relative">
-              <input
-                type="search"
-                placeholder="Search for products..."
-                class="w-full pl-12 pr-4 py-4 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-full text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
-                id="search-input"
-              >
-              <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
-            </div>
-            <div class="mt-6" id="search-results">
-              <!-- Search results will be populated here -->
+            
+            <!-- Predictive Search Component -->
+            <div data-predictive-search>
+              <div class="relative">
+                <input
+                  type="search"
+                  placeholder="Search for products..."
+                  class="search-input w-full pl-12 pr-12 py-4 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-full text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                  autocomplete="off"
+                  name="q"
+                >
+                <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <button
+                  data-search-clear
+                  class="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400 hover:text-neutral-600 transition-colors hidden"
+                  aria-label="Clear search"
+                >
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              
+              <!-- Search Results Container -->
+              <div data-search-results class="mt-4"></div>
             </div>
           </div>
         </div>

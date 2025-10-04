@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test Suite</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .console { background: #000; color: #0f0; padding: 20px; font-family: monospace; height: 500px; overflow-y: auto; }
+        .btn { background: #007cba; color: white; border: none; padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Debug Test Suite</h1>
+        <button id="loadScripts" class="btn">Load Test Scripts</button>
+        <button id="runDebug" class="btn">Run Debug Tests</button>
+        <div id="console" class="console">Loading...</div>
+    </div>
+
+    <script>
+        const consoleEl = document.getElementById('console');
+        let scriptErrors = [];
+
+        function log(msg) {
+            console.log(msg);
+            consoleEl.innerHTML += msg + '\n';
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = () => {
+                    log(`✅ Loaded: ${src}`);
+                    resolve();
+                };
+                script.onerror = (error) => {
+                    log(`❌ Failed to load: ${src}`);
+                    scriptErrors.push(src);
+                    reject(error);
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        document.getElementById('loadScripts').addEventListener('click', async function() {
+            log('🔄 Loading test scripts...\n');
+            
+            const scripts = [
+                'assets/performance-tester.js',
+                'assets/accessibility-tester.js',
+                'assets/browser-compatibility-tester.js',
+                'assets/theme-test-suite.js'
+            ];
+
+            for (const script of scripts) {
+                try {
+                    await loadScript(script);
+                } catch (error) {
+                    log(`❌ Error loading ${script}: ${error.message}`);
+                }
+            }
+
+            log('\n📊 Script loading summary:');
+            log(`Total scripts: ${scripts.length}`);
+            log(`Failed: ${scriptErrors.length}`);
+            
+            if (scriptErrors.length === 0) {
+                log('✅ All scripts loaded successfully!');
+                log('\nTesting class availability:');
+                
+                const classes = ['PerformanceTester', 'AccessibilityTester', 'BrowserCompatibilityTester', 'ShopifyThemeTestSuite'];
+                classes.forEach(className => {
+                    if (typeof window[className] !== 'undefined') {
+                        log(`✅ ${className}: Available`);
+                        try {
+                            new window[className]();
+                            log(`✅ ${className}: Instance created successfully`);
+                        } catch (e) {
+                            log(`❌ ${className}: Error creating instance - ${e.message}`);
+                        }
+                    } else {
+                        log(`❌ ${className}: Not available`);
+                    }
+                });
+            } else {
+                log(`❌ ${scriptErrors.length} scripts failed to load`);
+            }
+        });
+
+        document.getElementById('runDebug').addEventListener('click', async function() {
+            log('\n🎯 Running debug tests...\n');
+            
+            if (typeof ShopifyThemeTestSuite !== 'undefined') {
+                try {
+                    const testSuite = new ShopifyThemeTestSuite();
+                    log('✅ Test suite instance created');
+                    
+                    // Run a simple test
+                    const result = await testSuite.run();
+                    log('✅ Test suite completed');
+                    log(JSON.stringify(result, null, 2));
+                } catch (error) {
+                    log(`❌ Test suite error: ${error.message}`);
+                    log(`Stack: ${error.stack}`);
+                }
+            } else {
+                log('❌ ShopifyThemeTestSuite not available');
+            }
+        });
+
+        // Initial load
+        log('🔧 Debug Test Suite Ready');
+        log('Click "Load Test Scripts" to begin\n');
+    </script>
+</body>
+</html>

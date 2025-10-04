@@ -1,0 +1,202 @@
+{% comment %}
+  Renders a loading spinner for various loading states
+  
+  Accepts:
+  - size: {String} size variant (small, medium, large)
+  - color: {String} color variant (primary, secondary, white)
+  - text: {String} optional loading text
+  
+  Usage:
+  {% render 'loading-spinner', size: 'medium', color: 'primary' %}
+{% endcomment %}
+
+{%- liquid
+  assign size = size | default: 'medium'
+  assign color = color | default: 'primary'
+  assign show_text = show_text | default: false
+-%}
+
+<div class="loading-spinner loading-spinner--{{ size }} loading-spinner--{{ color }}"{% if text %} aria-label="{{ text }}"{% endif %}>
+  <svg class="loading-spinner__svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle 
+      class="loading-spinner__circle loading-spinner__circle--track" 
+      cx="12" 
+      cy="12" 
+      r="10" 
+      stroke="currentColor" 
+      stroke-width="2"
+    />
+    <circle 
+      class="loading-spinner__circle loading-spinner__circle--progress" 
+      cx="12" 
+      cy="12" 
+      r="10" 
+      stroke="currentColor" 
+      stroke-width="2" 
+      stroke-linecap="round"
+      stroke-dasharray="62.83"
+      stroke-dashoffset="62.83"
+    />
+  </svg>
+  
+  {%- if text -%}
+    <span class="loading-spinner__text">{{ text }}</span>
+  {%- endif -%}
+  
+  <span class="visually-hidden">{{ 'general.loading' | t | default: 'Loading...' }}</span>
+</div>
+
+<style>
+.loading-spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.loading-spinner__svg {
+  animation: loading-spinner-rotate 1s linear infinite;
+}
+
+.loading-spinner__circle--track {
+  opacity: 0.2;
+}
+
+.loading-spinner__circle--progress {
+  animation: loading-spinner-progress 1.5s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Size variants */
+.loading-spinner--small .loading-spinner__svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.loading-spinner--medium .loading-spinner__svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.loading-spinner--large .loading-spinner__svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.loading-spinner--xlarge .loading-spinner__svg {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Color variants */
+.loading-spinner--primary {
+  color: #111827;
+}
+
+.loading-spinner--secondary {
+  color: #6b7280;
+}
+
+.loading-spinner--white {
+  color: white;
+}
+
+.loading-spinner--accent {
+  color: #3b82f6;
+}
+
+.loading-spinner--success {
+  color: #10b981;
+}
+
+.loading-spinner--warning {
+  color: #f59e0b;
+}
+
+.loading-spinner--error {
+  color: #ef4444;
+}
+
+/* Loading text */
+.loading-spinner__text {
+  font-size: 0.875rem;
+  color: currentColor;
+  opacity: 0.8;
+  text-align: center;
+}
+
+.loading-spinner--small .loading-spinner__text {
+  font-size: 0.75rem;
+}
+
+.loading-spinner--large .loading-spinner__text {
+  font-size: 1rem;
+}
+
+/* Animations */
+@keyframes loading-spinner-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loading-spinner-progress {
+  0% {
+    stroke-dashoffset: 62.83;
+  }
+  50% {
+    stroke-dashoffset: 15.71;
+  }
+  100% {
+    stroke-dashoffset: 62.83;
+  }
+}
+
+/* Accessibility */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .loading-spinner__svg {
+    animation: none;
+  }
+  
+  .loading-spinner__circle--progress {
+    animation: loading-spinner-pulse 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes loading-spinner-pulse {
+  0%, 100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .loading-spinner--primary {
+    color: #f9fafb;
+  }
+  
+  .loading-spinner--secondary {
+    color: #d1d5db;
+  }
+}
+</style>

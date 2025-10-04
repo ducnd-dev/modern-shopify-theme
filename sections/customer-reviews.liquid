@@ -1,0 +1,571 @@
+{% comment %}
+  Customer Reviews Section
+  - Product reviews with ratings
+  - Review filters and sorting
+  - Review submission form
+  - Photo reviews
+  - Helpful voting system
+  - Verified purchase badges
+{% endcomment %}
+
+<div class="reviews-section bg-white dark:bg-gray-900 py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Section Header -->
+    <div class="text-center mb-12">
+      {% if section.settings.heading != blank %}
+        <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          {{ section.settings.heading }}
+        </h2>
+      {% endif %}
+      
+      {% if section.settings.subheading != blank %}
+        <p class="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          {{ section.settings.subheading }}
+        </p>
+      {% endif %}
+    </div>
+
+    <!-- Reviews Summary -->
+    <div 
+      x-data="reviewsData()"
+      x-init="init()"
+      class="max-w-6xl mx-auto"
+    >
+      <!-- Overall Rating Card -->
+      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 mb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+          
+          <!-- Overall Score -->
+          <div class="text-center lg:text-left">
+            <div class="text-5xl font-bold text-gray-900 dark:text-white mb-2">
+              <span x-text="overallRating.toFixed(1)"></span>
+            </div>
+            <div class="flex items-center justify-center lg:justify-start mb-2">
+              <template x-for="i in 5" :key="i">
+                <svg 
+                  :class="i <= Math.round(overallRating) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'"
+                  class="w-6 h-6 fill-current"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </template>
+            </div>
+            <p class="text-gray-600 dark:text-gray-300">
+              Based on <span x-text="totalReviews"></span> reviews
+            </p>
+          </div>
+
+          <!-- Rating Breakdown -->
+          <div class="lg:col-span-2">
+            <div class="space-y-3">
+              <template x-for="(rating, index) in ratingBreakdown" :key="index">
+                <div class="flex items-center">
+                  <span class="text-sm text-gray-600 dark:text-gray-400 w-12">
+                    <span x-text="5 - index"></span> star
+                  </span>
+                  <div class="flex-1 mx-4">
+                    <div class="bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                      <div 
+                        class="bg-yellow-400 h-2 rounded-full transition-all duration-500"
+                        :style="`width: ${rating.percentage}%`"
+                      ></div>
+                    </div>
+                  </div>
+                  <span class="text-sm text-gray-600 dark:text-gray-400 w-12 text-right">
+                    <span x-text="rating.count"></span>
+                  </span>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter and Sort Controls -->
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 space-y-4 md:space-y-0">
+        
+        <!-- Filters -->
+        <div class="flex flex-wrap gap-3">
+          <button
+            @click="currentFilter = 'all'"
+            :class="currentFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
+            class="px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-blue-500 hover:text-white"
+          >
+            All Reviews (<span x-text="totalReviews"></span>)
+          </button>
+          
+          <button
+            @click="currentFilter = 'photos'"
+            :class="currentFilter === 'photos' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
+            class="px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-blue-500 hover:text-white"
+          >
+            With Photos (<span x-text="reviewsWithPhotos"></span>)
+          </button>
+          
+          <template x-for="star in [5,4,3,2,1]" :key="star">
+            <button
+              @click="currentFilter = star"
+              :class="currentFilter === star ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
+              class="px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-blue-500 hover:text-white"
+            >
+              <span x-text="star"></span>★ (<span x-text="getRatingCount(star)"></span>)
+            </button>
+          </template>
+        </div>
+
+        <!-- Sort Options -->
+        <div class="flex items-center space-x-3">
+          <label for="sort-reviews" class="text-sm text-gray-600 dark:text-gray-400">Sort by:</label>
+          <select
+            id="sort-reviews"
+            x-model="currentSort"
+            @change="sortReviews()"
+            class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="highest">Highest Rating</option>
+            <option value="lowest">Lowest Rating</option>
+            <option value="helpful">Most Helpful</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Reviews List -->
+      <div class="space-y-6">
+        <template x-for="review in filteredReviews" :key="review.id">
+          <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            
+            <!-- Review Header -->
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center space-x-4">
+                <!-- Customer Avatar -->
+                <div class="flex-shrink-0">
+                  <template x-if="review.customer_avatar">
+                    <img
+                      :src="review.customer_avatar"
+                      :alt="review.customer_name"
+                      class="w-12 h-12 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                    >
+                  </template>
+                  <template x-if="!review.customer_avatar">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+                      <span x-text="review.customer_name.charAt(0).toUpperCase()"></span>
+                    </div>
+                  </template>
+                </div>
+                
+                <!-- Customer Info -->
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <h4 class="font-semibold text-gray-900 dark:text-white" x-text="review.customer_name"></h4>
+                    <template x-if="review.verified_purchase">
+                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        Verified Purchase
+                      </span>
+                    </template>
+                  </div>
+                  
+                  <!-- Rating and Date -->
+                  <div class="flex items-center space-x-3 mt-1">
+                    <div class="flex items-center">
+                      <template x-for="i in 5" :key="i">
+                        <svg 
+                          :class="i <= review.rating ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'"
+                          class="w-4 h-4 fill-current"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                      </template>
+                    </div>
+                    <span class="text-sm text-gray-500 dark:text-gray-400" x-text="review.date"></span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Review Actions -->
+              <div class="flex items-center space-x-2">
+                <button
+                  @click="toggleHelpful(review.id)"
+                  :class="review.userFoundHelpful ? 'text-blue-600 bg-blue-50 dark:bg-blue-900' : 'text-gray-500 hover:text-blue-600'"
+                  class="flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
+                  </svg>
+                  <span x-text="review.helpful_count"></span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Review Content -->
+            <div class="mb-4">
+              <template x-if="review.title">
+                <h5 class="font-semibold text-gray-900 dark:text-white mb-2" x-text="review.title"></h5>
+              </template>
+              
+              <p class="text-gray-700 dark:text-gray-300 leading-relaxed" x-text="review.content"></p>
+            </div>
+
+            <!-- Review Photos -->
+            <template x-if="review.photos && review.photos.length > 0">
+              <div class="mb-4">
+                <div class="flex space-x-3 overflow-x-auto pb-2">
+                  <template x-for="photo in review.photos" :key="photo">
+                    <div class="flex-shrink-0">
+                      <img
+                        :src="photo"
+                        alt="Review photo"
+                        class="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
+                        @click="openPhotoModal(photo)"
+                      >
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </template>
+
+            <!-- Product Info -->
+            <template x-if="review.product_variant">
+              <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                <div class="text-sm text-gray-600 dark:text-gray-400">
+                  <strong>Purchased:</strong> <span x-text="review.product_variant"></span>
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+
+      <!-- Load More Button -->
+      <template x-if="hasMoreReviews">
+        <div class="text-center mt-12">
+          <button
+            @click="loadMoreReviews()"
+            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
+          >
+            Load More Reviews
+            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+        </div>
+      </template>
+
+      <!-- Write Review CTA -->
+      {% if section.settings.show_write_review %}
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 mt-12 text-center text-white">
+          <h3 class="text-2xl font-bold mb-4">Share Your Experience</h3>
+          <p class="text-blue-100 mb-6 max-w-2xl mx-auto">
+            Help other customers by writing a review about your purchase. Your feedback is valuable to us and our community.
+          </p>
+          <button
+            @click="openReviewForm()"
+            class="inline-flex items-center px-8 py-3 bg-white text-blue-600 font-semibold rounded-full hover:bg-gray-100 transition-colors shadow-lg"
+          >
+            Write a Review
+            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+            </svg>
+          </button>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Photo Modal -->
+<div 
+  x-data="{ photoModal: false, currentPhoto: '' }"
+  x-show="photoModal"
+  x-transition:enter="transition ease-out duration-300"
+  x-transition:enter-start="opacity-0"
+  x-transition:enter-end="opacity-100"
+  x-transition:leave="transition ease-in duration-200"
+  x-transition:leave-start="opacity-100"
+  x-transition:leave-end="opacity-0"
+  @keydown.escape.window="photoModal = false"
+  class="fixed inset-0 z-50 overflow-y-auto"
+  style="display: none;"
+>
+  <div class="flex items-center justify-center min-h-screen px-4 py-8">
+    <div class="fixed inset-0 bg-black opacity-75" @click="photoModal = false"></div>
+    
+    <div class="relative bg-white dark:bg-gray-800 rounded-lg max-w-4xl mx-auto">
+      <button
+        @click="photoModal = false"
+        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 z-10"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+      
+      <img
+        :src="currentPhoto"
+        alt="Review photo"
+        class="w-full h-auto rounded-lg"
+      >
+    </div>
+  </div>
+</div>
+
+<script>
+  function reviewsData() {
+    return {
+      // Demo reviews data
+      reviews: [
+        {
+          id: 1,
+          customer_name: "Sarah Johnson",
+          customer_avatar: null,
+          rating: 5,
+          title: "Absolutely love this product!",
+          content: "The quality is outstanding and exactly what I was looking for. Fast shipping and great customer service. Would definitely recommend to anyone considering this purchase.",
+          date: "2 days ago",
+          verified_purchase: true,
+          helpful_count: 12,
+          userFoundHelpful: false,
+          photos: ["/cdn/shop/files/review-photo-1.jpg", "/cdn/shop/files/review-photo-2.jpg"],
+          product_variant: "Size: Medium, Color: Blue"
+        },
+        {
+          id: 2,
+          customer_name: "Mike Chen",
+          customer_avatar: "/cdn/shop/files/avatar-2.jpg",
+          rating: 4,
+          title: "Great value for money",
+          content: "Really happy with this purchase. The material feels premium and the fit is perfect. Only minor issue is that shipping took a bit longer than expected, but worth the wait.",
+          date: "1 week ago",
+          verified_purchase: true,
+          helpful_count: 8,
+          userFoundHelpful: false,
+          photos: [],
+          product_variant: "Size: Large, Color: Black"
+        },
+        {
+          id: 3,
+          customer_name: "Emma Rodriguez",
+          customer_avatar: null,
+          rating: 5,
+          title: "Exceeded expectations",
+          content: "I've been looking for something like this for months. The design is beautiful and the functionality is exactly what I needed. Customer service was also very helpful when I had questions.",
+          date: "2 weeks ago",
+          verified_purchase: true,
+          helpful_count: 15,
+          userFoundHelpful: false,
+          photos: ["/cdn/shop/files/review-photo-3.jpg"],
+          product_variant: "Size: Small, Color: White"
+        },
+        {
+          id: 4,
+          customer_name: "David Park",
+          customer_avatar: "/cdn/shop/files/avatar-4.jpg",
+          rating: 3,
+          title: "Decent product",
+          content: "It's okay for the price. Quality is acceptable but not amazing. Would be nice if there were more color options available.",
+          date: "3 weeks ago",
+          verified_purchase: true,
+          helpful_count: 3,
+          userFoundHelpful: false,
+          photos: [],
+          product_variant: "Size: Medium, Color: Gray"
+        }
+      ],
+      
+      filteredReviews: [],
+      currentFilter: 'all',
+      currentSort: 'newest',
+      hasMoreReviews: false,
+      
+      init() {
+        this.filteredReviews = [...this.reviews];
+        this.sortReviews();
+        
+        // Make photo modal functions available globally
+        window.openPhotoModal = (photo) => {
+          this.currentPhoto = photo;
+          this.photoModal = true;
+        };
+      },
+      
+      get totalReviews() {
+        return this.reviews.length;
+      },
+      
+      get reviewsWithPhotos() {
+        return this.reviews.filter(r => r.photos && r.photos.length > 0).length;
+      },
+      
+      get overallRating() {
+        if (this.reviews.length === 0) return 0;
+        const sum = this.reviews.reduce((acc, review) => acc + review.rating, 0);
+        return sum / this.reviews.length;
+      },
+      
+      get ratingBreakdown() {
+        const breakdown = [0, 0, 0, 0, 0]; // 5-star to 1-star
+        this.reviews.forEach(review => {
+          breakdown[5 - review.rating]++;
+        });
+        
+        return breakdown.map(count => ({
+          count,
+          percentage: this.totalReviews > 0 ? (count / this.totalReviews) * 100 : 0
+        }));
+      },
+      
+      getRatingCount(stars) {
+        return this.reviews.filter(r => r.rating === stars).length;
+      },
+      
+      filterReviews() {
+        if (this.currentFilter === 'all') {
+          this.filteredReviews = [...this.reviews];
+        } else if (this.currentFilter === 'photos') {
+          this.filteredReviews = this.reviews.filter(r => r.photos && r.photos.length > 0);
+        } else {
+          this.filteredReviews = this.reviews.filter(r => r.rating === this.currentFilter);
+        }
+        this.sortReviews();
+      },
+      
+      sortReviews() {
+        switch (this.currentSort) {
+          case 'newest':
+            // In real implementation, sort by actual date
+            this.filteredReviews.sort((a, b) => b.id - a.id);
+            break;
+          case 'oldest':
+            this.filteredReviews.sort((a, b) => a.id - b.id);
+            break;
+          case 'highest':
+            this.filteredReviews.sort((a, b) => b.rating - a.rating);
+            break;
+          case 'lowest':
+            this.filteredReviews.sort((a, b) => a.rating - b.rating);
+            break;
+          case 'helpful':
+            this.filteredReviews.sort((a, b) => b.helpful_count - a.helpful_count);
+            break;
+        }
+      },
+      
+      toggleHelpful(reviewId) {
+        const review = this.reviews.find(r => r.id === reviewId);
+        if (review) {
+          if (review.userFoundHelpful) {
+            review.helpful_count--;
+            review.userFoundHelpful = false;
+          } else {
+            review.helpful_count++;
+            review.userFoundHelpful = true;
+          }
+        }
+      },
+      
+      loadMoreReviews() {
+        // In real implementation, fetch more reviews from API
+        this.hasMoreReviews = false;
+      },
+      
+      openReviewForm() {
+        // In real implementation, open review form modal
+        alert('Review form would open here');
+      }
+    }
+  }
+
+  // Watch for filter changes
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('reviewsData', reviewsData);
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Customer Reviews",
+  "tag": "section", 
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Customer Reviews"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading", 
+      "label": "Subheading",
+      "default": "See what our customers are saying about their experience with our products."
+    },
+    {
+      "type": "header",
+      "content": "Review Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_write_review",
+      "label": "Show write review CTA",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_verified_badges",
+      "label": "Show verified purchase badges",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_photo_reviews",
+      "label": "Enable photo reviews",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_helpful_voting",
+      "label": "Enable helpful voting",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "reviews_per_page",
+      "min": 5,
+      "max": 20,
+      "step": 5,
+      "label": "Reviews per page",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Integration"
+    },
+    {
+      "type": "paragraph",
+      "content": "Connect with review platforms like Judge.me, Yotpo, or Okendo for real review data."
+    },
+    {
+      "type": "text",
+      "id": "review_app_integration",
+      "label": "Review app integration",
+      "info": "Enter the name of your review app (e.g., 'judge.me', 'yotpo', 'okendo')"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Customer Reviews"
+    }
+  ]
+}
+{% endschema %}

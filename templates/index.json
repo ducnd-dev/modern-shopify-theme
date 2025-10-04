@@ -1,0 +1,152 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "enable_hero": true,
+        "hero_height": "screen",
+        "show_overlay": true
+      }
+    },
+    "collection_showcase": {
+      "type": "collection-showcase",
+      "settings": {
+        "title": "Featured Collections",
+        "show_view_all": true,
+        "collections_to_show": 3,
+        "layout": "grid"
+      }
+    },
+    "product_grid": {
+      "type": "product-grid",
+      "settings": {
+        "title": "Featured Products",
+        "product_list": [],
+        "products_to_show": 8,
+        "show_vendor": true,
+        "show_product_info": true,
+        "enable_quick_add": true
+      }
+    },
+    "product_carousel": {
+      "type": "product-carousel",
+      "settings": {
+        "title": "Trending Now",
+        "collection": "",
+        "products_to_show": 12,
+        "show_view_all": true,
+        "enable_autoplay": true,
+        "autoplay_speed": 5
+      }
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "title": "What Our Customers Say",
+        "testimonials_per_page": 3,
+        "enable_autoplay": true,
+        "show_ratings": true
+      },
+      "blocks": [
+        {
+          "type": "testimonial",
+          "settings": {
+            "customer_name": "Sarah Johnson",
+            "customer_title": "Verified Buyer",
+            "testimonial_text": "Amazing quality and fast shipping! Will definitely shop here again.",
+            "rating": 5,
+            "customer_image": ""
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "customer_name": "Mike Chen",
+            "customer_title": "Loyal Customer",
+            "testimonial_text": "Great products and excellent customer service. Highly recommended!",
+            "rating": 5,
+            "customer_image": ""
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "customer_name": "Emma Wilson",
+            "customer_title": "Happy Customer",
+            "testimonial_text": "Love the variety and quality. The website is so easy to navigate.",
+            "rating": 5,
+            "customer_image": ""
+          }
+        }
+      ]
+    },
+    "customer_reviews": {
+      "type": "customer-reviews",
+      "settings": {
+        "title": "Customer Reviews",
+        "show_photos": true,
+        "enable_filtering": true,
+        "reviews_per_page": 6
+      }
+    },
+    "social_media": {
+      "type": "social-media",
+      "settings": {
+        "title": "Follow Us",
+        "show_instagram_feed": true,
+        "instagram_hashtag": "ourstore",
+        "posts_to_show": 6
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "title": "Stay Updated",
+        "subtitle": "Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.",
+        "show_discount_offer": true,
+        "discount_text": "Get 10% off your first order!"
+      }
+    },
+    "faq_accordion": {
+      "type": "faq-accordion",
+      "settings": {
+        "title": "Frequently Asked Questions",
+        "show_search": true
+      },
+      "blocks": [
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "What is your return policy?",
+            "answer": "We offer a 30-day return policy for all unused items in original packaging."
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "How long does shipping take?",
+            "answer": "Standard shipping takes 3-5 business days. Express shipping is available for next-day delivery."
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do you ship internationally?",
+            "answer": "Yes, we ship to over 50 countries worldwide. Shipping costs vary by location."
+          }
+        }
+      ]
+    }
+  },
+  "order": [
+    "hero",
+    "collection_showcase", 
+    "product_grid",
+    "product_carousel",
+    "testimonials",
+    "customer_reviews",
+    "social_media",
+    "newsletter",
+    "faq_accordion"
+  ]
+}

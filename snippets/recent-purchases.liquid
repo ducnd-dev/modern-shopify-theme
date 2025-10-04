@@ -1,0 +1,404 @@
+{% comment %}
+  Recent Purchase Notifications
+  - Real-time style notifications showing recent purchases
+  - Creates social proof and urgency
+  - Configurable timing and products
+  - Mobile responsive
+  - Smooth animations
+{% endcomment %}
+
+<div 
+  x-data="recentPurchases()" 
+  x-init="init()"
+  x-show="enabled && notifications.length > 0"
+  class="fixed bottom-4 left-4 z-40 max-w-sm"
+  style="display: none;"
+>
+  <template x-for="notification in visibleNotifications" :key="notification.id">
+    <div
+      x-show="notification.visible"
+      x-transition:enter="transition ease-out duration-500 transform"
+      x-transition:enter-start="translate-y-full opacity-0"
+      x-transition:enter-end="translate-y-0 opacity-100"
+      x-transition:leave="transition ease-in duration-300 transform"
+      x-transition:leave-start="translate-y-0 opacity-100"
+      x-transition:leave-end="translate-y-full opacity-0"
+      class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg mb-3 overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+      @click="visitProduct(notification.product_url)"
+    >
+      <div class="p-4">
+        <!-- Header with close button -->
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex items-center">
+            <!-- Real-time indicator -->
+            <div class="flex items-center mr-2">
+              <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
+              <span class="text-xs text-green-600 dark:text-green-400 font-medium">
+                {{ section.settings.notification_prefix | default: 'Just sold' }}
+              </span>
+            </div>
+            
+            <!-- Time indicator -->
+            <span class="text-xs text-gray-500 dark:text-gray-400">
+              <span x-text="notification.timeAgo"></span> ago
+            </span>
+          </div>
+          
+          <!-- Close button -->
+          <button
+            @click.stop="dismissNotification(notification.id)"
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1 -mr-1 -mt-1"
+            aria-label="Dismiss notification"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Product info -->
+        <div class="flex items-center space-x-3">
+          <!-- Product image -->
+          <div class="flex-shrink-0">
+            <img
+              :src="notification.product_image"
+              :alt="notification.product_title"
+              class="w-12 h-12 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+              loading="lazy"
+            >
+          </div>
+          
+          <!-- Product details -->
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+              <span x-text="notification.product_title"></span>
+            </p>
+            
+            <div class="flex items-center justify-between mt-1">
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                <span x-text="notification.customer_location"></span>
+              </p>
+              
+              {% if section.settings.show_price %}
+                <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                  <span x-text="notification.product_price"></span>
+                </p>
+              {% endif %}
+            </div>
+            
+            {% if section.settings.show_variant %}
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" x-show="notification.variant_title">
+                <span x-text="notification.variant_title"></span>
+              </p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Trust elements -->
+        {% if section.settings.show_trust_badges %}
+          <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+            <div class="flex items-center text-xs text-gray-500 dark:text-gray-400">
+              <svg class="w-3 h-3 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <span>Verified purchase</span>
+            </div>
+            
+            <div class="text-xs text-gray-500 dark:text-gray-400">
+              🚚 Free shipping
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </template>
+</div>
+
+<script>
+  function recentPurchases() {
+    return {
+      enabled: {{ section.settings.enabled | default: true }},
+      notifications: [],
+      visibleNotifications: [],
+      maxVisible: {{ section.settings.max_visible | default: 1 }},
+      displayDuration: {{ section.settings.display_duration | default: 8000 }},
+      interval: {{ section.settings.interval | default: 15000 }},
+      currentIndex: 0,
+      timer: null,
+      
+      // Demo data - in a real implementation, this would come from your backend
+      demoData: [
+        {
+          id: 1,
+          product_title: 'Classic White T-Shirt',
+          product_image: '/cdn/shop/products/white-tshirt_120x120.jpg',
+          product_url: '/products/classic-white-tshirt',
+          product_price: '$24.99',
+          variant_title: 'Size: M, Color: White',
+          customer_location: 'New York, US',
+          timestamp: Date.now() - 2 * 60 * 1000 // 2 minutes ago
+        },
+        {
+          id: 2,
+          product_title: 'Denim Jacket',
+          product_image: '/cdn/shop/products/denim-jacket_120x120.jpg',
+          product_url: '/products/denim-jacket',
+          product_price: '$89.99',
+          variant_title: 'Size: L, Color: Blue',
+          customer_location: 'Los Angeles, US',
+          timestamp: Date.now() - 5 * 60 * 1000 // 5 minutes ago
+        },
+        {
+          id: 3,
+          product_title: 'Running Shoes',
+          product_image: '/cdn/shop/products/running-shoes_120x120.jpg',
+          product_url: '/products/running-shoes',
+          product_price: '$129.99',
+          variant_title: 'Size: 9, Color: Black',
+          customer_location: 'Chicago, US',
+          timestamp: Date.now() - 8 * 60 * 1000 // 8 minutes ago
+        },
+        {
+          id: 4,
+          product_title: 'Wireless Headphones',
+          product_image: '/cdn/shop/products/headphones_120x120.jpg',
+          product_url: '/products/wireless-headphones',
+          product_price: '$199.99',
+          variant_title: 'Color: Black',
+          customer_location: 'Toronto, CA',
+          timestamp: Date.now() - 12 * 60 * 1000 // 12 minutes ago
+        },
+        {
+          id: 5,
+          product_title: 'Leather Wallet',
+          product_image: '/cdn/shop/products/wallet_120x120.jpg',
+          product_url: '/products/leather-wallet',
+          product_price: '$49.99',
+          variant_title: 'Color: Brown',
+          customer_location: 'London, UK',
+          timestamp: Date.now() - 15 * 60 * 1000 // 15 minutes ago
+        }
+      ],
+
+      init() {
+        if (!this.enabled) return;
+        
+        // Process demo data
+        this.notifications = this.demoData.map(item => ({
+          ...item,
+          visible: false,
+          timeAgo: this.getTimeAgo(item.timestamp)
+        }));
+
+        // Start showing notifications
+        this.startNotifications();
+        
+        // Update time indicators every minute
+        setInterval(() => {
+          this.updateTimeAgo();
+        }, 60000);
+      },
+
+      startNotifications() {
+        if (this.notifications.length === 0) return;
+        
+        // Show first notification
+        this.showNextNotification();
+        
+        // Set up interval for subsequent notifications
+        this.timer = setInterval(() => {
+          this.showNextNotification();
+        }, this.interval);
+      },
+
+      showNextNotification() {
+        // Hide all current notifications first
+        this.visibleNotifications.forEach(notification => {
+          notification.visible = false;
+        });
+        
+        // Clear visible notifications after animation
+        setTimeout(() => {
+          this.visibleNotifications = [];
+          
+          // Show next notification(s)
+          const nextNotifications = [];
+          for (let i = 0; i < this.maxVisible && this.currentIndex < this.notifications.length; i++) {
+            const notification = { ...this.notifications[this.currentIndex] };
+            notification.visible = true;
+            nextNotifications.push(notification);
+            this.currentIndex++;
+          }
+          
+          // Reset index if we've shown all notifications
+          if (this.currentIndex >= this.notifications.length) {
+            this.currentIndex = 0;
+          }
+          
+          this.visibleNotifications = nextNotifications;
+          
+          // Auto-hide after display duration
+          setTimeout(() => {
+            this.visibleNotifications.forEach(notification => {
+              notification.visible = false;
+            });
+          }, this.displayDuration);
+          
+        }, 300); // Wait for exit animation
+      },
+
+      dismissNotification(id) {
+        const notification = this.visibleNotifications.find(n => n.id === id);
+        if (notification) {
+          notification.visible = false;
+          
+          // Remove from visible notifications after animation
+          setTimeout(() => {
+            this.visibleNotifications = this.visibleNotifications.filter(n => n.id !== id);
+          }, 300);
+        }
+      },
+
+      visitProduct(url) {
+        if (url) {
+          window.open(url, '_blank');
+        }
+      },
+
+      getTimeAgo(timestamp) {
+        const now = Date.now();
+        const diff = now - timestamp;
+        const minutes = Math.floor(diff / (1000 * 60));
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        
+        if (days > 0) return `${days} day${days > 1 ? 's' : ''}`;
+        if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''}`;
+        if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''}`;
+        return 'just now';
+      },
+
+      updateTimeAgo() {
+        this.notifications.forEach(notification => {
+          notification.timeAgo = this.getTimeAgo(notification.timestamp);
+        });
+        
+        this.visibleNotifications.forEach(notification => {
+          notification.timeAgo = this.getTimeAgo(notification.timestamp);
+        });
+      },
+
+      destroy() {
+        if (this.timer) {
+          clearInterval(this.timer);
+        }
+      }
+    }
+  }
+
+  // Clean up on page unload
+  window.addEventListener('beforeunload', () => {
+    // This would be handled by Alpine.js cleanup automatically
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Recent Purchase Notifications",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Notification Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "enabled",
+      "label": "Enable recent purchase notifications",
+      "default": true,
+      "info": "Show real-time purchase notifications to create social proof"
+    },
+    {
+      "type": "text",
+      "id": "notification_prefix",
+      "label": "Notification prefix text",
+      "default": "Just sold",
+      "info": "Text shown before the time indicator"
+    },
+    {
+      "type": "range",
+      "id": "max_visible",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "Maximum notifications shown at once",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "display_duration",
+      "min": 3000,
+      "max": 15000,
+      "step": 1000,
+      "unit": "ms",
+      "label": "Display duration per notification",
+      "default": 8000
+    },
+    {
+      "type": "range",
+      "id": "interval",
+      "min": 10000,
+      "max": 60000,
+      "step": 5000,
+      "unit": "ms",
+      "label": "Interval between notifications",
+      "default": 15000
+    },
+    {
+      "type": "header",
+      "content": "Display Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show product price",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_variant",
+      "label": "Show product variant",
+      "default": true,
+      "info": "Show size, color, etc. if available"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Show trust badges",
+      "default": true,
+      "info": "Show verified purchase and shipping info"
+    },
+    {
+      "type": "header",
+      "content": "Data Source"
+    },
+    {
+      "type": "paragraph",
+      "content": "In a production environment, recent purchase data would be fetched from your analytics or order management system. Currently using demo data for display purposes."
+    },
+    {
+      "type": "checkbox",
+      "id": "use_real_data",
+      "label": "Use real purchase data",
+      "default": false,
+      "info": "Enable this when connected to real data source"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Recent Purchase Notifications"
+    }
+  ]
+}
+{% endschema %}

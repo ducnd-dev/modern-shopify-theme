@@ -1,0 +1,260 @@
+{% comment %}
+  Product Quick View Modal
+  Beautiful lightbox-style product preview with full functionality
+  Usage: Automatically available on all product cards with quick view buttons
+{% endcomment %}
+
+<div id="quick-view-modal" class="quick-view-modal fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden transition-all duration-300 opacity-0" role="dialog" aria-labelledby="quick-view-title" aria-hidden="true">
+  <!-- Modal Container -->
+  <div class="modal-container flex items-center justify-center min-h-screen p-4 sm:p-8">
+    <div class="modal-content bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden transform scale-95 transition-transform duration-300">
+      
+      <!-- Modal Header -->
+      <div class="modal-header flex items-center justify-between p-4 sm:p-6 border-b border-neutral-200 dark:border-neutral-700">
+        <h2 id="quick-view-title" class="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white">Quick View</h2>
+        <button 
+          type="button" 
+          class="close-modal p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          aria-label="Close quick view"
+        >
+          <svg class="w-6 h-6 text-neutral-700 dark:text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        
+        <!-- Product Images -->
+        <div class="product-images">
+          <!-- Main Image -->
+          <div class="main-image-container relative bg-neutral-50 dark:bg-neutral-800 rounded-xl overflow-hidden mb-4 group">
+            <img 
+              id="quick-view-main-image" 
+              src="" 
+              alt="" 
+              class="w-full h-80 sm:h-96 lg:h-[500px] object-cover transition-transform duration-300 group-hover:scale-105"
+            >
+            
+            <!-- Image Zoom Overlay -->
+            <div class="zoom-overlay absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+              <div class="zoom-hint bg-white/90 dark:bg-neutral-900/90 px-3 py-2 rounded-lg text-sm font-medium text-neutral-900 dark:text-white backdrop-blur-sm">
+                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                </svg>
+                Click to zoom
+              </div>
+            </div>
+            
+            <!-- Sale Badge -->
+            <div id="quick-view-sale-badge" class="sale-badge absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium hidden">
+              <span id="quick-view-discount-percent"></span>% OFF
+            </div>
+            
+            <!-- Navigation Arrows -->
+            <button type="button" class="image-nav-prev absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-white dark:hover:bg-neutral-900 hidden">
+              <svg class="w-5 h-5 text-neutral-700 dark:text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+            <button type="button" class="image-nav-next absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-white dark:hover:bg-neutral-900 hidden">
+              <svg class="w-5 h-5 text-neutral-700 dark:text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Thumbnail Images -->
+          <div id="quick-view-thumbnails" class="thumbnails-container flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-600">
+            <!-- Thumbnails will be populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Product Information -->
+        <div class="product-info">
+          
+          <!-- Product Title & Vendor -->
+          <div class="product-header mb-4">
+            <div id="quick-view-vendor" class="vendor text-sm text-neutral-500 dark:text-neutral-400 mb-1 hidden"></div>
+            <h3 id="quick-view-title-text" class="product-title text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white mb-2"></h3>
+            
+            <!-- Rating Stars (if available) -->
+            <div id="quick-view-rating" class="rating flex items-center gap-2 mb-3 hidden">
+              <div class="stars flex">
+                <!-- Stars will be populated by JavaScript -->
+              </div>
+              <span class="rating-text text-sm text-neutral-500 dark:text-neutral-400"></span>
+            </div>
+          </div>
+
+          <!-- Pricing -->
+          <div class="pricing mb-6">
+            <div class="price-container flex items-center gap-3 mb-2">
+              <span id="quick-view-price" class="current-price text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white"></span>
+              <span id="quick-view-compare-price" class="compare-price text-lg text-neutral-500 dark:text-neutral-400 line-through hidden"></span>
+            </div>
+            <div id="quick-view-price-savings" class="savings text-sm text-green-600 dark:text-green-400 font-medium hidden">
+              You save <span id="savings-amount"></span>
+            </div>
+          </div>
+
+          <!-- Product Description -->
+          <div class="description mb-6">
+            <div id="quick-view-description" class="prose prose-sm dark:prose-invert text-neutral-600 dark:text-neutral-300 line-clamp-4">
+              <!-- Description will be populated by JavaScript -->
+            </div>
+            <button type="button" class="read-more text-primary-600 dark:text-primary-400 text-sm hover:underline mt-2 hidden">
+              Read more
+            </button>
+          </div>
+
+          <!-- Product Variants -->
+          <div id="quick-view-variants" class="variants-container space-y-4 mb-6">
+            <!-- Variants will be populated by JavaScript -->
+          </div>
+
+          <!-- Quantity Selector -->
+          <div class="quantity-container mb-6">
+            <label for="quick-view-quantity" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Quantity</label>
+            <div class="quantity-selector flex items-center border border-neutral-200 dark:border-neutral-700 rounded-lg overflow-hidden w-32">
+              <button type="button" class="quantity-decrease w-10 h-10 flex items-center justify-center bg-neutral-50 dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg class="w-4 h-4 text-neutral-700 dark:text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                </svg>
+              </button>
+              <input 
+                type="number" 
+                id="quick-view-quantity" 
+                value="1" 
+                min="1" 
+                class="quantity-input w-12 h-10 text-center border-0 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:outline-none focus:ring-0"
+              >
+              <button type="button" class="quantity-increase w-10 h-10 flex items-center justify-center bg-neutral-50 dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors duration-300">
+                <svg class="w-4 h-4 text-neutral-700 dark:text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons space-y-3 mb-6">
+            <!-- Add to Cart Button -->
+            <button 
+              type="button" 
+              id="quick-view-add-to-cart" 
+              class="add-to-cart-btn w-full bg-primary-600 hover:bg-primary-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 disabled:scale-100 disabled:cursor-not-allowed"
+              disabled
+            >
+              <span class="btn-text">Add to Cart</span>
+              <span class="btn-loading hidden">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Adding...
+              </span>
+            </button>
+
+            <!-- Buy Now Button -->
+            <button 
+              type="button" 
+              id="quick-view-buy-now" 
+              class="buy-now-btn w-full bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 text-white dark:text-neutral-900 font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed"
+              disabled
+            >
+              Buy it now
+            </button>
+
+            <!-- View Full Details -->
+            <a 
+              id="quick-view-full-details" 
+              href="#" 
+              class="view-details-btn block w-full text-center bg-transparent border border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 font-medium py-3 px-6 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
+            >
+              View full details
+            </a>
+          </div>
+
+          <!-- Product Features/Highlights -->
+          <div id="quick-view-features" class="product-features hidden">
+            <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Key Features</h4>
+            <ul class="features-list space-y-2">
+              <!-- Features will be populated by JavaScript -->
+            </ul>
+          </div>
+
+          <!-- Trust Signals -->
+          <div class="trust-signals mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-700">
+            <div class="grid grid-cols-2 gap-4 text-center">
+              <div class="trust-item">
+                <svg class="w-6 h-6 mx-auto mb-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-xs text-neutral-600 dark:text-neutral-400">Free Shipping</p>
+              </div>
+              <div class="trust-item">
+                <svg class="w-6 h-6 mx-auto mb-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                </svg>
+                <p class="text-xs text-neutral-600 dark:text-neutral-400">Easy Returns</p>
+              </div>
+              <div class="trust-item">
+                <svg class="w-6 h-6 mx-auto mb-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+                <p class="text-xs text-neutral-600 dark:text-neutral-400">Secure Payment</p>
+              </div>
+              <div class="trust-item">
+                <svg class="w-6 h-6 mx-auto mb-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-xs text-neutral-600 dark:text-neutral-400">24/7 Support</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Image Zoom Modal -->
+<div id="image-zoom-modal" class="image-zoom-modal fixed inset-0 bg-black/95 z-60 hidden transition-all duration-300 opacity-0" role="dialog" aria-label="Zoomed product image">
+  <div class="zoom-container flex items-center justify-center min-h-screen p-4">
+    <button 
+      type="button" 
+      class="close-zoom absolute top-4 right-4 z-10 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-white/50"
+      aria-label="Close zoom"
+    >
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+    
+    <img 
+      id="zoomed-image" 
+      src="" 
+      alt="" 
+      class="max-w-full max-h-full object-contain cursor-move"
+      draggable="false"
+    >
+    
+    <!-- Zoom Controls -->
+    <div class="zoom-controls absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+      <button type="button" class="zoom-out w-8 h-8 flex items-center justify-center text-white hover:bg-white/20 rounded-full transition-colors duration-300" aria-label="Zoom out">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path>
+        </svg>
+      </button>
+      <span class="zoom-level text-white text-sm font-medium">100%</span>
+      <button type="button" class="zoom-in w-8 h-8 flex items-center justify-center text-white hover:bg-white/20 rounded-full transition-colors duration-300" aria-label="Zoom in">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

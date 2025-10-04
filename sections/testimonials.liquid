@@ -1,0 +1,586 @@
+{% comment %}
+  Testimonials Carousel Section
+  - Customer testimonials with photos
+  - Auto-play carousel with manual controls
+  - Star ratings
+  - Responsive design
+  - Social proof elements
+{% endcomment %}
+
+<div class="testimonials-section bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 py-16 lg:py-24">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Section Header -->
+    <div class="text-center mb-16">
+      {% if section.settings.heading != blank %}
+        <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          {{ section.settings.heading }}
+        </h2>
+      {% endif %}
+      
+      {% if section.settings.subheading != blank %}
+        <p class="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          {{ section.settings.subheading }}
+        </p>
+      {% endif %}
+      
+      <!-- Trust Stats -->
+      {% if section.settings.show_stats %}
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-12 max-w-4xl mx-auto">
+          <div class="text-center">
+            <div class="text-3xl lg:text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+              {{ section.settings.stat_1_number | default: '10K+' }}
+            </div>
+            <div class="text-sm text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+              {{ section.settings.stat_1_label | default: 'Happy Customers' }}
+            </div>
+          </div>
+          
+          <div class="text-center">
+            <div class="text-3xl lg:text-4xl font-bold text-green-600 dark:text-green-400 mb-2">
+              {{ section.settings.stat_2_number | default: '4.9' }}
+            </div>
+            <div class="text-sm text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+              {{ section.settings.stat_2_label | default: 'Average Rating' }}
+            </div>
+          </div>
+          
+          <div class="text-center">
+            <div class="text-3xl lg:text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+              {{ section.settings.stat_3_number | default: '99%' }}
+            </div>
+            <div class="text-sm text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+              {{ section.settings.stat_3_label | default: 'Satisfaction' }}
+            </div>
+          </div>
+          
+          <div class="text-center">
+            <div class="text-3xl lg:text-4xl font-bold text-orange-600 dark:text-orange-400 mb-2">
+              {{ section.settings.stat_4_number | default: '24/7' }}
+            </div>
+            <div class="text-sm text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+              {{ section.settings.stat_4_label | default: 'Support' }}
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Testimonials Carousel -->
+    <div 
+      x-data="testimonialsCarousel()"
+      x-init="init()"
+      class="relative max-w-6xl mx-auto"
+    >
+      <!-- Carousel Container -->
+      <div class="overflow-hidden">
+        <div 
+          x-ref="carousel"
+          class="flex transition-transform duration-500 ease-in-out"
+          :style="`transform: translateX(-${currentSlide * (100 / slidesToShow)}%)`"
+        >
+          {% for block in section.blocks %}
+            {% case block.type %}
+              {% when 'testimonial' %}
+                <div class="flex-none w-full md:w-1/2 lg:w-1/3 px-4">
+                  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-8 h-full">
+                    
+                    <!-- Quote Icon -->
+                    <div class="text-blue-500 mb-6">
+                      <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609L24 4.139c-4.395 0.676-7.455 4.287-7.455 8.818 0 2.123 0.91 3.988 2.455 5.043v3z M0 21v-7.391c0-5.704 3.748-9.57 9-10.609L10 4.139c-4.395 0.676-7.455 4.287-7.455 8.818 0 2.123 0.91 3.988 2.455 5.043v3z"/>
+                      </svg>
+                    </div>
+                    
+                    <!-- Star Rating -->
+                    {% if block.settings.rating %}
+                      <div class="flex items-center mb-4">
+                        {% assign rating = block.settings.rating | times: 1.0 %}
+                        {% for i in (1..5) %}
+                          {% if rating >= i %}
+                            <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                          {% elsif rating > i minus 1 %}
+                            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24">
+                              <defs>
+                                <linearGradient id="half-{{ forloop.index }}">
+                                  <stop offset="50%" stop-color="currentColor"/>
+                                  <stop offset="50%" stop-color="transparent"/>
+                                </linearGradient>
+                              </defs>
+                              <path fill="url(#half-{{ forloop.index }})" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                              <path stroke="currentColor" stroke-width="1" fill="none" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                          {% else %}
+                            <svg class="w-5 h-5 text-gray-300 dark:text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                          {% endif %}
+                        {% endfor %}
+                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                          ({{ rating }}/5)
+                        </span>
+                      </div>
+                    {% endif %}
+                    
+                    <!-- Testimonial Text -->
+                    {% if block.settings.testimonial_text != blank %}
+                      <blockquote class="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-6 italic">
+                        "{{ block.settings.testimonial_text }}"
+                      </blockquote>
+                    {% endif %}
+                    
+                    <!-- Customer Info -->
+                    <div class="flex items-center">
+                      {% if block.settings.customer_image != blank %}
+                        <div class="flex-shrink-0 mr-4">
+                          <img
+                            src="{{ block.settings.customer_image | image_url: width: 60 }}"
+                            alt="{{ block.settings.customer_name | escape }}"
+                            class="w-12 h-12 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                            loading="lazy"
+                          >
+                        </div>
+                      {% else %}
+                        <div class="flex-shrink-0 mr-4">
+                          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+                            {{ block.settings.customer_name | slice: 0 | upcase }}
+                          </div>
+                        </div>
+                      {% endif %}
+                      
+                      <div>
+                        {% if block.settings.customer_name != blank %}
+                          <div class="font-semibold text-gray-900 dark:text-white">
+                            {{ block.settings.customer_name }}
+                          </div>
+                        {% endif %}
+                        
+                        {% if block.settings.customer_title != blank %}
+                          <div class="text-sm text-gray-600 dark:text-gray-400">
+                            {{ block.settings.customer_title }}
+                          </div>
+                        {% endif %}
+                        
+                        {% if block.settings.verified_purchase %}
+                          <div class="flex items-center mt-1">
+                            <svg class="w-4 h-4 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-xs text-green-600 dark:text-green-400 font-medium">
+                              Verified Purchase
+                            </span>
+                          </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                    
+                    <!-- Purchase Info -->
+                    {% if block.settings.product_purchased != blank %}
+                      <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                        <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                          Purchased Product
+                        </div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                          {{ block.settings.product_purchased }}
+                        </div>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+            {% endcase %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Navigation Arrows -->
+      {% if section.blocks.size > 3 %}
+        <button
+          x-show="!isAtStart"
+          @click="previousSlide()"
+          class="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-white dark:bg-gray-800 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors z-10"
+          aria-label="Previous testimonial"
+        >
+          <svg class="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+
+        <button
+          x-show="!isAtEnd"
+          @click="nextSlide()"
+          class="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-white dark:bg-gray-800 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors z-10"
+          aria-label="Next testimonial"
+        >
+          <svg class="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      {% endif %}
+
+      <!-- Dots Indicator -->
+      {% if section.blocks.size > 3 %}
+        <div class="flex justify-center mt-8 space-x-2">
+          <template x-for="(dot, index) in dots" :key="index">
+            <button
+              @click="goToSlide(index)"
+              :class="{'bg-blue-600': currentSlide === index, 'bg-gray-300 dark:bg-gray-600': currentSlide !== index}"
+              class="w-3 h-3 rounded-full transition-colors duration-300 hover:bg-blue-500"
+              :aria-label="`Go to testimonial ${index + 1}`"
+            ></button>
+          </template>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Call to Action -->
+    {% if section.settings.show_cta %}
+      <div class="text-center mt-16">
+        {% if section.settings.cta_text != blank %}
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            {{ section.settings.cta_text }}
+          </h3>
+        {% endif %}
+        
+        {% if section.settings.cta_button_text != blank and section.settings.cta_button_link != blank %}
+          <a
+            href="{{ section.settings.cta_button_link }}"
+            class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300 shadow-lg hover:shadow-xl"
+          >
+            {{ section.settings.cta_button_text }}
+            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  function testimonialsCarousel() {
+    return {
+      currentSlide: 0,
+      totalSlides: {{ section.blocks.size }},
+      slidesToShow: 3,
+      autoPlay: {{ section.settings.autoplay | default: true }},
+      autoPlayInterval: {{ section.settings.autoplay_delay | default: 5000 }},
+      autoPlayTimer: null,
+      isAtStart: true,
+      isAtEnd: false,
+
+      init() {
+        this.updateSlidesToShow();
+        this.updateNavigationState();
+        
+        if (this.autoPlay && this.totalSlides > this.slidesToShow) {
+          this.startAutoPlay();
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+          this.updateSlidesToShow();
+          this.updateNavigationState();
+        });
+
+        // Pause autoplay on hover
+        this.$refs.carousel.addEventListener('mouseenter', () => {
+          this.stopAutoPlay();
+        });
+
+        this.$refs.carousel.addEventListener('mouseleave', () => {
+          if (this.autoPlay) {
+            this.startAutoPlay();
+          }
+        });
+      },
+
+      updateSlidesToShow() {
+        if (window.innerWidth >= 1024) {
+          this.slidesToShow = 3;
+        } else if (window.innerWidth >= 768) {
+          this.slidesToShow = 2;
+        } else {
+          this.slidesToShow = 1;
+        }
+      },
+
+      get maxSlides() {
+        return Math.max(0, this.totalSlides - this.slidesToShow);
+      },
+
+      get dots() {
+        return Array(Math.ceil(this.totalSlides / this.slidesToShow)).fill(null);
+      },
+
+      updateNavigationState() {
+        this.isAtStart = this.currentSlide === 0;
+        this.isAtEnd = this.currentSlide >= this.maxSlides;
+      },
+
+      nextSlide() {
+        if (this.currentSlide < this.maxSlides) {
+          this.currentSlide++;
+        } else {
+          this.currentSlide = 0; // Loop back to start
+        }
+        this.updateNavigationState();
+      },
+
+      previousSlide() {
+        if (this.currentSlide > 0) {
+          this.currentSlide--;
+        } else {
+          this.currentSlide = this.maxSlides; // Loop to end
+        }
+        this.updateNavigationState();
+      },
+
+      goToSlide(index) {
+        this.currentSlide = Math.min(index, this.maxSlides);
+        this.updateNavigationState();
+      },
+
+      startAutoPlay() {
+        this.stopAutoPlay();
+        if (this.totalSlides > this.slidesToShow) {
+          this.autoPlayTimer = setInterval(() => {
+            this.nextSlide();
+          }, this.autoPlayInterval);
+        }
+      },
+
+      stopAutoPlay() {
+        if (this.autoPlayTimer) {
+          clearInterval(this.autoPlayTimer);
+          this.autoPlayTimer = null;
+        }
+      }
+    }
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "What Our Customers Say"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Don't just take our word for it. Here's what real customers have to say about their experience."
+    },
+    {
+      "type": "header",
+      "content": "Trust Statistics"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stats",
+      "label": "Show trust statistics",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "stat_1_number",
+      "label": "Statistic 1 Number",
+      "default": "10K+"
+    },
+    {
+      "type": "text",
+      "id": "stat_1_label",
+      "label": "Statistic 1 Label",
+      "default": "Happy Customers"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_number",
+      "label": "Statistic 2 Number",
+      "default": "4.9"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_label",
+      "label": "Statistic 2 Label",
+      "default": "Average Rating"
+    },
+    {
+      "type": "text",
+      "id": "stat_3_number",
+      "label": "Statistic 3 Number",
+      "default": "99%"
+    },
+    {
+      "type": "text",
+      "id": "stat_3_label",
+      "label": "Statistic 3 Label",
+      "default": "Satisfaction"
+    },
+    {
+      "type": "text",
+      "id": "stat_4_number",
+      "label": "Statistic 4 Number",
+      "default": "24/7"
+    },
+    {
+      "type": "text",
+      "id": "stat_4_label",
+      "label": "Statistic 4 Label",
+      "default": "Support"
+    },
+    {
+      "type": "header",
+      "content": "Carousel Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Enable autoplay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_delay",
+      "min": 3000,
+      "max": 10000,
+      "step": 1000,
+      "unit": "ms",
+      "label": "Autoplay delay",
+      "default": 5000
+    },
+    {
+      "type": "header",
+      "content": "Call to Action"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show call to action",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA Heading",
+      "default": "Join Thousands of Happy Customers"
+    },
+    {
+      "type": "text",
+      "id": "cta_button_text",
+      "label": "Button Text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "cta_button_link",
+      "label": "Button Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "testimonial_text",
+          "label": "Testimonial Text",
+          "default": "Amazing quality and fast shipping! The product exceeded my expectations and the customer service was outstanding."
+        },
+        {
+          "type": "text",
+          "id": "customer_name",
+          "label": "Customer Name",
+          "default": "Sarah Johnson"
+        },
+        {
+          "type": "text",
+          "id": "customer_title",
+          "label": "Customer Title",
+          "default": "Verified Buyer"
+        },
+        {
+          "type": "image_picker",
+          "id": "customer_image",
+          "label": "Customer Photo"
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 0.5,
+          "label": "Rating",
+          "default": 5
+        },
+        {
+          "type": "checkbox",
+          "id": "verified_purchase",
+          "label": "Show verified purchase badge",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "product_purchased",
+          "label": "Product Purchased",
+          "info": "Optional - name of product this customer bought"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials",
+      "blocks": [
+        {
+          "type": "testimonial",
+          "settings": {
+            "testimonial_text": "The quality is outstanding and the shipping was incredibly fast. I'll definitely be ordering again!",
+            "customer_name": "Emily Chen",
+            "customer_title": "Fashion Blogger",
+            "rating": 5,
+            "verified_purchase": true,
+            "product_purchased": "Premium Cotton T-Shirt"
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "testimonial_text": "Perfect fit and amazing customer service. The team went above and beyond to help me find the right size.",
+            "customer_name": "Marcus Rodriguez",
+            "customer_title": "Fitness Enthusiast",
+            "rating": 4.5,
+            "verified_purchase": true,
+            "product_purchased": "Athletic Shorts"
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "testimonial_text": "I've been shopping here for years and they never disappoint. Great products, fair prices, and excellent service.",
+            "customer_name": "Jennifer Park",
+            "customer_title": "Loyal Customer",
+            "rating": 5,
+            "verified_purchase": true,
+            "product_purchased": "Designer Handbag"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

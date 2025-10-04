@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopify Theme Store Testing Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .test-section {
+            margin-bottom: 40px;
+            padding: 30px;
+            border: 2px solid #f8f9fa;
+            border-radius: 8px;
+            background: #fafbfc;
+        }
+
+        .test-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-section p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 15px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 25px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .results h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .console-output {
+            background: #1e1e1e;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-pending { background: #f39c12; }
+        .status-running { background: #3498db; animation: pulse 1.5s infinite; }
+        .status-success { background: #27ae60; }
+        .status-error { background: #e74c3c; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .summary-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .score-display {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .score-excellent { color: #27ae60; }
+        .score-good { color: #2ecc71; }
+        .score-warning { color: #f39c12; }
+        .score-danger { color: #e74c3c; }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span class="emoji">🎯</span>Shopify Theme Store Testing Suite</h1>
+            <p>Comprehensive validation for theme store submission compliance</p>
+        </div>
+
+        <div class="content">
+            <div class="test-section">
+                <h2><span class="emoji">🚀</span>Performance Testing</h2>
+                <p>Tests Core Web Vitals and Lighthouse performance scores across key pages. Shopify requires ≥60% performance score.</p>
+                <button id="runPerformance" class="btn">
+                    <span class="status-indicator status-pending"></span>
+                    Run Performance Tests
+                </button>
+                <div id="performanceResults" class="results" style="display: none;">
+                    <h3>Performance Test Results</h3>
+                    <div class="console-output" id="performanceConsole"></div>
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h2><span class="emoji">♿</span>Accessibility Testing</h2>
+                <p>Validates WCAG 2.1 AA compliance using automated accessibility auditing. Shopify requires ≥90% accessibility score.</p>
+                <button id="runAccessibility" class="btn">
+                    <span class="status-indicator status-pending"></span>
+                    Run Accessibility Tests
+                </button>
+                <div id="accessibilityResults" class="results" style="display: none;">
+                    <h3>Accessibility Test Results</h3>
+                    <div class="console-output" id="accessibilityConsole"></div>
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h2><span class="emoji">🌐</span>Browser Compatibility Testing</h2>
+                <p>Tests cross-browser compatibility for Chrome, Safari, Firefox, and Edge. Validates modern web features support.</p>
+                <button id="runCompatibility" class="btn">
+                    <span class="status-indicator status-pending"></span>
+                    Run Compatibility Tests
+                </button>
+                <div id="compatibilityResults" class="results" style="display: none;">
+                    <h3>Browser Compatibility Results</h3>
+                    <div class="console-output" id="compatibilityConsole"></div>
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h2><span class="emoji">🎯</span>Complete Test Suite</h2>
+                <p>Runs all tests in sequence and generates comprehensive Shopify Theme Store compliance report.</p>
+                <button id="runAllTests" class="btn btn-success">
+                    <span class="status-indicator status-pending"></span>
+                    Run Complete Test Suite
+                </button>
+                <div class="progress-bar" id="progressBar" style="display: none;">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div id="allTestsResults" class="results" style="display: none;">
+                    <h3>Complete Test Suite Results</h3>
+                    <div class="console-output" id="allTestsConsole"></div>
+                </div>
+            </div>
+
+            <div id="summarySection" class="summary-card" style="display: none;">
+                <h3><span class="emoji">📊</span>Test Summary</h3>
+                <div id="overallScore" class="score-display">--</div>
+                <div id="complianceStatus"></div>
+                <div id="individualScores"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 Modern Shopify Theme Pro - Testing Suite v1.0.0</p>
+            <p>Automated validation for Shopify Theme Store submission compliance</p>
+        </div>
+    </div>
+
+    <!-- Include testing scripts -->
+    <script src="assets/performance-tester.js"></script>
+    <script src="assets/accessibility-tester.js"></script>
+    <script src="assets/browser-compatibility-tester.js"></script>
+    <script src="assets/theme-test-suite.js"></script>
+    <script src="assets/test-debug.js"></script>
+
+    <script>
+        // Console capture utility
+        class ConsoleCapture {
+            constructor(outputElement) {
+                this.output = outputElement;
+                this.originalLog = console.log;
+                this.originalError = console.error;
+                this.originalWarn = console.warn;
+                this.capturing = false;
+            }
+
+            start() {
+                this.capturing = true;
+                this.output.textContent = '';
+                
+                console.log = (...args) => {
+                    if (this.capturing) {
+                        this.appendToOutput(args.join(' '), 'log');
+                    }
+                    this.originalLog.apply(console, args);
+                };
+
+                console.error = (...args) => {
+                    if (this.capturing) {
+                        this.appendToOutput('ERROR: ' + args.join(' '), 'error');
+                    }
+                    this.originalError.apply(console, args);
+                };
+
+                console.warn = (...args) => {
+                    if (this.capturing) {
+                        this.appendToOutput('WARN: ' + args.join(' '), 'warn');
+                    }
+                    this.originalWarn.apply(console, args);
+                };
+            }
+
+            stop() {
+                this.capturing = false;
+                console.log = this.originalLog;
+                console.error = this.originalError;
+                console.warn = this.originalWarn;
+            }
+
+            appendToOutput(text, type = 'log') {
+                const span = document.createElement('span');
+                span.textContent = text + '\n';
+                
+                switch(type) {
+                    case 'error':
+                        span.style.color = '#ff6b6b';
+                        break;
+                    case 'warn':
+                        span.style.color = '#ffa726';
+                        break;
+                    default:
+                        span.style.color = '#f8f8f2';
+                }
+                
+                this.output.appendChild(span);
+                this.output.scrollTop = this.output.scrollHeight;
+            }
+        }
+
+        // Test execution handlers
+        document.getElementById('runPerformance').addEventListener('click', async function() {
+            const btn = this;
+            const results = document.getElementById('performanceResults');
+            const console = document.getElementById('performanceConsole');
+            const capture = new ConsoleCapture(console);
+
+            updateButton(btn, 'running', 'Running Performance Tests...');
+            results.style.display = 'block';
+            capture.start();
+
+            try {
+                const tester = new PerformanceTester();
+                const result = await tester.run();
+                capture.stop();
+                updateButton(btn, 'success', 'Performance Tests Complete');
+            } catch (error) {
+                capture.stop();
+                capture.appendToOutput('Test failed: ' + error.message, 'error');
+                updateButton(btn, 'error', 'Performance Tests Failed');
+            }
+        });
+
+        document.getElementById('runAccessibility').addEventListener('click', async function() {
+            const btn = this;
+            const results = document.getElementById('accessibilityResults');
+            const console = document.getElementById('accessibilityConsole');
+            const capture = new ConsoleCapture(console);
+
+            updateButton(btn, 'running', 'Running Accessibility Tests...');
+            results.style.display = 'block';
+            capture.start();
+
+            try {
+                const tester = new AccessibilityTester();
+                const result = await tester.run();
+                capture.stop();
+                updateButton(btn, 'success', 'Accessibility Tests Complete');
+            } catch (error) {
+                capture.stop();
+                capture.appendToOutput('Test failed: ' + error.message, 'error');
+                updateButton(btn, 'error', 'Accessibility Tests Failed');
+            }
+        });
+
+        document.getElementById('runCompatibility').addEventListener('click', async function() {
+            const btn = this;
+            const results = document.getElementById('compatibilityResults');
+            const console = document.getElementById('compatibilityConsole');
+            const capture = new ConsoleCapture(console);
+
+            updateButton(btn, 'running', 'Running Compatibility Tests...');
+            results.style.display = 'block';
+            capture.start();
+
+            try {
+                const tester = new BrowserCompatibilityTester();
+                const result = await tester.run();
+                capture.stop();
+                updateButton(btn, 'success', 'Compatibility Tests Complete');
+            } catch (error) {
+                capture.stop();
+                capture.appendToOutput('Test failed: ' + error.message, 'error');
+                updateButton(btn, 'error', 'Compatibility Tests Failed');
+            }
+        });
+
+        document.getElementById('runAllTests').addEventListener('click', async function() {
+            const btn = this;
+            const results = document.getElementById('allTestsResults');
+            const console = document.getElementById('allTestsConsole');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            const capture = new ConsoleCapture(console);
+
+            updateButton(btn, 'running', 'Running Complete Test Suite...');
+            results.style.display = 'block';
+            progressBar.style.display = 'block';
+            capture.start();
+
+            try {
+                // Simulate progress updates
+                const updateProgress = (percent) => {
+                    progressFill.style.width = percent + '%';
+                };
+
+                updateProgress(10);
+                const testSuite = new ShopifyThemeTestSuite();
+                
+                updateProgress(30);
+                const result = await testSuite.run();
+                
+                updateProgress(100);
+                capture.stop();
+                
+                // Display summary
+                displayTestSummary(result);
+                updateButton(btn, 'success', 'Complete Test Suite Finished');
+                
+            } catch (error) {
+                capture.stop();
+                capture.appendToOutput('Test suite failed: ' + error.message, 'error');
+                updateButton(btn, 'error', 'Test Suite Failed');
+            }
+        });
+
+        function updateButton(button, status, text) {
+            const indicator = button.querySelector('.status-indicator');
+            indicator.className = `status-indicator status-${status}`;
+            
+            // Update button text (preserve indicator)
+            const textNode = Array.from(button.childNodes).find(node => node.nodeType === Node.TEXT_NODE);
+            if (textNode) {
+                textNode.textContent = text;
+            } else {
+                button.appendChild(document.createTextNode(text));
+            }
+
+            if (status === 'running') {
+                button.disabled = true;
+            } else {
+                button.disabled = false;
+            }
+        }
+
+        function displayTestSummary(result) {
+            const summarySection = document.getElementById('summarySection');
+            const overallScore = document.getElementById('overallScore');
+            const complianceStatus = document.getElementById('complianceStatus');
+            const individualScores = document.getElementById('individualScores');
+
+            if (result && result.overall) {
+                summarySection.style.display = 'block';
+                
+                const score = result.overall.weightedScore;
+                overallScore.textContent = score + '%';
+                
+                // Set score color based on value
+                if (score >= 90) {
+                    overallScore.className = 'score-display score-excellent';
+                } else if (score >= 80) {
+                    overallScore.className = 'score-display score-good';
+                } else if (score >= 60) {
+                    overallScore.className = 'score-display score-warning';
+                } else {
+                    overallScore.className = 'score-display score-danger';
+                }
+
+                // Compliance status
+                const isReady = result.shopifyCompliance?.ready || false;
+                complianceStatus.innerHTML = `
+                    <strong>Shopify Theme Store Status:</strong> 
+                    <span style="color: ${isReady ? '#27ae60' : '#e74c3c'};">
+                        ${isReady ? '✅ READY FOR SUBMISSION' : '❌ REQUIRES FIXES'}
+                    </span>
+                `;
+
+                // Individual scores
+                const scores = result.overall.individualScores;
+                const passes = result.overall.individualPasses;
+                
+                individualScores.innerHTML = `
+                    <div style="margin-top: 20px;">
+                        <h4>Individual Test Results:</h4>
+                        <div style="margin: 10px 0;">
+                            <strong>Performance:</strong> ${scores.performance}% ${passes.performance ? '✅' : '❌'}
+                        </div>
+                        <div style="margin: 10px 0;">
+                            <strong>Accessibility:</strong> ${scores.accessibility}% ${passes.accessibility ? '✅' : '❌'}
+                        </div>
+                        <div style="margin: 10px 0;">
+                            <strong>Compatibility:</strong> ${scores.compatibility}% ${passes.compatibility ? '✅' : '❌'}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize page
+        console.log('🎯 Shopify Theme Store Testing Suite Loaded');
+        console.log('📋 Ready to test theme compliance with Shopify requirements');
+    </script>
+</body>
+</html>

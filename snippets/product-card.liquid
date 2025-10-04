@@ -11,17 +11,19 @@
     <!-- Product Image -->
     <div class="product-card-image aspect-square mb-4">
       {% if product.featured_media %}
-        <img 
+        <img
           src="{{ product.featured_media | image_url: width: 400 }}"
           alt="{{ product.featured_media.alt | escape }}"
+          width="400"
+          height="400"
           class="w-full h-full object-cover transition-opacity duration-300"
           {% if settings.lazy_loading_enabled %}loading="lazy"{% endif %}
-        >
-        
-        {% if settings.product_card_hover_image and product.media[1] %}
-          <img 
+        >        {% if settings.product_card_hover_image and product.media[1] %}
+          <img
             src="{{ product.media[1] | image_url: width: 400 }}"
             alt="{{ product.media[1].alt | escape }}"
+            width="400"
+            height="400"
             class="w-full h-full object-cover absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
             {% if settings.lazy_loading_enabled %}loading="lazy"{% endif %}
           >

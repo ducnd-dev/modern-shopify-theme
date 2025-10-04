@@ -1,9 +1,4 @@
-/**
- * Modern Shopify Theme JavaScript
- * Built with modern ES6+ features and accessibility in mind
- */
-
-// Theme Configuration
+
 const THEME_CONFIG = {
   animations: {
     enabled: true,
@@ -25,13 +20,9 @@ const THEME_CONFIG = {
     skipToContent: true,
     reduceMotion: false
   }
-};
-
-// Utility Functions
+};
 const utils = {
-  /**
-   * Debounce function calls
-   */
+
   debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -44,9 +35,6 @@ const utils = {
     };
   },
 
-  /**
-   * Throttle function calls
-   */
   throttle(func, limit) {
     let inThrottle;
     return function(...args) {
@@ -58,18 +46,15 @@ const utils = {
     };
   },
 
-  /**
-   * Format money with currency
-   */
   formatMoney(cents, format = '${{amount}}') {
     if (typeof cents === 'string') {
       cents = cents.replace('.', '');
     }
-    
+
     let value = '';
     const placeholderRegex = /\{\{\s*(\w+)\s*\}\}/;
     const formatString = format || '${{amount}}';
-    
+
     switch (formatString.match(placeholderRegex)[1]) {
       case 'amount':
         value = (cents / 100).toFixed(2);
@@ -81,31 +66,22 @@ const utils = {
         value = (cents / 100).toFixed(2).replace('.', ',');
         break;
     }
-    
+
     return formatString.replace(placeholderRegex, value);
   },
 
-  /**
-   * Get cookie value
-   */
   getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
   },
 
-  /**
-   * Set cookie
-   */
   setCookie(name, value, days = 30) {
     const expires = new Date();
     expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
     document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
   },
 
-  /**
-   * Check if element is in viewport
-   */
   isInViewport(element) {
     const rect = element.getBoundingClientRect();
     return (
@@ -116,17 +92,12 @@ const utils = {
     );
   },
 
-  /**
-   * Animate element into view
-   */
   animateIntoView(element, className = 'animate') {
     if (THEME_CONFIG.animations.scrollAnimations && this.isInViewport(element)) {
       element.classList.add(className);
     }
   }
-};
-
-// Dark Mode Manager
+};
 class DarkModeManager {
   constructor() {
     this.darkMode = this.getDarkModePreference();
@@ -145,9 +116,7 @@ class DarkModeManager {
   }
 
   applyDarkMode() {
-    document.documentElement.setAttribute('data-theme', this.darkMode ? 'dark' : 'light');
-    
-    // Update toggle buttons
+    document.documentElement.setAttribute('data-theme', this.darkMode ? 'dark' : 'light');
     const toggles = document.querySelectorAll('[data-dark-mode-toggle]');
     toggles.forEach(toggle => {
       const icon = toggle.querySelector('.dark-mode-icon');
@@ -167,9 +136,7 @@ class DarkModeManager {
     const toggles = document.querySelectorAll('[data-dark-mode-toggle]');
     toggles.forEach(toggle => {
       toggle.addEventListener('click', () => this.toggle());
-    });
-
-    // Listen for system preference changes
+    });
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
       if (!utils.getCookie('darkMode')) {
         this.darkMode = e.matches;
@@ -177,16 +144,14 @@ class DarkModeManager {
       }
     });
   }
-}
-
-// Mobile Menu Manager
+}
 class MobileMenuManager {
   constructor() {
     this.menu = document.querySelector('.mobile-menu');
     this.toggles = document.querySelectorAll('[data-mobile-menu-toggle]');
     this.overlay = document.querySelector('.overlay');
     this.isOpen = false;
-    
+
     if (this.menu) {
       this.init();
     }
@@ -200,9 +165,7 @@ class MobileMenuManager {
     this.isOpen = true;
     this.menu.classList.add('active');
     this.overlay?.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    
-    // Focus management
+    document.body.style.overflow = 'hidden';
     const firstFocusable = this.menu.querySelector('a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
     firstFocusable?.focus();
   }
@@ -221,25 +184,21 @@ class MobileMenuManager {
       });
     });
 
-    this.overlay?.addEventListener('click', () => this.close());
-
-    // Close on escape key
+    this.overlay?.addEventListener('click', () => this.close());
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && this.isOpen) {
         this.close();
       }
     });
   }
-}
-
-// Cart Drawer Manager
+}
 class CartDrawerManager {
   constructor() {
     this.drawer = document.querySelector('.cart-drawer');
     this.overlay = document.querySelector('.overlay');
     this.toggles = document.querySelectorAll('[data-cart-toggle]');
     this.isOpen = false;
-    
+
     if (this.drawer) {
       this.init();
     }
@@ -279,7 +238,7 @@ class CartDrawerManager {
   renderCartContents(cart) {
     const cartItemsContainer = this.drawer.querySelector('.cart-items');
     const cartTotalContainer = this.drawer.querySelector('.cart-total');
-    
+
     if (!cartItemsContainer) return;
 
     if (cart.items.length === 0) {
@@ -333,7 +292,7 @@ class CartDrawerManager {
 
   renderFreeShippingProgress(totalPrice) {
     if (!THEME_CONFIG.cart.freeShippingThreshold) return '';
-    
+
     const threshold = THEME_CONFIG.cart.freeShippingThreshold;
     const remaining = threshold - totalPrice;
     const progress = Math.min((totalPrice / threshold) * 100, 100);
@@ -404,9 +363,7 @@ class CartDrawerManager {
       });
     });
 
-    this.overlay?.addEventListener('click', () => this.close());
-
-    // Close on escape key
+    this.overlay?.addEventListener('click', () => this.close());
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && this.isOpen) {
         this.close();
@@ -414,8 +371,7 @@ class CartDrawerManager {
     });
   }
 
-  bindCartEvents() {
-    // Quantity changes
+  bindCartEvents() {
     this.drawer.querySelectorAll('[data-quantity-change]').forEach(button => {
       button.addEventListener('click', (e) => {
         const change = parseInt(e.target.dataset.quantityChange);
@@ -424,18 +380,14 @@ class CartDrawerManager {
         const newQuantity = Math.max(1, parseInt(input.value) + change);
         this.updateQuantity(key, newQuantity);
       });
-    });
-
-    // Direct quantity input
+    });
     this.drawer.querySelectorAll('.quantity-input').forEach(input => {
       input.addEventListener('change', (e) => {
         const key = e.target.dataset.key;
         const quantity = Math.max(1, parseInt(e.target.value));
         this.updateQuantity(key, quantity);
       });
-    });
-
-    // Remove items
+    });
     this.drawer.querySelectorAll('[data-remove-item]').forEach(button => {
       button.addEventListener('click', (e) => {
         const key = e.target.closest('[data-key]').dataset.key;
@@ -443,16 +395,14 @@ class CartDrawerManager {
       });
     });
   }
-}
-
-// Search Manager
+}
 class SearchManager {
   constructor() {
     this.searchModal = document.querySelector('.search-modal');
     this.searchInput = document.querySelector('.search-input');
     this.searchResults = document.querySelector('.search-results');
     this.searchToggles = document.querySelectorAll('[data-search-toggle]');
-    
+
     if (this.searchModal) {
       this.init();
     }
@@ -522,39 +472,29 @@ class SearchManager {
   bindEvents() {
     this.searchToggles.forEach(toggle => {
       toggle.addEventListener('click', () => this.open());
-    });
-
-    // Close modal
+    });
     const closeButtons = this.searchModal?.querySelectorAll('[data-search-close]');
     closeButtons?.forEach(button => {
       button.addEventListener('click', () => this.close());
-    });
-
-    // Search input
+    });
     if (this.searchInput) {
       const debouncedSearch = utils.debounce((query) => this.search(query), 300);
       this.searchInput.addEventListener('input', (e) => {
         debouncedSearch(e.target.value);
       });
-    }
-
-    // Close on escape
+    }
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && this.searchModal?.classList.contains('active')) {
         this.close();
       }
-    });
-
-    // Close on overlay click
+    });
     this.searchModal?.addEventListener('click', (e) => {
       if (e.target === this.searchModal) {
         this.close();
       }
     });
   }
-}
-
-// Carousel Manager
+}
 class CarouselManager {
   constructor(element) {
     this.carousel = element;
@@ -563,12 +503,12 @@ class CarouselManager {
     this.prevBtn = element.querySelector('.carousel-prev');
     this.nextBtn = element.querySelector('.carousel-next');
     this.indicators = element.querySelectorAll('.carousel-indicator');
-    
+
     this.currentSlide = 0;
     this.totalSlides = this.slides.length;
     this.autoplayDelay = parseInt(element.dataset.autoplay) || 0;
     this.autoplayTimer = null;
-    
+
     if (this.totalSlides > 0) {
       this.init();
     }
@@ -577,7 +517,7 @@ class CarouselManager {
   init() {
     this.updateCarousel();
     this.bindEvents();
-    
+
     if (this.autoplayDelay > 0) {
       this.startAutoplay();
     }
@@ -601,14 +541,10 @@ class CarouselManager {
   updateCarousel() {
     if (this.track) {
       this.track.style.transform = `translateX(-${this.currentSlide * 100}%)`;
-    }
-
-    // Update indicators
+    }
     this.indicators.forEach((indicator, index) => {
       indicator.classList.toggle('active', index === this.currentSlide);
-    });
-
-    // Update navigation buttons
+    });
     if (this.prevBtn) {
       this.prevBtn.disabled = this.currentSlide === 0;
     }
@@ -646,9 +582,7 @@ class CarouselManager {
         this.goToSlide(index);
         this.stopAutoplay();
       });
-    });
-
-    // Touch/swipe support
+    });
     let startX = 0;
     let isDragging = false;
 
@@ -665,10 +599,10 @@ class CarouselManager {
 
     this.carousel.addEventListener('touchend', (e) => {
       if (!isDragging) return;
-      
+
       const endX = e.changedTouches[0].clientX;
       const diff = startX - endX;
-      
+
       if (Math.abs(diff) > 50) {
         if (diff > 0) {
           this.nextSlide();
@@ -676,11 +610,9 @@ class CarouselManager {
           this.prevSlide();
         }
       }
-      
-      isDragging = false;
-    });
 
-    // Pause autoplay on hover
+      isDragging = false;
+    });
     this.carousel.addEventListener('mouseenter', () => this.stopAutoplay());
     this.carousel.addEventListener('mouseleave', () => {
       if (this.autoplayDelay > 0) {
@@ -688,9 +620,7 @@ class CarouselManager {
       }
     });
   }
-}
-
-// Form Handler
+}
 class FormHandler {
   constructor() {
     this.forms = document.querySelectorAll('form[data-ajax-form]');
@@ -710,9 +640,7 @@ class FormHandler {
 
   async handleSubmit(form) {
     const submitBtn = form.querySelector('[type="submit"]');
-    const originalText = submitBtn?.textContent;
-    
-    // Show loading state
+    const originalText = submitBtn?.textContent;
     if (submitBtn) {
       submitBtn.disabled = true;
       submitBtn.textContent = 'Processing...';
@@ -733,8 +661,7 @@ class FormHandler {
       }
     } catch (error) {
       this.showMessage('Something went wrong. Please try again.', 'error');
-    } finally {
-      // Restore button state
+    } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
@@ -757,14 +684,12 @@ class FormHandler {
       notification.remove();
     }, 5000);
   }
-}
-
-// Scroll Animations
+}
 class ScrollAnimations {
   constructor() {
     this.elements = document.querySelectorAll('.fade-in, .slide-up, .scale-in');
     this.observer = null;
-    
+
     if (THEME_CONFIG.animations.scrollAnimations && this.elements.length > 0) {
       this.init();
     }
@@ -787,15 +712,13 @@ class ScrollAnimations {
       this.observer.observe(element);
     });
   }
-}
-
-// Cookie Consent Manager
+}
 class CookieConsentManager {
   constructor() {
     this.banner = document.querySelector('.cookie-banner');
     this.acceptBtn = document.querySelector('[data-cookie-accept]');
     this.declineBtn = document.querySelector('[data-cookie-decline]');
-    
+
     if (this.banner && !utils.getCookie('cookieConsent')) {
       this.init();
     }
@@ -830,15 +753,13 @@ class CookieConsentManager {
     this.acceptBtn?.addEventListener('click', () => this.accept());
     this.declineBtn?.addEventListener('click', () => this.decline());
   }
-}
-
-// Newsletter Popup Manager
+}
 class NewsletterPopupManager {
   constructor() {
     this.popup = document.querySelector('.newsletter-popup');
     this.closeBtn = document.querySelector('[data-newsletter-close]');
     this.delay = parseInt(document.body.dataset.newsletterDelay) * 1000 || 5000;
-    
+
     if (this.popup && !utils.getCookie('newsletterShown')) {
       this.init();
     }
@@ -848,7 +769,7 @@ class NewsletterPopupManager {
     setTimeout(() => {
       this.show();
     }, this.delay);
-    
+
     this.bindEvents();
   }
 
@@ -865,7 +786,7 @@ class NewsletterPopupManager {
 
   bindEvents() {
     this.closeBtn?.addEventListener('click', () => this.hide());
-    
+
     this.popup?.addEventListener('click', (e) => {
       if (e.target === this.popup) {
         this.hide();
@@ -878,13 +799,11 @@ class NewsletterPopupManager {
       }
     });
   }
-}
-
-// Initialize everything when DOM is ready
+}
 class ThemeManager {
   constructor() {
     this.components = [];
-    
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.init());
     } else {
@@ -892,8 +811,7 @@ class ThemeManager {
     }
   }
 
-  init() {
-    // Initialize all components
+  init() {
     this.components.push(new DarkModeManager());
     this.components.push(new MobileMenuManager());
     this.components.push(new CartDrawerManager());
@@ -901,20 +819,12 @@ class ThemeManager {
     this.components.push(new FormHandler());
     this.components.push(new ScrollAnimations());
     this.components.push(new CookieConsentManager());
-    this.components.push(new NewsletterPopupManager());
-
-    // Initialize carousels
+    this.components.push(new NewsletterPopupManager());
     document.querySelectorAll('.carousel').forEach(carousel => {
       new CarouselManager(carousel);
-    });
-
-    // Initialize quick add buttons
-    this.initQuickAdd();
-
-    // Initialize announcement bar
-    this.initAnnouncementBar();
-
-    // Accessibility improvements
+    });
+    this.initQuickAdd();
+    this.initAnnouncementBar();
     this.initAccessibility();
 
     console.log('🎉 Modern Shopify Theme initialized successfully!');
@@ -924,11 +834,11 @@ class ThemeManager {
     document.addEventListener('click', async (e) => {
       if (e.target.matches('[data-quick-add]')) {
         e.preventDefault();
-        
+
         const button = e.target;
         const productId = button.dataset.productId;
         const originalText = button.textContent;
-        
+
         button.disabled = true;
         button.textContent = 'Adding...';
 
@@ -945,15 +855,11 @@ class ThemeManager {
           });
 
           if (response.ok) {
-            button.textContent = 'Added!';
-            
-            // Update cart count
+            button.textContent = 'Added!';
             const cartManager = this.components.find(c => c instanceof CartDrawerManager);
             if (cartManager) {
               await cartManager.fetchCartContents();
-            }
-            
-            // Show success feedback
+            }
             setTimeout(() => {
               button.textContent = originalText;
               button.disabled = false;
@@ -975,36 +881,31 @@ class ThemeManager {
   initAnnouncementBar() {
     const announcementBar = document.querySelector('.announcement-bar');
     const closeBtn = announcementBar?.querySelector('[data-announcement-close]');
-    
+
     if (closeBtn) {
       closeBtn.addEventListener('click', () => {
         announcementBar.style.display = 'none';
         utils.setCookie('announcementClosed', 'true', 1); // Hide for 1 day
       });
-    }
-
-    // Auto-hide if previously closed
+    }
     if (utils.getCookie('announcementClosed') && announcementBar) {
       announcementBar.style.display = 'none';
     }
   }
 
-  initAccessibility() {
-    // Skip to content link
+  initAccessibility() {
     if (THEME_CONFIG.accessibility.skipToContent) {
       const skipLink = document.createElement('a');
       skipLink.href = '#main';
       skipLink.className = 'skip-link';
       skipLink.textContent = 'Skip to content';
       document.body.insertBefore(skipLink, document.body.firstChild);
-    }
-
-    // Keyboard navigation for dropdowns
+    }
     const dropdowns = document.querySelectorAll('[data-dropdown]');
     dropdowns.forEach(dropdown => {
       const trigger = dropdown.querySelector('[data-dropdown-trigger]');
       const menu = dropdown.querySelector('[data-dropdown-menu]');
-      
+
       if (trigger && menu) {
         trigger.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -1015,13 +916,9 @@ class ThemeManager {
       }
     });
   }
-}
-
-// Global utilities
+}
 window.Theme = {
   utils,
   formatMoney: utils.formatMoney
-};
-
-// Start the theme
+};
 new ThemeManager();

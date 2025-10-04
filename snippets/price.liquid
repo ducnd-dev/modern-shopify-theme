@@ -1,0 +1,210 @@
+{% comment %}
+  Renders a product price with proper formatting and sale indicators
+  
+  Accepts:
+  - product: {Object} product object
+  - price_class: {String} additional CSS classes for price container
+  - show_compare_at_price: {Boolean} whether to show compare at price
+  - show_badges: {Boolean} whether to show sale/sold out badges
+  
+  Usage:
+  {% render 'price', product: product, show_badges: true %}
+{% endcomment %}
+
+{%- liquid
+  assign target = product
+  assign price_class = price_class | default: ''
+  assign show_compare_at_price = show_compare_at_price | default: true
+  assign show_badges = show_badges | default: false
+  
+  if target.price_varies
+    assign price_min = target.price_min
+    assign price_max = target.price_max
+    assign compare_at_price = target.compare_at_price_min
+  else
+    assign price_min = target.price
+    assign price_max = target.price
+    assign compare_at_price = target.compare_at_price
+  endif
+  
+  assign on_sale = false
+  if compare_at_price and compare_at_price > price_min
+    assign on_sale = true
+  endif
+  
+  assign sold_out = false
+  if target.available == false
+    assign sold_out = true
+  endif
+-%}
+
+<div class="price {{ price_class }}" data-price-wrapper>
+  {%- if show_badges -%}
+    <div class="price__badges">
+      {%- if sold_out -%}
+        <span class="badge badge--sold-out">
+          {{ 'products.product.sold_out' | t }}
+        </span>
+      {%- elsif on_sale -%}
+        <span class="badge badge--sale">
+          {{ 'products.product.on_sale' | t }}
+        </span>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="price__container">
+    {%- if target.price_varies -%}
+      <div class="price__regular">
+        <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+        <span class="price-item price-item--regular">
+          {{ 'products.product.price.from_price_html' | t: price: price_min | money }}
+        </span>
+      </div>
+    {%- else -%}
+      <div class="price__regular">
+        <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+        <span class="price-item price-item--regular" data-regular-price>
+          {{ price_min | money }}
+        </span>
+      </div>
+    {%- endif -%}
+
+    {%- if show_compare_at_price and on_sale -%}
+      <div class="price__sale">
+        <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
+        <span class="price-item price-item--sale" data-compare-price>
+          {{ compare_at_price | money }}
+        </span>
+      </div>
+      
+      {%- if price_min < compare_at_price -%}
+        <div class="price__savings">
+          <span class="price-item price-item--savings">
+            {%- assign savings = compare_at_price | minus: price_min -%}
+            {%- assign savings_percent = savings | times: 100.0 | divided_by: compare_at_price | round -%}
+            {{ 'products.product.save_price_html' | t: saved_amount: savings | money, percentage: savings_percent }}
+          </span>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+
+  {%- if target.unit_price_measurement -%}
+    <div class="price__unit">
+      <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
+      <span class="price-item price-item--unit">
+        {{- target.unit_price | money -}}
+        <span aria-hidden="true">/</span>
+        <span class="visually-hidden">{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span>
+        {%- if target.unit_price_measurement.reference_value != 1 -%}
+          {{- target.unit_price_measurement.reference_value -}}
+        {%- endif -%}
+        {{ target.unit_price_measurement.reference_unit }}
+      </span>
+    </div>
+  {%- endif -%}
+</div>
+
+<style>
+.price {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.price__badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  border-radius: 0.25rem;
+  white-space: nowrap;
+}
+
+.badge--sale {
+  background-color: #dc2626;
+  color: white;
+}
+
+.badge--sold-out {
+  background-color: #6b7280;
+  color: white;
+}
+
+.price__container {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.price__regular {
+  display: flex;
+  align-items: baseline;
+}
+
+.price-item {
+  font-weight: 500;
+}
+
+.price-item--regular {
+  font-size: 1.125rem;
+  color: #111827;
+}
+
+.price-item--sale {
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-decoration: line-through;
+}
+
+.price-item--savings {
+  font-size: 0.875rem;
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.price__unit {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.price-item--unit {
+  font-weight: normal;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+@media (max-width: 640px) {
+  .price__container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .price-item--regular {
+    font-size: 1rem;
+  }
+}
+</style>

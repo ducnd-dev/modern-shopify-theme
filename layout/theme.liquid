@@ -32,6 +32,29 @@
     {% render 'meta-tags' %}
 
     {{ content_for_header }}
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('SW registered: ', registration);
+            })
+            .catch(registrationError => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Performance measurement end -->
+    <script>
+      window.performance && performance.mark && performance.mark('shopify.content_for_header.end');
+    </script>
 
     <!-- CSS Variables for Theme Customization -->
     <style>
@@ -107,8 +130,20 @@
     {%- endunless -%}
 
     {%- if settings.predictive_search_enabled -%}
-      <link rel="stylesheet" href="{{ 'component-predictive-search.css' | asset_url }}" media="print" onload="this.media='all'">
+      <link rel="stylesheet" href="{{ 'predictive-search.css' | asset_url }}" media="print" onload="this.media='all'">
     {%- endif -%}
+    
+    <!-- Performance Critical CSS -->
+    <link rel="stylesheet" href="{{ 'performance-critical.css' | asset_url }}" media="all">
+    
+    <!-- Component Stylesheets -->
+    <link rel="stylesheet" href="{{ 'quick-view.css' | asset_url }}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{ 'cart-drawer.css' | asset_url }}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{ 'social-proof.css' | asset_url }}" media="print" onload="this.media='all'">
+    
+    <!-- Preload Critical JavaScript -->
+    <link rel="preload" href="{{ 'performance-optimizer.js' | asset_url }}" as="script">
+    <link rel="preload" href="{{ 'theme.js' | asset_url }}" as="script">
 
     <script>
       document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
@@ -122,6 +157,9 @@
       } else {
         document.documentElement.classList.remove('dark')
       }
+      
+      // Performance monitoring
+      window.performance && performance.mark && performance.mark('shopify.content_for_header.start');
     </script>
   </head>
 
@@ -134,26 +172,59 @@
       </svg>
     </a>
 
-    <!-- Announcement Bar -->
-    {%- if settings.announcement_bar_enabled -%}
-      {%- section 'announcement-bar' -%}
-    {%- endif -%}
-
-    <!-- Header -->
-    {%- section 'header' -%}
+    <!-- Header Group -->
+    {% sections 'group-header' %}
+    
+    <!-- Performance monitoring for layout start -->
+    <script>
+      window.performance && performance.mark && performance.mark('shopify.content_for_layout.start');
+    </script>
 
     <!-- Main Content -->
     <main id="MainContent" class="content-for-layout focus:outline-none" role="main" tabindex="-1">
       {{ content_for_layout }}
     </main>
 
-    <!-- Footer -->
-    {%- section 'footer' -%}
+    <!-- Quick View Modal -->
+    {% render 'quick-view-modal' %}
+
+    <!-- Footer Group -->
+    {% sections 'group-footer' %}
 
     <!-- Cart Drawer -->
     {%- if settings.cart_type == 'drawer' -%}
+      {%- render 'cart-drawer-enhanced' -%}
+    {%- else -%}
       {%- render 'cart-drawer' -%}
     {%- endif -%}
+    
+    <!-- Predictive Search -->
+    {%- if settings.predictive_search_enabled -%}
+      {%- render 'predictive-search' -%}
+    {%- endif -%}
+    
+    <!-- Recent Purchase Notifications -->
+    {%- if settings.show_recent_purchases -%}
+      {%- render 'recent-purchases' -%}
+    {%- endif -%}
+    
+    <!-- Modal Backdrop -->
+    <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden opacity-0 transition-opacity duration-300"></div>
+    
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" class="fixed top-0 left-0 w-full h-1 bg-blue-600 transform scale-x-0 transition-transform duration-300 z-50"></div>
+    
+    <!-- Back to Top Button -->
+    <button
+      id="back-to-top"
+      class="fixed bottom-6 right-6 w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 transform translate-y-16 opacity-0 z-40"
+      aria-label="Back to top"
+      type="button"
+    >
+      <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+      </svg>
+    </button>
 
     <!-- Newsletter Modal -->
     {%- if settings.newsletter_popup_enabled -%}
@@ -189,6 +260,49 @@
         pauseSlideshow: `{{ 'sections.slideshow.pause_slideshow' | t }}`,
         playSlideshow: `{{ 'sections.slideshow.play_slideshow' | t }}`,
       }
+      
+      // Theme Settings for JavaScript
+      window.themeSettings = {
+        cartType: '{{ settings.cart_type | default: "drawer" }}',
+        predictiveSearchEnabled: {{ settings.predictive_search_enabled | default: false }},
+        showRecentPurchases: {{ settings.show_recent_purchases | default: false }},
+        animationSpeed: '{{ settings.animation_speed | default: "normal" }}',
+        enableQuickView: {{ settings.enable_quick_view | default: true }},
+        enableLazyLoading: {{ settings.enable_lazy_loading | default: true }},
+        currency: '{{ shop.currency }}',
+        moneyFormat: '{{ shop.money_format }}',
+        moneyWithCurrencyFormat: '{{ shop.money_with_currency_format }}'
+      };
+      
+      // Performance tracking
+      window.performance && performance.mark && performance.mark('shopify.content_for_layout.end');
+    </script>
+    
+    <!-- Performance Optimizer (Critical) -->
+    <script src="{{ 'performance-optimizer.js' | asset_url }}" defer></script>
+    
+    <!-- Theme JavaScript (Main) -->
+    <script src="{{ 'theme.js' | asset_url }}" defer></script>
+    
+    <!-- Component JavaScript (Lazy Loaded) -->
+    {%- if settings.enable_quick_view -%}
+      <script src="{{ 'quick-view.js' | asset_url }}" defer></script>
+    {%- endif -%}
+    
+    {%- if settings.cart_type == 'drawer' -%}
+      <script src="{{ 'cart-drawer-enhanced.js' | asset_url }}" defer></script>
+    {%- endif -%}
+    
+    {%- if settings.predictive_search_enabled -%}
+      <script src="{{ 'predictive-search.js' | asset_url }}" defer></script>
+    {%- endif -%}
+
+      window.accessibilityStrings = {
+        imageAvailable: `{{ 'products.product.media.image_available' | t: index: '[index]' }}`,
+        shareSuccess: `{{ 'general.share.success_message' | t }}`,
+        pauseSlideshow: `{{ 'sections.slideshow.pause_slideshow' | t }}`,
+        playSlideshow: `{{ 'sections.slideshow.play_slideshow' | t }}`,
+      }
     </script>
 
     {%- if settings.predictive_search_enabled -%}
@@ -198,10 +312,16 @@
     <!-- Global Cart Management -->
     <script src="{{ 'global-cart.js' | asset_url }}" defer="defer"></script>
     
+    <!-- Enhanced Cart Drawer -->
+    <script src="{{ 'cart-drawer-enhanced.js' | asset_url }}" defer="defer"></script>
+    
     <!-- Page-specific scripts -->
     {% if template.name == 'collection' %}
       <script src="{{ 'collection.js' | asset_url }}" defer="defer"></script>
     {% endif %}
+    
+    <!-- Quick View Modal (available on all pages) -->
+    <script src="{{ 'quick-view.js' | asset_url }}" defer="defer"></script>
     
     {{ 'theme.js' | asset_url | script_tag }}
 

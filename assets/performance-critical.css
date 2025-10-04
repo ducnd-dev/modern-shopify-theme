@@ -1,0 +1,272 @@
+/* Performance Optimization CSS - Critical Styles */
+
+/* Critical Above-the-fold Styles */
+.critical-css {
+  /* Hero Section Critical Styles */
+  .hero-section {
+    @apply relative min-h-screen flex items-center justify-center;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+  }
+
+  /* Header Critical Styles */
+  .header-wrapper {
+    @apply fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 shadow-sm;
+    transform: translateZ(0); /* Force hardware acceleration */
+  }
+
+  /* Navigation Critical Styles */
+  .nav-menu {
+    @apply flex items-center space-x-6;
+  }
+
+  /* Logo Critical Styles */
+  .logo {
+    @apply text-2xl font-bold text-gray-900 dark:text-white;
+  }
+
+  /* Cart Icon Critical Styles */
+  .cart-icon {
+    @apply relative;
+  }
+
+  /* Button Critical Styles */
+  .btn-primary {
+    @apply px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200;
+    transform: translateZ(0); /* Force hardware acceleration */
+  }
+
+  /* Grid Critical Styles */
+  .product-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
+  }
+
+  /* Card Critical Styles */
+  .product-card {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden;
+    transform: translateZ(0);
+  }
+
+  /* Image Critical Styles */
+  .product-image {
+    @apply w-full aspect-square object-cover;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Lazy Loading Optimization */
+.lazy-loading {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.lazy-loading.loaded {
+  opacity: 1;
+}
+
+/* Image Placeholder Styles */
+.image-placeholder {
+  @apply bg-gray-200 dark:bg-gray-700 animate-pulse;
+  aspect-ratio: 1;
+}
+
+/* Performance-focused animations */
+.perf-animation {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* GPU-accelerated transforms */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Optimize font loading */
+@font-face {
+  font-family: 'Primary';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/primary-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Primary';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/primary-semibold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Primary';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/primary-bold.woff2') format('woff2');
+}
+
+/* Optimized scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 dark:bg-gray-600 rounded-full;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500 dark:bg-gray-500;
+}
+
+/* Intersection Observer Loading States */
+.fade-in-observer {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.fade-in-observer.observed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Critical CSS for Layout Shift Prevention */
+.prevent-cls {
+  /* Product grid container */
+  .product-grid-container {
+    min-height: 400px; /* Prevent layout shift */
+  }
+
+  /* Image containers with aspect ratio */
+  .aspect-ratio-container {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 100%; /* 1:1 aspect ratio */
+  }
+
+  .aspect-ratio-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Skeleton loading states */
+  .skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+  }
+
+  @keyframes loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+}
+
+/* Critical CSS for Performance */
+.performance-critical {
+  /* Contain layout for better performance */
+  .product-card,
+  .modal,
+  .dropdown {
+    contain: layout style paint;
+  }
+
+  /* Optimize compositing */
+  .transform-element {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* Efficient transitions */
+  .transition-optimized {
+    transition-property: transform, opacity;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Web Vitals Optimization */
+.web-vitals-optimized {
+  /* LCP Optimization */
+  .hero-image {
+    content-visibility: auto;
+    contain-intrinsic-size: 1200px 600px;
+  }
+
+  /* FID Optimization */
+  .interactive-element {
+    touch-action: manipulation;
+  }
+
+  /* CLS Prevention */
+  .fixed-dimensions {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/9;
+  }
+}
+
+/* Resource hints for better loading */
+.resource-hints {
+  /* Preload critical resources */
+  link[rel="preload"][as="font"] {
+    font-display: swap;
+  }
+
+  /* Prefetch next page resources */
+  link[rel="prefetch"] {
+    /* Will be loaded with low priority */
+  }
+
+  /* Preconnect to external domains */
+  link[rel="preconnect"] {
+    /* Establish early connections */
+  }
+}
+
+/* Critical inline styles for immediate rendering */
+.inline-critical {
+  /* Header height to prevent layout shift */
+  .header-height {
+    height: 70px;
+  }
+
+  /* Main content top margin */
+  .main-content {
+    margin-top: 70px;
+  }
+
+  /* Loading spinner */
+  .loading-spinner {
+    @apply w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin;
+  }
+}
